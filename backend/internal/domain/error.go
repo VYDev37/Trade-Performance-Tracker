@@ -11,11 +11,6 @@ var (
 	ErrUserNotFound        = errors.New("User not found.")
 	ErrInternalServerError = errors.New("Internal server error.")
 
-	// midtrans
-	ErrInvalidSignature = errors.New("Signature is not valid.")
-	ErrAlreadyPaid      = errors.New("Order has already been processed.")
-	ErrMismatchedPrice  = errors.New("Price mismatches.")
-
 	// Create User
 	ErrAlreadyExist    = errors.New("Email or username has already been taken.")
 	ErrWrongCredential = errors.New("Wrong username or password.")
