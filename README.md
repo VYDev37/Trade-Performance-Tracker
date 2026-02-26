@@ -9,7 +9,7 @@ A comprehensive full-stack application for tracking and analyzing trade performa
 - **Transaction Management**: Record buy/sell actions with detailed history.
 - **Stock Positions**: Track current holdings and live performance.
 - **Profile Management**: Manage user settings and adjust balance sheets dynamically.
-- **AI Assistant**: Built-in assistant to help analyze trading patterns and offer insights.
+- **AI Assistant**: Built-in assistant to help analyze trading patterns and offer insights. (Coming soon)
 
 ## 🛠 Tech Stack
 
