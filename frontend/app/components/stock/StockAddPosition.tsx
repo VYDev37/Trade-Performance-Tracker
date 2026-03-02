@@ -13,6 +13,8 @@ import { useUser } from "@/app/context/UserContext";
 import { useAddPosition, useGetCurrentPrice } from "@/app/hooks";
 import type { PortfolioAddReq } from "@/app/types/user/PortfolioInfo";
 
+import QuantitySlider from "@/app/components/stock/QuantitySlider";
+
 export default function StockAddPosition() {
     const [opened, setOpened] = useState<boolean>(false);
     const [useCurrent, setUseCurrent] = useState<boolean>(false);
@@ -33,7 +35,9 @@ export default function StockAddPosition() {
     const isSellMode = action === "sell";
 
     const currentStock = user?.positions?.find(p => p.ticker === ticker);
-    const maxLot = currentStock?.total_qty || 0;
+    const maxLot = (currentStock?.total_qty || 0) / 100;
+
+    const [customPrice, setCustomPrice] = useState(currentPrice);
 
     const handleFormChange = (field: string, value: string | number) => {
         setFormData({ ...formData, [field]: value });
@@ -79,11 +83,11 @@ export default function StockAddPosition() {
     };
 
     return (
-        <Sheet open={opened} onOpenChange={handleOpenChange} >
+        <Sheet open={opened} onOpenChange={handleOpenChange}>
             <SheetTrigger asChild>
                 <Button variant="gradient">+ Add Stock</Button>
             </SheetTrigger>
-            <SheetContent className="bg-zinc-950 text-white border-white/10 sm:max-w-md">
+            <SheetContent className="bg-zinc-950 text-white border-white/10 sm:max-w-md overflow-y-auto">
                 <SheetHeader>
                     <SheetTitle className={isSellMode ? "text-red-500" : "text-green-500"}>
                         {isSellMode ? "Sell Position" : "Add Position / Buy"}
@@ -108,27 +112,71 @@ export default function StockAddPosition() {
                         </div>
                     )}
                     <div className="space-y-3">
-                        <Label htmlFor="qty">Quantity (Lot)</Label>
-                        <Input id="qty" type="number" value={formData.qty} min="1" max={isSellMode ? maxLot : undefined}
-                            onChange={(e) => handleFormChange("qty", e.target.value)} />
+                        <div className="space-y-3">
+                            <Label htmlFor="qty">Quantity (Lot)</Label>
+                            <Input id="qty" type="number" value={formData.qty} min="1" max={isSellMode ? maxLot : undefined}
+                                onChange={(e) => handleFormChange("qty", e.target.value)} />
+                        </div>
+                        {isSellMode && (
+                            <QuantitySlider
+                                max={maxLot}
+                                current={formData.qty}
+                                onChange={(val) => handleFormChange("qty", val)}
+                            />
+                        )}
+
                     </div>
                     <div className="space-y-3">
                         <Label htmlFor="inv">{isSellMode ? "Sold for" : "Invested Total"} (Rp)</Label>
                         <Input id="inv" type="number" value={formData.inv} min="1" disabled={useCurrent}
                             onChange={(e) => handleFormChange("inv", e.target.value)} />
-                        <div className="flex flex-row items-center gap-2 mt-2">
-                            <Input id="inv2" type="checkbox" checked={useCurrent} className="w-4 h-4"
-                                onChange={(e) => {
-                                    const checked = e.target.checked;
-                                    setUseCurrent(checked);
-                                    if (checked) {
-                                        handleFormChange("inv", currentPrice * formData.qty * 100);
-                                    }
-                                }} />
-                            <Label htmlFor="inv2">
-                                Use current market price
-                                {isLoadingPrice ? " (loading...)" : currentPrice > 0 ? ` (Rp ${currentPrice.toLocaleString("id-ID")}/share)` : ""}
-                            </Label>
+
+                        <div className="space-y-4 mt-4 p-3 bg-gray-800/30 rounded-lg border border-gray-700">
+                            {/* Checkbox Market Price */}
+                            <div className="flex flex-row items-center gap-2">
+                                <Input
+                                    id="inv2"
+                                    type="checkbox"
+                                    checked={useCurrent}
+                                    className="w-4 h-4 accent-blue-500"
+                                    onChange={(e) => {
+                                        const checked = e.target.checked;
+                                        setUseCurrent(checked);
+                                        if (checked) {
+                                            // Jika dicentang, langsung hitung total investasi pakai harga pasar
+                                            handleFormChange("inv", currentPrice * formData.qty * 100);
+                                        }
+                                    }}
+                                />
+                                <Label htmlFor="inv2" className="text-sm cursor-pointer">
+                                    Use current market price
+                                    {isLoadingPrice ? " (loading...)" : currentPrice > 0 ? ` (Rp ${currentPrice.toLocaleString("id-ID")}/share)` : ""}
+                                </Label>
+                            </div>
+
+                            {/* Separator 'OR' */}
+                            <div className="relative flex py-1 items-center">
+                                <div className="flex-grow border-t border-gray-700"></div>
+                                <span className="flex-shrink mx-2 text-[10px] text-gray-500 uppercase tracking-widest font-bold">OR</span>
+                                <div className="flex-grow border-t border-gray-700"></div>
+                            </div>
+
+                            {/* Custom Price Input */}
+                            <div className="space-y-2">
+                                <Label htmlFor="custom-price" className={`text-xs ${useCurrent ? 'text-gray-600' : 'text-gray-400'}`}>
+                                    Set custom price per share
+                                </Label>
+                                <div className="relative">
+                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">Rp</span>
+                                    <Input id="custom-price" type="number" disabled={useCurrent} placeholder={currentPrice.toString()}
+                                        className={`pl-9 bg-gray-950 border-gray-700 transition-opacity ${useCurrent ? 'opacity-40 cursor-not-allowed' : 'opacity-100'}`}
+                                        onChange={(e) => {
+                                            const pricePerShare = Number(e.target.value);
+                                            handleFormChange("inv", pricePerShare * formData.qty * 100);
+                                        }}
+                                    />
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div className="space-y-3">

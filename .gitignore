@@ -20,6 +20,7 @@ frontend/certificates
 frontend/.env
 frontend/.env.local
 frontend/.env.*.local
+frontend/next-env.d.ts
 frontend/.pnp
 frontend/.pnp.*
 frontend/.yarn/*

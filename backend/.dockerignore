@@ -1,0 +1,21 @@
+# Go workspace and build output
+bin/
+*.exe
+*.test
+*.out
+
+# Environment variables
+.env
+
+# Go modules
+vendor/
+go.work
+go.work.sum
+
+# IDEs and OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+.vscode/
+.idea/
+*.log

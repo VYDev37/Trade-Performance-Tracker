@@ -17,13 +17,15 @@ import (
 func main() {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Println("No .env file found, relying on environment variables")
 	}
 
 	db, err := config.InitDBConnection(os.Getenv("DB_CONNECTION"))
 	if err != nil {
 		log.Fatalf("Error connecting to database: %v", err)
 	}
+
+	log.Println("Database connection established.")
 
 	userRepo := repository.NewUserRepo(db)
 	posRepo := repository.NewPositionRepo(db)

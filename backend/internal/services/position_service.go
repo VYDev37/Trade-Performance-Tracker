@@ -33,7 +33,7 @@ func NewPositionService(repo repository.PositionRepository, uRepo repository.Use
 func (s *positionService) handleSellMode(existing *domain.Position, sellData *domain.Position, fee float64) error {
 	db := s.repo.GetDB()
 	return db.Transaction(func(tx *gorm.DB) error {
-		if existing.ID == 0 || existing.TotalQty < sellData.TotalQty {
+		if existing == nil || existing.ID == 0 || existing.TotalQty < sellData.TotalQty {
 			return domain.ErrInsufficientAmount
 		}
 
@@ -46,18 +46,23 @@ func (s *positionService) handleSellMode(existing *domain.Position, sellData *do
 			basePrice = existing.InvestedTotal
 		}
 
-		existing.InvestedTotal -= basePrice
-		existing.TotalQty -= sellData.TotalQty
-
 		if err := s.uRepo.UpdateBalance(existing.OwnerID, sellData.InvestedTotal-fee, tx); err != nil {
 			return domain.ErrInternalServerError
 		}
+
+		existing.InvestedTotal -= basePrice
+		existing.TotalQty -= sellData.TotalQty
+
 		if existing.TotalQty <= 0 {
-			return s.repo.RemovePosition(existing.OwnerID, existing.Ticker, tx)
+			if err := s.repo.RemovePosition(existing.ID, tx); err != nil {
+				return err
+			}
+		} else {
+			if err := s.repo.Update(existing, tx); err != nil {
+				return err
+			}
 		}
-		if err := s.repo.Update(existing, tx); err != nil {
-			return err
-		}
+
 		return s.transactionService.LogActivity(existing, sellData.TotalQty, sellData.InvestedTotal, fee, basePrice,
 			"sell", fmt.Sprintf("Sold %.f lot of %s for Rp%.f.", sellData.TotalQty, sellData.Ticker, sellData.InvestedTotal), tx)
 	})
@@ -96,7 +101,7 @@ func (s *positionService) handleBuyMode(existing *domain.Position, buyData *doma
 			}
 		}
 
-		return s.transactionService.LogActivity(existing, buyData.TotalQty, buyData.InvestedTotal+fee, fee, buyData.InvestedTotal, "buy",
+		return s.transactionService.LogActivity(buyData, buyData.TotalQty, buyData.InvestedTotal+fee, fee, buyData.InvestedTotal, "buy",
 			fmt.Sprintf("Bought %.f lot of %s for Rp%.f", buyData.TotalQty, buyData.Ticker, buyData.InvestedTotal), tx)
 	})
 }

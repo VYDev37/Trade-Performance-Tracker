@@ -8,7 +8,7 @@ import (
 
 type PositionRepository interface {
 	AddPosition(pos *domain.Position, trx *gorm.DB) error
-	RemovePosition(userID uint64, ticker string, trx *gorm.DB) error
+	RemovePosition(posID uint, trx *gorm.DB) error
 	Update(pos *domain.Position, trx *gorm.DB) error
 
 	GetPositions(userID uint64) ([]domain.Position, error)
@@ -48,13 +48,12 @@ func (r *positionRepo) GetPositions(userID uint64) ([]domain.Position, error) {
 	return positions, nil
 }
 
-func (r *positionRepo) RemovePosition(userID uint64, ticker string, trx *gorm.DB) error {
+func (r *positionRepo) RemovePosition(posID uint, trx *gorm.DB) error {
 	db := r.DB
 	if trx != nil {
 		db = trx
 	}
-	result := db.Unscoped().Where("owner_id = ? AND ticker ILIKE ?", userID, ticker).Delete(&domain.Position{})
-
+	result := db.Unscoped().Delete(&domain.Position{}, posID)
 	if result.Error != nil {
 		return result.Error
 	}

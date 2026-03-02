@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"strings"
 	"trade-tracker/internal/domain"
 	"trade-tracker/internal/services"
@@ -62,6 +63,7 @@ func (h *PositionHandler) HandleAddPosition(c fiber.Ctx) error {
 		InvestedTotal: req.InvestedTotal,
 		PositionType:  req.PositionType,
 	}, req.Fee); err != nil {
+		fmt.Println(err.Error())
 		return c.Status(400).JSON(fiber.Map{"message": err.Error()})
 	}
 

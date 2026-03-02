@@ -24,7 +24,7 @@ type PositionAddReq struct {
 	PositionType  string  `json:"position_type" validate:"required,oneof=stocks crypto futures"`
 	TotalQty      float64 `json:"total_qty" validate:"required,gt=0"`
 	InvestedTotal float64 `json:"invested_total" validate:"required,gt=0"` // avg price to add (ex: buy 3 lot BBRI for 800k IDR, avg += 800k, qty += 3)
-	Fee           float64 `json:"fee" validate:"required,gte=0"`
+	Fee           float64 `json:"fee" validate:"gte=0"`
 	Notes         float64 `json:"notes" validate:"max=255"`
 }
 

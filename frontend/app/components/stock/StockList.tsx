@@ -72,7 +72,7 @@ export default function StockList() {
                                 </div>
                                 <div className="text-right">
                                     <div className="text-[10px] text-zinc-500 uppercase">Total Qty</div>
-                                    <div className="text-sm font-medium">{Formatter.toLocale(stock.total_qty)} Lot</div>
+                                    <div className="text-sm font-medium">{Formatter.toLocale(stock.total_qty / 100)} Lot</div>
                                 </div>
                             </div>
                             <div className="grid grid-cols-2 gap-4 py-2 border-y border-white/5">

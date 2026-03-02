@@ -66,8 +66,7 @@ func (s *userService) UpdateBalance(userID uint64, req domain.UserBalanceUpdateR
 			logged = req.Amount - bal
 		}
 
-		final := logged + req.Fee
-		if err := s.repo.UpdateBalance(userID, final, tx); err != nil {
+		if err := s.repo.UpdateBalance(userID, logged, tx); err != nil {
 			return err
 		}
 
@@ -80,7 +79,7 @@ func (s *userService) UpdateBalance(userID uint64, req domain.UserBalanceUpdateR
 			OwnerID:         userID,
 			TransactionType: "cashflow",
 			BasePrice:       logged,
-			Price:           final,
+			Price:           logged + req.Fee,
 			TransactionFee:  req.Fee,
 			Ticker:          req.BankSource,
 			Notes:           note,

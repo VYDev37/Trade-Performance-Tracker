@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"trade-tracker/internal/domain"
 	"trade-tracker/internal/repository"
 
@@ -32,7 +33,13 @@ func (s *transactionService) LogActivity(pos *domain.Position, qty, price, fee, 
 		Notes:           notes,
 	}
 
-	return s.repo.AddTransaction(log, tx)
+	err := s.repo.AddTransaction(log, tx)
+	if err != nil {
+		fmt.Println(err.Error())
+		return err
+	}
+
+	return nil
 }
 
 func (s *transactionService) GetLocalTransactions(userID uint64) ([]domain.TransactionResponse, error) {

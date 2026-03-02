@@ -68,12 +68,11 @@ export default function ManageBalanceSheet({ children }: ManageBalanceSheetProps
                     </>
                 )}
                 <Label htmlFor="notes" className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                    Transaction Note
+                    Transaction Note (Optional)
                 </Label>
                 <div className="relative">
                     <Input id="notes" type="text" placeholder="Your notes here..." value={formData.note} onChange={(e) => handleFormChange("note", e.target.value)}
-                        className="bg-transparent border-none text-md h-14 focus-visible:ring-0 focus-visible:ring-offset-0 font-bold"
-                        required />
+                        className="bg-transparent border-none text-md h-14 focus-visible:ring-0 focus-visible:ring-offset-0 font-bold" />
                 </div>
             </div>
 
