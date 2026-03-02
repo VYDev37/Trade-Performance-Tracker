@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Dockerfile (still messy for now, need some changes on environment variables)
+- Slider for quantity (in sell mode)
+- Price customizer (in both buy and sell mode)
 
 ## [0.1.0] - Initial Release
 - Initial commit with base project structure and features.
