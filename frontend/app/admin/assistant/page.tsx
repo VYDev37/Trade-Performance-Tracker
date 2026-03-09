@@ -51,9 +51,7 @@ export default function AssistantPage() {
         setInput('')
         setIsLoading(true)
 
-        // Mock API call - Replace with real API/SDK later
         try {
-            // Simulate network delay
             await new Promise(resolve => setTimeout(resolve, 1500))
 
             const aiResponse: Message = {

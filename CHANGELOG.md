@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.2] - Frontend Focused Update
+### Added
+- Added fee by percentage input for transactions.
+- Added shareable trade result (PnL) report card.
+- Added Skeleton (loading) on more page
+
+### Changed
+- Removed `fontawesome` package and fully switched to `lucide-react` for icons.
+- Refactored various components for better maintainability and performance.
+- Stocks list table are now sorted by ticker name
+
 ## [0.1.1] - Bug Fixes
 ### Fixed
 - Fixed an issue where transactions with the same ticker and `owner_id` could not be logged.

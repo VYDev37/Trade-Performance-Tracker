@@ -8,7 +8,7 @@ This directory contains the Next.js frontend for the Trade Performance Tracker a
 - **Library**: React 19
 - **Styling**: Tailwind CSS v4
 - **Components**: shadcn/ui (Radix UI)
-- **Icons**: Lucide React & FontAwesome
+- **Icons**: Lucide React
 - **Charts**: Recharts
 - **Data Fetching / State**: Axios & Custom Hooks
 - **Package Manager**: pnpm
@@ -33,6 +33,8 @@ The frontend is modularized into several feature-specific directories under `app
 - **Transaction**
   - `TransactionTable.tsx`: Detailed data table of all historical transactions (buys/sells) with sorting and filtering.
   - `TransactionCard.tsx`: Card-based layout for mobile transaction viewing.
+- **Trades**
+  - `PnLReportModal.tsx`: Shareable PnL (Profit and Loss) report card for trades.
 - **Shared / Layout**
   - `AuthForm.tsx`: Reusable login and registration form component.
   - `AdminSidebar.tsx`: The primary navigation for the dashboard.

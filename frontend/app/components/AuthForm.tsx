@@ -1,9 +1,10 @@
-import React from "react";
+import { useState } from "react";
+import { Eye, EyeOff, CircleAlert } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface Field {
     id: string;
@@ -36,7 +37,7 @@ interface AuthFormProps {
 }
 
 export default function AuthForm({ title, subtitle, fields, submitLabel, loading, error, footerLink, onSubmit }: AuthFormProps) {
-    const [showPassword, setShowPassword] = React.useState<Record<string, boolean>>({});
+    const [showPassword, setShowPassword] = useState<Record<string, boolean>>({});
 
     const togglePassword = (id: string) => {
         setShowPassword((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -66,7 +67,11 @@ export default function AuthForm({ title, subtitle, fields, submitLabel, loading
 
                                     {field.type === "password" && (
                                         <button type="button" onClick={() => togglePassword(field.id)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-blue-400 transition-colors px-1">
-                                            <i className={`fa-solid ${showPassword[field.id] ? 'fa-eye' : 'fa-eye-slash'} text-sm`}></i>
+                                            {showPassword[field.id] ? (
+                                                <Eye className="h-4 w-4" />
+                                            ) : (
+                                                <EyeOff className="h-4 w-4" />
+                                            )}
                                         </button>
                                     )}
                                 </div>
@@ -85,8 +90,8 @@ export default function AuthForm({ title, subtitle, fields, submitLabel, loading
                         </Button>
 
                         {error && (
-                            <div className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive border border-destructive/20 animate-in fade-in zoom-in duration-300">
-                                <i className="fa-solid fa-circle-exclamation mr-2"></i>
+                            <div className="rounded-lg bg-destructive/10 p-3 flex items-center text-sm text-destructive border border-destructive/20 animate-in fade-in zoom-in duration-300">
+                                <CircleAlert className="w-4 h-4 mr-2" />
                                 {error}
                             </div>
                         )}

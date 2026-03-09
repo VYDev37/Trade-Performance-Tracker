@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react";
+import { CircleAlert } from "lucide-react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
@@ -11,9 +12,9 @@ import { Button } from "@/components/ui/button";
 
 import { useUser } from "@/app/context/UserContext";
 import { useAddPosition, useGetCurrentPrice } from "@/app/hooks";
-import type { PortfolioAddReq } from "@/app/types/user/PortfolioInfo";
 
-import QuantitySlider from "@/app/components/stock/QuantitySlider";
+import { QuantitySlider } from "@/app/components/stock";
+import type { PortfolioAddReq } from "@/app/types/user/PortfolioInfo";
 
 export default function StockAddPosition() {
     const [opened, setOpened] = useState<boolean>(false);
@@ -143,7 +144,6 @@ export default function StockAddPosition() {
                                         const checked = e.target.checked;
                                         setUseCurrent(checked);
                                         if (checked) {
-                                            // Jika dicentang, langsung hitung total investasi pakai harga pasar
                                             handleFormChange("inv", currentPrice * formData.qty * 100);
                                         }
                                     }}
@@ -182,7 +182,31 @@ export default function StockAddPosition() {
                     <div className="space-y-3">
                         <Label htmlFor="inv">Transaction Fee (Rp)</Label>
                         <Input id="inv" type="number" value={formData.fee} min="1"
-                            onChange={(e) => handleFormChange("fee", e.target.value)} />
+                            onChange={(e) => handleFormChange("fee", +e.target.value)} />
+                    </div>
+
+                    {/* Separator 'OR' */}
+                    <div className="relative flex py-1 items-center">
+                        <div className="flex-grow border-t border-gray-700"></div>
+                        <span className="flex-shrink mx-2 text-[10px] text-gray-500 uppercase tracking-widest font-bold">OR</span>
+                        <div className="flex-grow border-t border-gray-700"></div>
+                    </div>
+
+                    {/* Custom Fee percentage input */}
+                    <div className="space-y-2">
+                        <Label htmlFor="custom-price" className="text-xs text-gray-400">
+                            Input fee percentage
+                        </Label>
+                        <div className="relative">
+                            <Input id="custom-price" type="number" className="pr-9 bg-gray-950 border-gray-700 transition-opacity opacity-100"
+                                onChange={(e) => {
+                                    const feePercentage = Number(e.target.value);
+                                    const fee = (feePercentage / 100) * formData.inv;
+                                    handleFormChange("fee", Math.round(fee * 100) / 100);
+                                }}
+                            />
+                            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">%</span>
+                        </div>
                     </div>
 
                     <Button className="mt-3" onClick={handleSubmit} disabled={isSubmitting || isLoadingPrice}>
@@ -190,16 +214,15 @@ export default function StockAddPosition() {
                     </Button>
 
                     {fetchPriceError && (
-                        <div className="rounded-lg bg-destructive/10 p-3 mb-2 text-sm text-destructive border border-destructive/20 animate-in fade-in zoom-in duration-300">
-                            <i className="fa-solid fa-circle-exclamation mr-2"></i>
+                        <div className="flex items-center rounded-lg bg-destructive/10 p-3 mb-2 text-sm text-destructive border border-destructive/20 animate-in fade-in zoom-in duration-300">
+                            <CircleAlert className="h-4 w-4 mr-2" />
                             {fetchPriceError}
                         </div>
                     )}
 
                     {submissionError && (
-                        <div className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive border border-destructive/20 animate-in fade-in zoom-in duration-300">
-                            <i className="fa-solid fa-circle-exclamation mr-2"></i>
-                            {submissionError}
+                        <div className="flex items-center rounded-lg bg-destructive/10 p-3 text-sm text-destructive border border-destructive/20 animate-in fade-in zoom-in duration-300">
+                            <CircleAlert className="h-4 w-4" /> {submissionError}
                         </div>
                     )}
                 </div>

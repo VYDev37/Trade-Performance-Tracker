@@ -1,28 +1,25 @@
 import type { TransactionInfo } from "@/app/types/user/TransactionInfo";
 
 import { Button } from "@/components/ui/button";
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent } from "@/components/ui/card";
+
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 import { Formatter } from "@/app/lib";
+import { PnLReportModal } from "@/app/components/trades";
 
 import { ArrowUpDown, Info } from "lucide-react";
 
 interface TranTableProps {
     transactions: TransactionInfo[];
     loading: boolean;
+    username: string;
     toggleSort: () => void;
 }
 
-export default function TransactionTable({ transactions, loading, toggleSort }: TranTableProps) {
+export default function TransactionTable({ transactions, loading, username, toggleSort }: TranTableProps) {
     return (
         <Card className="hidden md:block border-slate-800 bg-slate-950/50 backdrop-blur-sm shadow-xl">
             <CardContent className="p-0">
@@ -44,7 +41,7 @@ export default function TransactionTable({ transactions, loading, toggleSort }: 
                                 <TableHead className="text-right">Fee</TableHead>
                                 <TableHead className="text-right">Total Value</TableHead>
                                 <TableHead className="text-right">Realized PnL</TableHead>
-                                <TableHead className="text-right">Notes</TableHead>
+                                <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -61,7 +58,7 @@ export default function TransactionTable({ transactions, loading, toggleSort }: 
                                         <TableCell><Skeleton className="h-4 w-16 bg-slate-800 ml-auto" /></TableCell>
                                     </TableRow>
                                 ))
-                            ) : transactions.length > 0 ? (
+                            ) : (transactions && transactions.length > 0) ? (
                                 transactions.map((transaction) => {
                                     const sign = transaction.realized_pnl > 0 ? "+" : "-";
                                     const color = transaction.realized_pnl === 0 ? "" : sign === "+" ? "text-emerald-500" : "text-red-500";
@@ -108,7 +105,11 @@ export default function TransactionTable({ transactions, loading, toggleSort }: 
                                                                 (${sign}${Formatter.toLocale(Math.abs(rPnlPercentage))}%)`}
                                             </TableCell>
                                             <TableCell className="text-center text-slate-400 text-xs">
-                                                {isCashflow ? (
+                                                {transaction.transaction_type.toLowerCase() === 'sell' && (
+                                                    <PnLReportModal transaction={transaction} username={username} />
+                                                )}
+
+                                                {transaction.notes && (
                                                     <Dialog>
                                                         <DialogTrigger asChild>
                                                             <Button variant="ghost">
@@ -124,7 +125,7 @@ export default function TransactionTable({ transactions, loading, toggleSort }: 
                                                             </div>
                                                         </DialogContent>
                                                     </Dialog>
-                                                ) : "-"}
+                                                )}
                                             </TableCell>
                                         </TableRow>
                                     )

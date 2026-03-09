@@ -1,11 +1,17 @@
 import { UserStatValue } from "@/app/components/dashboard";
 import { Card, CardTitle, CardHeader, CardContent } from "@/components/ui/card";
 import { buttonVariants } from "@/components/ui/button";
+
 import Link from "next/link";
+import {
+    Package, Wallet, Landmark, TrendingUp, TrendingDown,
+    BarChart3, CircleCheckBig, CircleX, Target, Zap, Flame,
+    LucideIcon
+} from "lucide-react";
 
 interface DashboardInfo {
     title: string;
-    icon: string;
+    icon: LucideIcon;
     color: "green" | "yellow" | "red";
     field: "balance" | "total_equity" | "positions_count" |
     "top_gain" | "top_loss" | "loss_amount" |
@@ -26,17 +32,17 @@ export default function Page() {
     };
 
     const infos: DashboardInfo[] = [
-        { title: "Stock count", icon: "fa-box", color: "green", field: "positions_count" },
-        { title: "Balance", icon: "fa-wallet", color: "green", field: "balance", isCurrency: true },
-        { title: "Total Equity", icon: "fa-store", color: "yellow", field: "total_equity", isCurrency: true },
-        { title: "Gain Total (Unrealized)", icon: "fa-cash-register", color: "green", field: "gain_amount", isCurrency: true, textColor: "text_green" },
-        { title: "Loss Total (Unrealized)", icon: "fa-file", color: "red", field: "loss_amount", isCurrency: true, textColor: "text_red" },
-        { title: "Unrealized PnL Total", icon: "fa-folder", color: "yellow", field: "loss_gain_sum", isCurrency: true, useDynamicColor: true },
-        { title: "Winning Positions (Unrealized)", icon: "fa-folder", color: "green", field: "winning_positions" },
-        { title: "Losing positions (Unrealized)", icon: "fa-folder", color: "red", field: "losing_positions" },
-        { title: "Current Win Rate (Unrealized)", icon: "fa-folder", color: "green", field: "temp_win_rate" },
-        { title: "Top Gainer Ticker (Unrealized)", icon: "fa-folder", color: "green", field: "top_gain" },
-        { title: "Top Loser Ticker (Unrealized)", icon: "fa-folder", color: "red", field: "top_loss" }
+        { title: "Stock count", icon: Package, color: "green", field: "positions_count" },
+        { title: "Balance", icon: Wallet, color: "green", field: "balance", isCurrency: true },
+        { title: "Total Equity", icon: Landmark, color: "yellow", field: "total_equity", isCurrency: true },
+        { title: "Gain Total (Unrealized)", icon: TrendingUp, color: "green", field: "gain_amount", isCurrency: true, textColor: "text_green" },
+        { title: "Loss Total (Unrealized)", icon: TrendingDown, color: "red", field: "loss_amount", isCurrency: true, textColor: "text_red" },
+        { title: "Unrealized PnL Total", icon: BarChart3, color: "yellow", field: "loss_gain_sum", isCurrency: true, useDynamicColor: true },
+        { title: "Winning Positions (Unrealized)", icon: CircleCheckBig, color: "green", field: "winning_positions" },
+        { title: "Losing positions (Unrealized)", icon: CircleX, color: "red", field: "losing_positions" },
+        { title: "Current Win Rate (Unrealized)", icon: Target, color: "green", field: "temp_win_rate" },
+        { title: "Top Gainer Ticker (Unrealized)", icon: Zap, color: "green", field: "top_gain" },
+        { title: "Top Loser Ticker (Unrealized)", icon: Flame, color: "red", field: "top_loss" }
     ];
 
     return (
@@ -53,21 +59,24 @@ export default function Page() {
                 </CardHeader>
                 <div className="h-[1px] bg-white/10 w-full" />
                 <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-                    {infos.map((info, idx) => (
-                        <Card key={idx} className="bg-zinc-900/40 border-white/5">
-                            <CardContent className="flex items-center p-4">
-                                <div className={`flex h-12 w-12 items-center justify-center rounded-lg ${colors[info.color]} text-black shadow-lg`}>
-                                    <i className={`fas ${info.icon} text-lg`}></i>
-                                </div>
-                                <div className="flex flex-col ml-5">
-                                    <div className="text-sm text-zinc-400">{info.title}</div>
-                                    <div className={`text-lg ${info.textColor ? colors[info.textColor] : "text-white"}`}>
-                                        <UserStatValue field={info.field as any} isCurrency={info.isCurrency} useDynamicColor={info.useDynamicColor} />
+                    {infos.map((info, idx) => {
+                        const Icon = info.icon;
+                        return (
+                            <Card key={idx} className="bg-zinc-900/40 border-white/5">
+                                <CardContent className="flex items-center p-4">
+                                    <div className={`flex h-12 w-12 items-center justify-center rounded-lg ${colors[info.color]} text-black shadow-lg`}>
+                                        <Icon className="h-6 w-6" strokeWidth={3} />
                                     </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    ))}
+                                    <div className="flex flex-col ml-5">
+                                        <div className="text-sm text-zinc-400">{info.title}</div>
+                                        <div className={`text-lg ${info.textColor ? colors[info.textColor] : "text-white"}`}>
+                                            <UserStatValue field={info.field as any} isCurrency={info.isCurrency} useDynamicColor={info.useDynamicColor} />
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        )
+                    })}
                 </CardContent>
             </Card>
         </div>

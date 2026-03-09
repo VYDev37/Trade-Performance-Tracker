@@ -3,7 +3,8 @@ import { Formatter } from "@/app/lib";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { buttonVariants, Button } from "@/components/ui/button";
-import { ManageBalanceSheet } from "./helper";
+
+import { ManageBalanceSheet } from "@/app/components/profile";
 
 import Link from "next/link";
 import { Wallet, Landmark, UserCircle, PlusCircleIcon } from "lucide-react";

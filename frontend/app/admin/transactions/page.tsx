@@ -10,12 +10,15 @@ import { Card, CardContent } from "@/components/ui/card";
 
 import { TransactionTable, TransactionCard } from "@/app/components/transaction";
 import { useGetTransactions } from "@/app/hooks";
+import { useUser } from "@/app/context/UserContext";
 
 export default function TransactionHistoryPage() {
     const { transactions, loading, error } = useGetTransactions();
     const [searchTerm, setSearchTerm] = useState("");
     const [filterType, setFilterType] = useState("all");
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+
+    const { user } = useUser();
 
     const filteredTransactions = useMemo(() => {
         if (!transactions)
@@ -102,7 +105,7 @@ export default function TransactionHistoryPage() {
             ) : (
                 <>
                     {/* Desktop View */}
-                    <TransactionTable toggleSort={toggleSort} loading={loading} transactions={filteredTransactions} />
+                    <TransactionTable toggleSort={toggleSort} username={user?.username || "Guest Account"} loading={loading} transactions={filteredTransactions} />
 
                     {/* Mobile View */}
                     <div className="block md:hidden space-y-4">

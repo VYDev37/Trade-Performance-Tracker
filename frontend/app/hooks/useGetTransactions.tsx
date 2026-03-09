@@ -6,12 +6,11 @@ import axios from "@/app/lib/axios";
 import type { TransactionInfo } from "@/app/types/user/TransactionInfo";
 
 export default function useGetTransactions() {
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [transactions, setTransactions] = useState<TransactionInfo[]>([]);
 
     const fetchTransactions = useCallback(async () => {
-        setLoading(true);
         setError(null);
 
         try {

@@ -1,11 +1,10 @@
 interface QuantitySliderProps {
-    max: number;      // Total lot yang dimiliki (maxLot)
-    current: number;  // formData.qty saat ini
+    max: number;
+    current: number;
     onChange: (value: number) => void;
 }
 
 export default function QuantitySlider({ max, current, onChange }: QuantitySliderProps) {
-    // Hitung persen berdasarkan nilai qty saat ini vs max
     const percent = max > 0 ? Math.round((current / max) * 100) : 0;
     const marks = [0, 25, 50, 75, 100];
 
@@ -17,18 +16,10 @@ export default function QuantitySlider({ max, current, onChange }: QuantitySlide
     return (
         <div className="w-full space-y-4">
             <div className="relative pt-6 pb-2">
-                {/* Tooltip Persen yang Mengikuti Thumb (Opsional tapi Keren) */}
-                <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    step="1"
-                    value={percent}
-                    onChange={(e) => handleSliderChange(Number(e.target.value))}
-                    className="w-full h-1.5 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500 hover:accent-blue-400 transition-all"
-                />
+                <input type="range" min="0" max="100" step="1" value={percent} onChange={(e) => handleSliderChange(Number(e.target.value))}
+                    className="w-full h-1.5 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500 hover:accent-blue-400 transition-all" />
 
-                {/* Custom Marks UI (Lebih rapi dari datalist) */}
+                {/* Custom Marks UI */}
                 <div className="flex justify-between mt-2 px-1">
                     {marks.map((m) => (
                         <div key={m} className="flex flex-col items-center">
