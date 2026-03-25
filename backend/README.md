@@ -28,6 +28,7 @@ There are no manual CLI migration commands to run. When the application boots up
 - `domain.User`
 - `domain.Position`
 - `domain.Transaction`
+- `domain.Note`
 
 *Note: `AutoMigrate` will only create tables, missing columns, and missing indexes. It will NOT delete unused columns to protect your data.*
 
@@ -55,6 +56,12 @@ The backend uses **Fiber** for routing. CORS is pre-configured to accept request
 
 #### Transactions (`/api/transactions`)
 - **`GET /my-info`** - Retrieve the historical transaction history for the authenticated user
+
+#### Journals / Notes (`/api/notes`)
+- **`GET /get`** - Retrieve the user's journal entries
+- **`POST /add`** - Create a new journal entry
+- **`DELETE /remove/:nId`** - Delete a journal
+- **`PUT /update/:nId`** - Update a journal
 
 ---
 

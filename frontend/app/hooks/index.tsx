@@ -1,8 +1,9 @@
-import useLogin from "./useLogin";
-import useRegister from "./useRegister";
-import useAddPosition from "./useAddPosition";
-import useGetCurrentPrice from "./useGetCurrentPrice";
-import useGetTransactions from "./useGetTransactions";
-import useUpdateBalance from "./useUpdateBalance";
+import { useLogin, useRegister, useUpdateBalance } from "./user";
+import { useAddPosition, useGetCurrentPrice } from "./position";
+import { useGetNotes, useAddNote, useUpdateNote } from "./note";
 
-export { useLogin, useRegister, useAddPosition, useGetCurrentPrice, useGetTransactions, useUpdateBalance };
+export {
+    useLogin, useRegister,
+    useAddPosition, useGetCurrentPrice, useUpdateBalance,
+    useAddNote, useGetNotes, useUpdateNote
+};

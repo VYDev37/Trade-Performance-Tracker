@@ -6,10 +6,11 @@ import type { TransactionInfo } from "@/app/types/user/TransactionInfo";
 interface PnLReportProps {
     transaction: TransactionInfo;
     userNickname: string;
+    mode: string;
     cardRef?: React.RefObject<HTMLDivElement | null>;
 }
 
-export default function PnLReport({ transaction, userNickname, cardRef }: PnLReportProps) {
+export default function PnLReport({ transaction, userNickname, mode, cardRef }: PnLReportProps) {
     const roiPercentage = (transaction.realized_pnl / transaction.base_price) * 100;
     const isProfit = transaction.realized_pnl > 0;
 
@@ -49,15 +50,15 @@ export default function PnLReport({ transaction, userNickname, cardRef }: PnLRep
                     "text-6xl font-black tracking-tighter leading-none my-2",
                     isProfit ? "text-emerald-400" : "text-red-400"
                 )}>
-                    {isProfit ? "+" : ""}{roiPercentage.toFixed(2)}%
+                    {isProfit ? "+" : ""}{mode !== "pnl" ? `${roiPercentage.toFixed(2)}%` : `${Formatter.toCurrency(transaction.realized_pnl)}`}
                 </div>
 
-                <div className={cn(
+                {(mode === "pnl_roi") && (<div className={cn(
                     "px-6 py-2 rounded-full font-black text-xl flex items-center gap-2",
                     isProfit ? "bg-emerald-500/10 text-emerald-500" : "bg-red-500/10 text-red-500"
                 )}>
-                    Rp{Formatter.toLocale(Math.abs(transaction.realized_pnl))}
-                </div>
+                    {Formatter.toCurrency(transaction.realized_pnl)}
+                </div>)}
             </div>
 
             {/* Transaction Details Footer */}
@@ -80,11 +81,11 @@ export default function PnLReport({ transaction, userNickname, cardRef }: PnLRep
                         Rp{Formatter.toLocale(transaction.transaction_fee)}
                     </p>
                 </div>
-                <div className="flex justify-end items-center">
-                    {/* Logo atau QR Code Placeholder */}
-                    <div className="h-14 w-14 bg-white p-1 rounded-lg">
-                        <img src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://google.com`} alt="QR" />
-                    </div>
+                <div className="text-right">
+                    <p className="text-zinc-500 text-[10px] uppercase tracking-widest font-bold mb-1">Sell Lot</p>
+                    <p className="text-sm font-bold text-zinc-400">
+                        {Formatter.toLocale(transaction.quantity / 100)}
+                    </p>
                 </div>
             </div>
         </div>

@@ -9,7 +9,7 @@ import (
 type PositionRepository interface {
 	AddPosition(pos *domain.Position, trx *gorm.DB) error
 	RemovePosition(posID uint, trx *gorm.DB) error
-	Update(pos *domain.Position, trx *gorm.DB) error
+	UpdatePosition(pos *domain.Position, trx *gorm.DB) error
 
 	GetPositions(userID uint64) ([]domain.Position, error)
 	GetPosByTicker(userID uint64, ticker string) (*domain.Position, error)
@@ -64,7 +64,7 @@ func (r *positionRepo) RemovePosition(posID uint, trx *gorm.DB) error {
 
 	return nil
 }
-func (r *positionRepo) Update(pos *domain.Position, trx *gorm.DB) error {
+func (r *positionRepo) UpdatePosition(pos *domain.Position, trx *gorm.DB) error {
 	db := r.DB
 	if trx != nil {
 		db = trx

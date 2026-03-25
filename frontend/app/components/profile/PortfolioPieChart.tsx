@@ -7,6 +7,7 @@ import { Formatter } from '@/app/lib';
 
 export interface PortfolioPieChartProps {
     positions?: PortfolioItem[];
+    isCapital?: boolean;
 }
 
 const COLORS = [
@@ -44,14 +45,14 @@ const CustomTooltip = ({ active, payload }: any) => {
     return null;
 };
 
-export default function PortfolioPieChart({ positions }: PortfolioPieChartProps) {
+export default function PortfolioPieChart({ positions, isCapital }: PortfolioPieChartProps) {
     const { chartData, sumValue } = useMemo(() => {
         if (!positions || positions.length === 0)
             return { chartData: [], sumValue: 0 };
 
         const mapped = positions.map(p => ({
             ticker: p.ticker,
-            value: (p.current_price || 0)
+            value: isCapital ? (p.invested_total) : (p.current_price || 0)
         }));
 
         mapped.sort((a, b) => b.value - a.value);
@@ -85,7 +86,7 @@ export default function PortfolioPieChart({ positions }: PortfolioPieChartProps)
     if (!chartData || chartData.length === 0) {
         return (
             <div className="w-full h-[350px] bg-slate-900/40 backdrop-blur-xl border border-white/10 rounded-2xl p-6 flex flex-col items-center justify-center shadow-lg relative">
-                <h3 className="text-white font-semibold self-start absolute top-4 left-6">Portfolio Allocation</h3>
+                <h3 className="text-white font-semibold self-start absolute top-4 left-6">Portfolio Allocation ({isCapital ? "by capital" : "by market value"})</h3>
                 <p className="text-slate-400 text-sm">No portfolio data available to display.</p>
             </div>
         );
@@ -96,7 +97,7 @@ export default function PortfolioPieChart({ positions }: PortfolioPieChartProps)
             {/* Decorative gradient blur in background (Antigravity Concept) */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-blue-500/10 rounded-full blur-[80px] pointer-events-none transition-opacity duration-700 group-hover:bg-blue-500/20" />
 
-            <h3 className="text-white font-semibold self-start absolute top-4 left-6 z-10 w-full">Portfolio Allocation</h3>
+            <h3 className="text-white font-semibold self-start absolute top-4 left-6 z-10 w-full">Portfolio Allocation ({isCapital ? "by capital" : "by market value"})</h3>
 
             <div className="w-full mt-6 h-[220px] relative z-10">
                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none animate-in fade-in zoom-in duration-700">

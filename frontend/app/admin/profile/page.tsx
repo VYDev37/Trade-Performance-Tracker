@@ -58,7 +58,16 @@ export default function ProfilePage() {
                 <div className="space-y-8">
                     <AccountSummaryCard user={user} />
                     <PortfolioOverviewCard portfolio={user.positions} />
-                    <PortfolioPieChart positions={user.positions} />
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                            <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest ml-2">Current Exposure</p>
+                            <PortfolioPieChart positions={user.positions} isCapital={false} />
+                        </div>
+                        <div className="space-y-2">
+                            <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest ml-2">Initial Investment</p>
+                            <PortfolioPieChart positions={user.positions} isCapital={true} />
+                        </div>
+                    </div>
                 </div>
             )}
         </div>

@@ -10,7 +10,10 @@ const Formatter = {
         if (typeof num !== "number")
             return "Rp0";
 
-        return num === 0 ? "-" : num.toLocaleString("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 2, minimumFractionDigits: 0 });
+        if (num === 0)
+            return "-";
+
+        return new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 2, minimumFractionDigits: 0 }).format(num).replace(/\s/g, "");
     },
     toDate(date: Date): string {
         const d = typeof date === "string" ? new Date(date) : date;

@@ -16,7 +16,7 @@ var (
 	ErrWrongCredential = errors.New("Wrong username or password.")
 
 	// Add Position
-	ErrMismatchInfo = errors.New("There are some mismatch on the information of the position. (e.g. Owner, quantity, etc.)")
+	ErrMismatchInfo = errors.New("There are some mismatch on the information. (e.g. Owner, quantity, etc.)")
 
 	// Create transaction
 	ErrInvalidAction           = errors.New("Invalid action. Action can only be 'buy' or 'sell'.")

@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { AppConfig } from "./app.config";
 import { ThemeProvider } from "./components/ThemeProvider";
 import { UserProvider } from "./context/UserContext";
+import { TransactionProvider } from "./context/TransactionContext";
 
 import "./globals.css";
 
@@ -27,7 +28,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           <UserProvider>
-            {children}
+            <TransactionProvider>
+              {children}
+            </TransactionProvider>
           </UserProvider>
         </ThemeProvider>
       </body>

@@ -33,8 +33,10 @@ The frontend is modularized into several feature-specific directories under `app
 - **Transaction**
   - `TransactionTable.tsx`: Detailed data table of all historical transactions (buys/sells) with sorting and filtering.
   - `TransactionCard.tsx`: Card-based layout for mobile transaction viewing.
+- **Journal**
+  - `NoteCard.tsx` & `NoteSheet.tsx`: Manage text and visual journal entries.
 - **Trades**
-  - `PnLReportModal.tsx`: Shareable PnL (Profit and Loss) report card for trades.
+  - `PnLReportModal.tsx`: Shareable PnL and ROI report card for trades.
 - **Shared / Layout**
   - `AuthForm.tsx`: Reusable login and registration form component.
   - `AdminSidebar.tsx`: The primary navigation for the dashboard.
@@ -46,11 +48,13 @@ The frontend is modularized into several feature-specific directories under `app
 
 The application heavily relies on custom hooks (located in `app/hooks/`) to abstract API calls and manage state efficiently:
 
-- `useGetCurrentPrice`: Fetches live market prices for specific ticker symbols.
+- `useGetCurrentPrice`: Fetches live market prices for specific ticker symbols (using SWR).
 - `useAddPosition`: Handles the mutation logic when buying new stocks.
-- `useGetTransactions`: Fetches and stores the user's historical transaction log.
+- `useGetNotes`: Fetches and stores the user's journal entries.
 - `useUpdateBalance`: Directly interacts with the API to update the user's cash balance.
 - `useLogin` & `useRegister`: Manages authentication flows and JWT storage.
+
+*Note: Global transaction state is now managed via `TransactionContext` rather than `useGetTransactions` for better global data consistency.*
 
 ---
 

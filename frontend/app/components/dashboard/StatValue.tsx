@@ -2,7 +2,11 @@
 "use client";
 
 import { useMemo } from "react";
+
+import { Skeleton } from "@/components/ui/skeleton";
 import { useUser } from "@/app/context/UserContext";
+import { useTransaction } from "@/app/context/TransactionContext";
+
 import { Formatter } from "@/app/lib";
 
 interface UserStatValueProps {
@@ -14,34 +18,36 @@ interface UserStatValueProps {
     useDynamicColor?: boolean;
 }
 
+// TODO: Change unrealized PNL with realized PNL (from transactions)
 export default function UserStatValue({ field, isCurrency, useDynamicColor }: UserStatValueProps) {
     const { user, isLoading } = useUser();
+    const { transactions, loading } = useTransaction();
 
     const stats = useMemo(() => {
-        const positions = user?.positions || [];
+        const transaction = transactions.filter(pos => pos.transaction_type === "sell");
 
-        const gainPositions = positions
-            .filter(pos => pos.unrealized_pnl >= 0)
-            .toSorted((a, b) => b.unrealized_pnl - a.unrealized_pnl);
+        const gainPositions = transaction
+            .filter(pos => pos.realized_pnl >= 0)
+            .toSorted((a, b) => b.realized_pnl - a.realized_pnl);
 
-        const lossPositions = positions
-            .filter(pos => pos.unrealized_pnl < 0)
-            .toSorted((a, b) => a.unrealized_pnl - b.unrealized_pnl);
+        const lossPositions = transaction
+            .filter(pos => pos.realized_pnl < 0)
+            .toSorted((a, b) => a.realized_pnl - b.realized_pnl);
 
-        const totalGain = gainPositions.reduce((acc, curr) => acc + (curr.unrealized_pnl || 0), 0);
-        const totalLoss = lossPositions.reduce((acc, curr) => acc + (curr.unrealized_pnl || 0), 0);
+        const totalGain = gainPositions.reduce((acc, curr) => acc + (curr.realized_pnl || 0), 0);
+        const totalLoss = lossPositions.reduce((acc, curr) => acc + (curr.realized_pnl || 0), 0);
 
         return {
             gainPositions,
             lossPositions,
             totalGain,
             totalLoss,
-            totalCount: positions.length
+            totalCount: transaction.length
         };
     }, [user?.positions]);
 
     let value: number | string;
-    if (isLoading)
+    if (isLoading || loading)
         return <span className="animate-pulse bg-white/10 rounded w-16 h-4 inline-block" />;
 
     switch (field) {
@@ -83,7 +89,9 @@ export default function UserStatValue({ field, isCurrency, useDynamicColor }: Us
     const hasSign = typeof value === "number" && !["total_equity", "balance", "positions_count", "winning_positions", "losing_positions", "temp_win_rate"].includes(field);
     const sign = hasSign && (value as number) > 0 ? "+" : "";
 
-    return (
+    return (isLoading || loading) ? (
+        <Skeleton className="h-8 w-1/3 bg-slate-800 mb-6" />
+    ) : (
         <span className={`font-bold ${colorClass}`}>
             {sign}
             {typeof value === "string" ? value

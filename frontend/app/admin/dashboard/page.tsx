@@ -35,14 +35,14 @@ export default function Page() {
         { title: "Stock count", icon: Package, color: "green", field: "positions_count" },
         { title: "Balance", icon: Wallet, color: "green", field: "balance", isCurrency: true },
         { title: "Total Equity", icon: Landmark, color: "yellow", field: "total_equity", isCurrency: true },
-        { title: "Gain Total (Unrealized)", icon: TrendingUp, color: "green", field: "gain_amount", isCurrency: true, textColor: "text_green" },
-        { title: "Loss Total (Unrealized)", icon: TrendingDown, color: "red", field: "loss_amount", isCurrency: true, textColor: "text_red" },
-        { title: "Unrealized PnL Total", icon: BarChart3, color: "yellow", field: "loss_gain_sum", isCurrency: true, useDynamicColor: true },
-        { title: "Winning Positions (Unrealized)", icon: CircleCheckBig, color: "green", field: "winning_positions" },
-        { title: "Losing positions (Unrealized)", icon: CircleX, color: "red", field: "losing_positions" },
-        { title: "Current Win Rate (Unrealized)", icon: Target, color: "green", field: "temp_win_rate" },
-        { title: "Top Gainer Ticker (Unrealized)", icon: Zap, color: "green", field: "top_gain" },
-        { title: "Top Loser Ticker (Unrealized)", icon: Flame, color: "red", field: "top_loss" }
+        { title: "Gain Total", icon: TrendingUp, color: "green", field: "gain_amount", isCurrency: true, textColor: "text_green" },
+        { title: "Loss Total", icon: TrendingDown, color: "red", field: "loss_amount", isCurrency: true, textColor: "text_red" },
+        { title: "Realized PnL Total", icon: BarChart3, color: "yellow", field: "loss_gain_sum", isCurrency: true, useDynamicColor: true },
+        { title: "Winning Positions", icon: CircleCheckBig, color: "green", field: "winning_positions" },
+        { title: "Losing positions", icon: CircleX, color: "red", field: "losing_positions" },
+        { title: "Current Win Rate", icon: Target, color: "green", field: "temp_win_rate" },
+        { title: "Top Gainer Ticker", icon: Zap, color: "green", field: "top_gain" },
+        { title: "Top Loser Ticker", icon: Flame, color: "red", field: "top_loss" }
     ];
 
     return (

@@ -6,9 +6,11 @@ A comprehensive full-stack application for tracking and analyzing trade performa
 
 - **User Authentication**: Secure Login and Registration system using JWT.
 - **Interactive Dashboard**: Overview of account balance and portfolio allocation with visual charts (Recharts).
-- **Transaction Management**: Record buy/sell actions with detailed history (including fee by percentage input).
-- **Stock Positions**: Track current holdings and live performance.
-- **Trade Results**: Generate and share trade result (PnL) report cards.
+- **Transaction Management**: Record buy/sell actions with detailed, paginated history (including fee by percentage input).
+- **Stock Positions**: Track current holdings and live performance with auto-updating market prices.
+- **Trade Results**: Generate and share comprehensive trade result (PnL & ROI) report cards.
+- **Journals & Notes**: Personal note page with image and long-text support.
+- **Financial Tracker**: Manage and track personal financial activities. (Coming soon)
 - **Profile Management**: Manage user settings and adjust balance sheets dynamically.
 - **AI Assistant**: Built-in assistant to help analyze trading patterns and offer insights. (Coming soon)
 

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react";
-import axios from "@/app/lib/axios";
+import { axios } from "@/app/lib";
 
 import { useUser } from "@/app/context/UserContext";
 import type { PortfolioAddReq } from "@/app/types/user/PortfolioInfo";

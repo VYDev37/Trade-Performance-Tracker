@@ -58,7 +58,7 @@ func (s *positionService) handleSellMode(existing *domain.Position, sellData *do
 				return err
 			}
 		} else {
-			if err := s.repo.Update(existing, tx); err != nil {
+			if err := s.repo.UpdatePosition(existing, tx); err != nil {
 				return err
 			}
 		}
@@ -92,7 +92,7 @@ func (s *positionService) handleBuyMode(existing *domain.Position, buyData *doma
 			existing.TotalQty += buyData.TotalQty
 			existing.InvestedTotal += buyData.InvestedTotal
 
-			if err := s.repo.Update(existing, tx); err != nil {
+			if err := s.repo.UpdatePosition(existing, tx); err != nil {
 				return err
 			}
 		} else {
