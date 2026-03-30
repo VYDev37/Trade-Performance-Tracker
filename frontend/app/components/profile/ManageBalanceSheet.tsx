@@ -8,17 +8,27 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Wallet, ArrowUpCircle, ArrowDownCircle, RefreshCw } from "lucide-react"; // Ikon tambahan
 
+import { useUser } from "@/app/context/UserContext";
+import { useTransaction } from "@/app/context/TransactionContext";
+
 import { useUpdateBalance } from "@/app/hooks";
 import type { UserBalanceReq } from "@/app/types/http/UserRequest";
 
 interface ManageBalanceSheetProps {
     children?: React.ReactNode;
+    mode: 'stock' | 'cash';
 }
 
-export default function ManageBalanceSheet({ children }: ManageBalanceSheetProps) {
+export default function ManageBalanceSheet({ children, mode }: ManageBalanceSheetProps) {
     const [open, setOpen] = useState(false);
-    const [formData, setFormData] = useState<UserBalanceReq>({ amount: 0, mode: "add", note: "", fee: 0, bank_src: "" });
+    const [formData, setFormData] = useState<UserBalanceReq>({
+        amount: "", mode: "add", title: "",
+        note: "", fee: "",
+        bank_src: "", asset_type: mode === 'stock' ? "stock_balance" : "cash_balance"
+    });
 
+    const { refetch } = useTransaction();
+    const { refreshProfile } = useUser();
     const { updateBalance, loading, error } = useUpdateBalance();
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -27,23 +37,40 @@ export default function ManageBalanceSheet({ children }: ManageBalanceSheetProps
         const success = await updateBalance(formData);
         if (success) {
             setOpen(false);
+
+            await refreshProfile();
+            await refetch();
         }
     }
 
-    const handleFormChange = (field: "amount" | "mode" | "note" | "fee" | "bank_src", value: string | number) => {
+    const handleFormChange = (field: keyof UserBalanceReq, value: string | number) => {
         setFormData({ ...formData, [field]: value });
     }
 
     const renderForm = (modeLabel: string, colorClass: string) => (
         <form onSubmit={handleSubmit} className="space-y-6 py-6 animate-in fade-in slide-in-from-bottom-4 duration-500 ">
             <div className="space-y-3 p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
+                {mode === "cash" && (
+                    <>
+                        <Label htmlFor="title" className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                            Title (e.g. Investment)
+                        </Label>
+                        <div className="relative">
+                            <Input id="title" type="text" placeholder="Title" value={formData.title} onChange={(e) => handleFormChange("title", e.target.value)}
+                                className="bg-transparent border-none text-xs h-14 focus-visible:ring-0 focus-visible:ring-offset-0 font-bold"
+                                required />
+                        </div>
+                    </>
+                )}
+
                 <Label htmlFor="amount" className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                    Amount to {modeLabel.toLowerCase()}
+                    {mode === "stock" ? `Amount to ${modeLabel.toLowerCase()}`
+                        : "Amount"}
                 </Label>
                 <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 font-medium">Rp</span>
-                    <Input id="amount" type="number" placeholder="0.00" value={formData.amount} min={0} max={formData.mode === "rem" ? formData.amount : undefined}
-                        onChange={(e) => handleFormChange("amount", +e.target.value)} className="pl-10 bg-transparent border-none text-2xl h-14 focus-visible:ring-0 focus-visible:ring-offset-0 font-bold"
+                    <Input id="amount" type="text" placeholder="0.00" value={formData.amount} min={0} max={formData.mode === "rem" ? formData.amount : undefined}
+                        onChange={(e) => handleFormChange("amount", e.target.value)} className="pl-10 bg-transparent border-none text-2xl h-14 focus-visible:ring-0 focus-visible:ring-offset-0 font-bold"
                         required />
                 </div>
                 <Label htmlFor="bank_src" className="text-xs font-semibold uppercase tracking-wider text-slate-400">
@@ -61,14 +88,13 @@ export default function ManageBalanceSheet({ children }: ManageBalanceSheetProps
                         </Label>
                         <div className="relative">
                             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 font-medium">Rp</span>
-                            <Input id="fee" type="number" placeholder="0.00" value={formData.fee} min={0}
-                                onChange={(e) => handleFormChange("fee", +e.target.value)} className="pl-10 bg-transparent border-none text-2xl h-14 focus-visible:ring-0 focus-visible:ring-offset-0 font-bold"
-                                required />
+                            <Input id="fee" type="text" placeholder="0.00" value={formData.fee} min={0}
+                                onChange={(e) => handleFormChange("fee", e.target.value)} className="pl-10 bg-transparent border-none text-2xl h-14 focus-visible:ring-0 focus-visible:ring-offset-0 font-bold" />
                         </div>
                     </>
                 )}
                 <Label htmlFor="notes" className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                    Transaction Note (Optional)
+                    Note (Optional)
                 </Label>
                 <div className="relative">
                     <Input id="notes" type="text" placeholder="Your notes here..." value={formData.note} onChange={(e) => handleFormChange("note", e.target.value)}
@@ -86,9 +112,11 @@ export default function ManageBalanceSheet({ children }: ManageBalanceSheetProps
                 disabled={loading}>
                 {loading ? (
                     <RefreshCw className="mr-2 h-5 w-5 animate-spin" />
-                ) : (
+                ) : (mode === "stock" ? (
                     `${modeLabel} Balance`
-                )}
+                ) : (
+                    `Add to ${modeLabel === "Withdraw" ? "expense" : "income"}`
+                ))}
             </Button>
         </form>
     );
@@ -113,21 +141,21 @@ export default function ManageBalanceSheet({ children }: ManageBalanceSheetProps
                 </SheetHeader>
 
                 <Tabs value={formData.mode} onValueChange={(v) => handleFormChange("mode", v as any)} className="w-[90%] ms-5">
-                    <TabsList className="grid w-full grid-cols-3 h-12 bg-white/5 p-1 rounded-xl border border-white/5">
+                    <TabsList className={`grid w-full grid-cols-${mode === "stock" ? 3 : 2} h-12 bg-white/5 p-1 rounded-xl border border-white/5`}>
                         <TabsTrigger value="add" className="rounded-lg data-[state=active]:bg-green-500/20 data-[state=active]:text-green-400">
-                            <ArrowUpCircle className="w-4 h-4 mr-1" /> Add
+                            <ArrowUpCircle className="w-4 h-4 mr-1" /> {mode !== "stock" ? "Income" : "Add"}
                         </TabsTrigger>
                         <TabsTrigger value="rem" className="rounded-lg data-[state=active]:bg-red-500/20 data-[state=active]:text-red-400">
-                            <ArrowDownCircle className="w-4 h-4 mr-1" /> Remove
+                            <ArrowDownCircle className="w-4 h-4 mr-1" /> {mode !== "stock" ? "Expense" : "Add"}
                         </TabsTrigger>
-                        <TabsTrigger value="mod" className="rounded-lg data-[state=active]:bg-blue-500/20 data-[state=active]:text-blue-400">
+                        {mode === "stock" && (<TabsTrigger value="mod" className="rounded-lg data-[state=active]:bg-blue-500/20 data-[state=active]:text-blue-400">
                             <RefreshCw className="w-4 h-4 mr-1" /> Mod
-                        </TabsTrigger>
+                        </TabsTrigger>)}
                     </TabsList>
 
                     <TabsContent value="add">{renderForm("Deposit", "bg-green-600 hover:bg-green-500 shadow-green-900/20")}</TabsContent>
                     <TabsContent value="rem">{renderForm("Withdraw", "bg-red-600 hover:bg-red-500 shadow-red-900/20")}</TabsContent>
-                    <TabsContent value="mod">{renderForm("Adjust", "bg-blue-600 hover:bg-blue-500 shadow-blue-900/20")}</TabsContent>
+                    {mode === "stock" && (<TabsContent value="mod">{renderForm("Adjust", "bg-blue-600 hover:bg-blue-500 shadow-blue-900/20")}</TabsContent>)}
                 </Tabs>
             </SheetContent>
         </Sheet>

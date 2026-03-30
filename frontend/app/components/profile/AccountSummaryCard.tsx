@@ -26,7 +26,7 @@ export default function AccountSummaryCard({ user }: AccountSummaryCardProps) {
                         </div>
                     </div>
                     <div className="flex flex-row gap-2 sm:gap-3 w-full sm:w-auto">
-                        <ManageBalanceSheet>
+                        <ManageBalanceSheet mode="stock">
                             <Button variant="secondary" className="flex-1 sm:flex-none gap-2 px-2 sm:px-4 shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_8px_30px_rgba(59,130,246,0.3)] transition-all active:scale-95 text-xs sm:text-sm">
                                 <PlusCircleIcon className="w-4 h-4 shrink-0" /> <span className="truncate">Add Cash</span>
                             </Button>
@@ -45,9 +45,9 @@ export default function AccountSummaryCard({ user }: AccountSummaryCardProps) {
                             <Wallet className="h-6 w-6" />
                         </div>
                         <div className="min-w-0">
-                            <p className="text-sm font-medium text-slate-400 mb-1 truncate">Cash Balance</p>
+                            <p className="text-sm font-medium text-slate-400 mb-1 truncate">Stock Liquid Balance</p>
                             <p className="text-xl md:text-2xl font-bold text-white tracking-tight truncate">
-                                {Formatter.toCurrency(user.balance)}
+                                {Formatter.toCurrency(user.balance.stock_balance)}
                             </p>
                         </div>
                     </div>

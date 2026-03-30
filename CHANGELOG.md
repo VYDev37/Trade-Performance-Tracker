@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.4] - 2026-03-30
+### Added
+- Added `CustomDialog` component to replace repetitive markup across modals.
+- Implemented "Load More" style pagination for tracking statistics.
+- Combined inflow and outflow into a single chronologically sorted view for mobile form factors.
+- Added comprehensive backend infrastructure (handler, service, repo) to support direct balance adjustments.
+- Added text formatting utility `pkg/utils/format/text.go` for localized number formats in the backend.
+
+### Changed
+- Extracted and modularized the `Tracker` page into mobile-friendly shared components (`TrackerHeader`, `TrackerSummary`, `TrackerTransactionColumn`, `TrackerCombinedColumn`).
+- User balance now moved to separate table
+- Updated `useUpdateBalance` hook for seamless balance manipulation.
+- Minor changes in account registration
+
 ## [0.1.3] - 2026-03-25
 ### Added
 - Auto update market price (`hooks/useGetCurrentPrice.tsx`) with SWR.

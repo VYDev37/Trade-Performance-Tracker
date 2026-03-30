@@ -93,30 +93,3 @@ func (h *UserHandler) HandleGetMe(c fiber.Ctx) error {
 
 	return c.Status(200).JSON(fiber.Map{"data": res})
 }
-
-func (h *UserHandler) HandleUpdateBalance(c fiber.Ctx) error {
-	rawUid := c.Locals("user_id")
-	if rawUid == nil {
-		return c.Status(401).JSON(fiber.Map{"message": "Unauthorized."})
-	}
-
-	var req domain.UserBalanceUpdateReq
-	if err := c.Bind().Body(&req); err != nil {
-		return c.Status(400).JSON(fiber.Map{"message": "Failed to parse body."})
-	}
-
-	validate := validator.New()
-	if err := validate.Struct(req); err != nil {
-		if validationErrors, ok := err.(validator.ValidationErrors); ok {
-			errFirst := validationErrors[0]
-			return c.Status(400).JSON(fiber.Map{"message": format.FormatError(errFirst)})
-		}
-		return c.Status(400).JSON(fiber.Map{"message": "Invalid request."})
-	}
-
-	if err := h.service.UpdateBalance(rawUid.(uint64), req); err != nil {
-		return c.Status(400).JSON(fiber.Map{"message": err.Error()})
-	}
-
-	return c.Status(200).JSON(fiber.Map{"message": "Balance updated."})
-}

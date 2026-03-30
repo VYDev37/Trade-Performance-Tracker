@@ -37,8 +37,12 @@ The frontend is modularized into several feature-specific directories under `app
   - `NoteCard.tsx` & `NoteSheet.tsx`: Manage text and visual journal entries.
 - **Trades**
   - `PnLReportModal.tsx`: Shareable PnL and ROI report card for trades.
+- **Tracker**
+  - `TrackerHeader.tsx` & `TrackerSummary.tsx`: Displays high-level balance and inflow/outflow properties.
+  - `TrackerTransactionColumn.tsx` & `TrackerCombinedColumn.tsx`: Lists separated transactions on desktop, and a dynamically combined and chronologically sorted view tailored for mobile context.
 - **Shared / Layout**
   - `AuthForm.tsx`: Reusable login and registration form component.
+  - `CustomDialog.tsx`: Reusable wrapper component for standardizing interactive modal overlays.
   - `AdminSidebar.tsx`: The primary navigation for the dashboard.
   - `ThemeProvider.tsx`: Handles dark/light mode switching.
 

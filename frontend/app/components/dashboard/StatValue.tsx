@@ -14,12 +14,13 @@ interface UserStatValueProps {
     "top_gain" | "top_loss" | "loss_amount" |
     "gain_amount" | "loss_gain_sum" | "winning_positions" |
     "losing_positions" | "temp_win_rate";
+    subfield?: "stock_balance" | "cash_balance";
     isCurrency?: boolean;
     useDynamicColor?: boolean;
 }
 
 // TODO: Change unrealized PNL with realized PNL (from transactions)
-export default function UserStatValue({ field, isCurrency, useDynamicColor }: UserStatValueProps) {
+export default function UserStatValue({ field, subfield, isCurrency, useDynamicColor }: UserStatValueProps) {
     const { user, isLoading } = useUser();
     const { transactions, loading } = useTransaction();
 
@@ -77,6 +78,10 @@ export default function UserStatValue({ field, isCurrency, useDynamicColor }: Us
             break;
         case "positions_count":
             value = stats.totalCount;
+            break;
+        case "balance":
+            const balanceData = user?.balance;
+            value = subfield ? (balanceData?.[subfield] || 0) : (user?.balance.stock_balance || 0);
             break;
         default:
             value = (user as any)?.[field] || 0;

@@ -17,6 +17,7 @@ type Transaction struct {
 	BasePrice       float64 `gorm:"not null" json:"base_price"`
 	Price           float64 `gorm:"not null" json:"price"`
 	Ticker          string  `gorm:"not null" json:"ticker"`
+	Title           string  `gorm:"type:varchar(50)" json:"title"`
 	Notes           string  `gorm:"type:varchar(255)" json:"notes"`
 
 	CreatedAt time.Time `json:"created_at"`

@@ -9,7 +9,8 @@ import (
 	"github.com/gofiber/fiber/v3/middleware/cors"
 )
 
-func InitRoutes(uService services.UserService, pService services.PositionService, tService services.TransactionService, nService services.NoteService) *fiber.App {
+func InitRoutes(uService services.UserService, pService services.PositionService,
+	tService services.TransactionService, nService services.NoteService, bService services.BalanceService) *fiber.App {
 	app := fiber.New()
 	app.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:3000"},
@@ -43,7 +44,6 @@ func InitRoutes(uService services.UserService, pService services.PositionService
 	userApi := api.Group("/user", middleware.AuthMiddleware())
 
 	userApi.Get("/me", userService.HandleGetMe)
-	userApi.Post("/update-balance", userService.HandleUpdateBalance)
 
 	positionApi := api.Group("/position", middleware.AuthMiddleware())
 	positionService := handlers.NewPositionHandler(pService)
@@ -64,6 +64,11 @@ func InitRoutes(uService services.UserService, pService services.PositionService
 	noteApi.Post("/add", noteService.HandleAddNote)
 	noteApi.Delete("/remove/:nId", noteService.HandleRemoveNote)
 	noteApi.Put("/update/:nId", noteService.HandleUpdateNote)
+
+	balanceApi := api.Group("/balance", middleware.AuthMiddleware())
+	balanceService := handlers.NewBalanceHandler(bService)
+
+	balanceApi.Post("/update-balance", balanceService.HandleUpdateBalance)
 
 	return app
 }

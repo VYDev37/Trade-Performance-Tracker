@@ -31,7 +31,8 @@ export default function TransactionHistoryPage() {
         if (!transactions)
             return [];
 
-        let result = [...transactions];
+        const tx = transactions.filter(x => x.transaction_type !== "income" && x.transaction_type !== "expense")
+        let result = [...tx];
 
         if (filterType !== "all") {
             result = result.filter(t => {

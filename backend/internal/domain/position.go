@@ -9,8 +9,8 @@ import (
 type Position struct {
 	gorm.Model
 
-	OwnerID           uint64  `gorm:"not null;index"`
-	Ticker            string  `gorm:"not null;index" json:"ticker"`
+	OwnerID           uint64  `gorm:"not null;index;"`
+	Ticker            string  `gorm:"not null;index;" json:"ticker"`
 	TotalQty          float64 `gorm:"not null" json:"total_qty"` // bisa aja untuk crypto
 	InvestedTotal     float64 `gorm:"not null" json:"invested_total"`
 	PositionType      string  `gorm:"type:varchar(20);not null;default:'stocks'" json:"position_type"`    // stocks / crypto / futures

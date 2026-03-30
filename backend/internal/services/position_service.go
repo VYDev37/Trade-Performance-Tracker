@@ -7,6 +7,7 @@ import (
 	"trade-tracker/internal/domain"
 	"trade-tracker/internal/integrations/providers"
 	"trade-tracker/internal/repository"
+	"trade-tracker/pkg/utils/format"
 
 	"gorm.io/gorm"
 )
@@ -20,14 +21,16 @@ type PositionService interface {
 }
 
 type positionService struct {
-	repo               repository.PositionRepository
-	uRepo              repository.UserRepository
-	provider           providers.PriceProvider
+	repo     repository.PositionRepository
+	uRepo    repository.UserRepository
+	provider providers.PriceProvider
+
+	balService         BalanceService
 	transactionService TransactionService
 }
 
-func NewPositionService(repo repository.PositionRepository, uRepo repository.UserRepository, provider providers.PriceProvider, transactionService TransactionService) PositionService {
-	return &positionService{repo: repo, uRepo: uRepo, provider: provider, transactionService: transactionService}
+func NewPositionService(repo repository.PositionRepository, uRepo repository.UserRepository, provider providers.PriceProvider, transactionService TransactionService, balService BalanceService) PositionService {
+	return &positionService{repo: repo, uRepo: uRepo, provider: provider, transactionService: transactionService, balService: balService}
 }
 
 func (s *positionService) handleSellMode(existing *domain.Position, sellData *domain.Position, fee float64) error {
@@ -46,7 +49,7 @@ func (s *positionService) handleSellMode(existing *domain.Position, sellData *do
 			basePrice = existing.InvestedTotal
 		}
 
-		if err := s.uRepo.UpdateBalance(existing.OwnerID, sellData.InvestedTotal-fee, tx); err != nil {
+		if err := s.balService.UpdateBalance(existing.OwnerID, sellData.InvestedTotal-fee, "stock_balance", tx); err != nil {
 			return domain.ErrInternalServerError
 		}
 
@@ -64,14 +67,14 @@ func (s *positionService) handleSellMode(existing *domain.Position, sellData *do
 		}
 
 		return s.transactionService.LogActivity(existing, sellData.TotalQty, sellData.InvestedTotal, fee, basePrice,
-			"sell", fmt.Sprintf("Sold %.f lot of %s for Rp%.f.", sellData.TotalQty, sellData.Ticker, sellData.InvestedTotal), tx)
+			"sell", fmt.Sprintf("Sold %.f lot of %s for %s.", sellData.TotalQty, sellData.Ticker, format.FormatNumber(sellData.InvestedTotal)), tx)
 	})
 }
 
 func (s *positionService) handleBuyMode(existing *domain.Position, buyData *domain.Position, fee float64) error {
 	db := s.repo.GetDB()
 	return db.Transaction(func(tx *gorm.DB) error {
-		balance, err := s.uRepo.GetBalance(buyData.OwnerID, tx)
+		balance, err := s.balService.GetBalanceByType(buyData.OwnerID, "stock_balance", tx)
 		if err != nil {
 			return err
 		}
@@ -80,7 +83,7 @@ func (s *positionService) handleBuyMode(existing *domain.Position, buyData *doma
 			return domain.ErrInsufficientBalance
 		}
 
-		if err := s.uRepo.UpdateBalance(buyData.OwnerID, -(buyData.InvestedTotal + fee), tx); err != nil {
+		if err := s.balService.UpdateBalance(buyData.OwnerID, -(buyData.InvestedTotal + fee), "stock_balance", tx); err != nil {
 			return err
 		}
 
@@ -102,7 +105,7 @@ func (s *positionService) handleBuyMode(existing *domain.Position, buyData *doma
 		}
 
 		return s.transactionService.LogActivity(buyData, buyData.TotalQty, buyData.InvestedTotal+fee, fee, buyData.InvestedTotal, "buy",
-			fmt.Sprintf("Bought %.f lot of %s for Rp%.f", buyData.TotalQty, buyData.Ticker, buyData.InvestedTotal), tx)
+			fmt.Sprintf("Bought %.f lot of %s for %s.", buyData.TotalQty, buyData.Ticker, format.FormatNumber(buyData.InvestedTotal)), tx)
 	})
 }
 

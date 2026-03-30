@@ -11,7 +11,7 @@ The backend follows a strict **Clean Architecture / Domain-Driven Design (DDD)**
 - **`domain/`**: Core data models and interface contracts.
 - **`repository/`**: Database queries and persistence logic using GORM.
 - **`services/`**: Core business logic and use cases.
-- **`pkg/`**: Shared utilities (e.g., JWT auth middleware).
+- **`pkg/`**: Shared utilities (e.g., JWT auth middleware, localized text/currency formatting).
 
 ---
 
@@ -26,6 +26,7 @@ The application connects to a **PostgreSQL** database. The connection pool is op
 Database migrations are handled **automatically on startup**. 
 There are no manual CLI migration commands to run. When the application boots up (`go run cmd/api/main.go`), GORM's `AutoMigrate` function automatically synchronizes the database schema with the following domain models:
 - `domain.User`
+- `domain.Balance`
 - `domain.Position`
 - `domain.Transaction`
 - `domain.Note`
@@ -47,7 +48,6 @@ The backend uses **Fiber** for routing. CORS is pre-configured to accept request
 
 #### User (`/api/user`)
 - **`GET /me`** - Get current authenticated user details
-- **`POST /update-balance`** - Update the user's account balance
 
 #### Positions (`/api/position`)
 - **`POST /add/:type`** - Add a new stock position (supports different types)
@@ -62,6 +62,9 @@ The backend uses **Fiber** for routing. CORS is pre-configured to accept request
 - **`POST /add`** - Create a new journal entry
 - **`DELETE /remove/:nId`** - Delete a journal
 - **`PUT /update/:nId`** - Update a journal
+
+#### Balance (`/api/balance`)
+- **`POST /update-balance`** - Update the user's account balance
 
 ---
 

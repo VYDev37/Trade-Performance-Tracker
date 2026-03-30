@@ -38,7 +38,8 @@ func InitDBConnection(dbConnection string) (*gorm.DB, error) {
 	sqlDB.SetMaxOpenConns(100)
 	sqlDB.SetConnMaxLifetime(time.Hour)
 
-	if err := db.AutoMigrate(&domain.User{}, &domain.Position{}, &domain.Transaction{}, &domain.Note{}); err != nil {
+	if err := db.AutoMigrate(&domain.User{}, &domain.Position{},
+		&domain.Transaction{}, &domain.Note{}, &domain.Balance{}); err != nil {
 		return nil, err
 	}
 

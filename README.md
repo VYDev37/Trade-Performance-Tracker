@@ -10,7 +10,7 @@ A comprehensive full-stack application for tracking and analyzing trade performa
 - **Stock Positions**: Track current holdings and live performance with auto-updating market prices.
 - **Trade Results**: Generate and share comprehensive trade result (PnL & ROI) report cards.
 - **Journals & Notes**: Personal note page with image and long-text support.
-- **Financial Tracker**: Manage and track personal financial activities. (Coming soon)
+- **Financial Tracker**: Manage and track personal financial activities through a dedicated dashboard with mobile-responsive consolidated views.
 - **Profile Management**: Manage user settings and adjust balance sheets dynamically.
 - **AI Assistant**: Built-in assistant to help analyze trading patterns and offer insights. (Coming soon)
 

@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import { toPng } from 'html-to-image';
 import { Download, Share2 } from "lucide-react";
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { CustomDialog } from "@/app/components/shared";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
@@ -42,19 +42,17 @@ export default function PnLReportModal({ transaction, username }: PnLReportModal
     };
 
     return (
-        <Dialog>
-            <DialogTrigger asChild>
+        <CustomDialog
+            trigger={
                 <Button variant="ghost" size="sm" className="gap-2 bg-transparent border-white/5 hover:bg-zinc-800 text-zinc-400 hover:text-white transition-all">
                     <Share2 className="h-4 w-4" />
                 </Button>
-            </DialogTrigger>
-
-            <DialogContent className="sm:max-w-[550px] bg-zinc-950 border-white/10 text-white shadow-2xl">
-                <DialogHeader>
-                    <DialogTitle className="text-zinc-400 font-medium tracking-tight">Performance Report</DialogTitle>
-                </DialogHeader>
-
-                <div className="flex flex-col items-center justify-center py-6 overflow-hidden">
+            }
+            title="Performance Report"
+            titleClassName="text-zinc-400 font-medium tracking-tight"
+            contentClassName="sm:max-w-[550px] shadow-2xl"
+        >
+            <div className="flex flex-col items-center justify-center py-6 overflow-hidden">
                     <div className="scale-75 sm:scale-90 origin-center transition-transform hover:scale-95 duration-500">
                         <PnlReport transaction={transaction} userNickname={username} mode={mode} />
                     </div>
@@ -90,7 +88,6 @@ export default function PnLReportModal({ transaction, username }: PnLReportModal
                         Generated via Trading Performance Tracker
                     </p>
                 </div>
-            </DialogContent>
-        </Dialog>
+        </CustomDialog>
     );
 }

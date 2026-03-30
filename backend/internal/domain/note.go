@@ -9,6 +9,7 @@ import (
 
 type Note struct {
 	gorm.Model
+
 	Title       string         `gorm:"type:varchar(255);not null"`
 	Description string         `gorm:"type:text;not null"`
 	Category    string         `gorm:"type:varchar(100);not null;default:'General';index"`

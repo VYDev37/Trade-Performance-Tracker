@@ -31,14 +31,16 @@ func main() {
 	posRepo := repository.NewPositionRepo(db)
 	tranRepo := repository.NewTransactionRepo(db)
 	noteRepo := repository.NewNoteRepo(db)
+	balRepo := repository.NewBalanceRepo(db)
 
 	priceProvider := providers.NewPriceProvider()
 
-	tService := services.NewTransactionService(tranRepo)
-	pService := services.NewPositionService(posRepo, userRepo, priceProvider, tService)
-	uService := services.NewUserService(userRepo, pService, tService)
 	nService := services.NewNoteService(noteRepo)
+	tService := services.NewTransactionService(tranRepo)
+	bService := services.NewBalanceService(balRepo)
+	pService := services.NewPositionService(posRepo, userRepo, priceProvider, tService, bService)
+	uService := services.NewUserService(userRepo, pService, tService, bService)
 
-	app := http.InitRoutes(uService, pService, tService, nService)
+	app := http.InitRoutes(uService, pService, tService, nService, bService)
 	log.Fatal(app.Listen(fmt.Sprintf(":%s", os.Getenv("SERVER_PORT"))))
 }

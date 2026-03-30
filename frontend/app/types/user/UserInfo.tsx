@@ -1,9 +1,10 @@
 import type { PortfolioItem } from "./PortfolioInfo";
+import type { BalanceInfo } from "./BalanceInfo";
 
 export interface UserProfile {
     name: string;
     username: string;
-    balance: number;
+    balance: BalanceInfo;
     total_equity: number;
     positions?: PortfolioItem[];
 }

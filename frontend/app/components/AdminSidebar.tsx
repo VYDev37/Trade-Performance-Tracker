@@ -14,7 +14,7 @@ import { useUser } from "@/app/context/UserContext";
 
 import {
     LayoutDashboard, TrendingUp, MessageSquareText, ArrowLeftRight,
-    User, Code2, LogOut, NotebookPen, LucideIcon
+    User, Code2, LogOut, NotebookPen, Wallet2, LucideIcon
 } from "lucide-react";
 
 interface SidebarMenus {
@@ -31,6 +31,7 @@ export default function AdminSidebar() {
         { label: "Dashboard", link: "/admin/dashboard", icon: LayoutDashboard },
         { label: "Stocks", link: "/admin/stocks", icon: TrendingUp },
         { label: "AI Assistant", link: "/admin/assistant", icon: MessageSquareText },
+        { label: "Financial Tracker", link: "/admin/tracker", icon: Wallet2 },
         { label: "My Journals", link: "/admin/journals", icon: NotebookPen },
         { label: "Transactions", link: "/admin/transactions", icon: ArrowLeftRight },
         { label: "User Profile", link: "/admin/profile", icon: User }

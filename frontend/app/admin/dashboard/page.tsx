@@ -17,6 +17,7 @@ interface DashboardInfo {
     "top_gain" | "top_loss" | "loss_amount" |
     "gain_amount" | "loss_gain_sum" | "winning_positions" |
     "losing_positions" | "temp_win_rate";
+    subfield?: "stock_balance" | "cash_balance";
     isCurrency?: boolean;
     useDynamicColor?: boolean;
     textColor?: "text_green" | "text_red";
@@ -33,7 +34,7 @@ export default function Page() {
 
     const infos: DashboardInfo[] = [
         { title: "Stock count", icon: Package, color: "green", field: "positions_count" },
-        { title: "Balance", icon: Wallet, color: "green", field: "balance", isCurrency: true },
+        { title: "Balance", icon: Wallet, color: "green", field: "balance", subfield: "stock_balance", isCurrency: true },
         { title: "Total Equity", icon: Landmark, color: "yellow", field: "total_equity", isCurrency: true },
         { title: "Gain Total", icon: TrendingUp, color: "green", field: "gain_amount", isCurrency: true, textColor: "text_green" },
         { title: "Loss Total", icon: TrendingDown, color: "red", field: "loss_amount", isCurrency: true, textColor: "text_red" },

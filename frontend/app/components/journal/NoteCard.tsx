@@ -1,13 +1,13 @@
 "use client";
 
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+
 import { DropdownMenu, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuContent } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 
 import { Formatter } from "@/app/lib";
 import { useRemoveNote } from "@/app/hooks/note";
-import { ConfirmModal, ImageBox } from "@/app/components/shared";
+import { ConfirmModal, ImageBox, CustomDialog } from "@/app/components/shared";
 import { NoteSheet } from "@/app/components/journal";
 import type { JournalInfo } from "@/app/types/user/JournalInfo";
 
@@ -42,8 +42,9 @@ export default function NoteCard({ note, onRefresh }: NoteCardProps) {
 
     return (
         <div >
-            <Dialog>
-                <DialogTrigger asChild className="w-full h-full">
+            <CustomDialog
+                triggerClassName="w-full h-full"
+                trigger={
                     <Card className="flex flex-col w-full h-full cursor-pointer hover:shadow-lg transition-all duration-300 border-white/5 bg-zinc-900/50 group overflow-hidden">
                         <div className="relative w-full aspect-[16/10] overflow-hidden bg-zinc-800 flex-shrink-0">
                             <div className="absolute top-2 right-2 z-10">
@@ -107,14 +108,12 @@ export default function NoteCard({ note, onRefresh }: NoteCardProps) {
                             </div>
                         </CardFooter>
                     </Card>
-                </DialogTrigger>
-                <DialogContent
-                    onPointerDownOutside={(e) => e.preventDefault()}
-                    onInteractOutside={(e) => e.preventDefault()}
-                    className="sm:max-w-md bg-zinc-950 text-white border-white/10 max-h-[90vh] overflow-y-auto">
-                    <DialogHeader>
-                        <DialogTitle>{note.title}</DialogTitle>
-                    </DialogHeader>
+                }
+                title={note.title}
+                contentClassName="sm:max-w-md max-h-[90vh] overflow-y-auto"
+                onPointerDownOutside={(e) => e.preventDefault()}
+                onInteractOutside={(e) => e.preventDefault()}
+            >
 
                     <div className="flex flex-col gap-3 mt-4">
                         <div className="text-slate-300 text-sm mt-4 break-words leading-relaxed">
@@ -128,15 +127,14 @@ export default function NoteCard({ note, onRefresh }: NoteCardProps) {
                             ))}
                         </div>
                     </div>
-                </DialogContent>
+            </CustomDialog>
 
-                <NoteSheet onRefresh={onRefresh} existingData={note} isOpen={open} onOpenChange={setOpen} />
-                <ConfirmModal title="Delete this note?" isOpen={showDeleteConfirm}
-                    onClose={() => setShowDeleteConfirm(false)}
-                    onConfirm={handleDelete}
-                    description={`Are you sure you would like to delete "${note.title}"? Changes made can't be reverted.`}
-                />
-            </Dialog>
+            <NoteSheet onRefresh={onRefresh} existingData={note} isOpen={open} onOpenChange={setOpen} />
+            <ConfirmModal title="Delete this note?" isOpen={showDeleteConfirm}
+                onClose={() => setShowDeleteConfirm(false)}
+                onConfirm={handleDelete}
+                description={`Are you sure you would like to delete "${note.title}"? Changes made can't be reverted.`}
+            />
         </div>
     );
 }

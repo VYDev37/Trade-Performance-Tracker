@@ -10,6 +10,7 @@ export interface TransactionInfo {
     realized_pnl: number;
     price_per_unit: number;
     notes: string;
+    title?: string;
 
     created_at: Date;
 }

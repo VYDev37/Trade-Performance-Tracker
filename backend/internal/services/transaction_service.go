@@ -57,7 +57,7 @@ func (s *transactionService) GetLocalTransactions(userID uint64) ([]domain.Trans
 		}
 
 		ppu := t.BasePrice / t.Quantity
-		if t.TransactionType == "cashflow" {
+		if t.TransactionType == "cashflow" || t.TransactionType == "expense" || t.TransactionType == "income" {
 			ppu = 0
 		}
 

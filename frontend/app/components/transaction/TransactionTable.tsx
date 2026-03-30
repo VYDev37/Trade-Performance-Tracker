@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { CustomDialog } from "@/app/components/shared";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 import { Formatter } from "@/app/lib";
@@ -110,21 +110,19 @@ export default function TransactionTable({ transactions, loading, username, togg
                                                 )}
 
                                                 {transaction.notes && (
-                                                    <Dialog>
-                                                        <DialogTrigger asChild>
+                                                    <CustomDialog
+                                                        trigger={
                                                             <Button variant="ghost">
                                                                 <Info className="h-2 w-2" />
                                                             </Button>
-                                                        </DialogTrigger>
-                                                        <DialogContent className="sm:max-w-md bg-zinc-950 text-white border-white/10">
-                                                            <DialogHeader>
-                                                                <DialogTitle>Transaction Notes</DialogTitle>
-                                                            </DialogHeader>
-                                                            <div className="text-slate-300 text-sm mt-4 break-words">
-                                                                {transaction.notes || "No notes available for this transaction."}
-                                                            </div>
-                                                        </DialogContent>
-                                                    </Dialog>
+                                                        }
+                                                        title="Transaction Notes"
+                                                        contentClassName="sm:max-w-md"
+                                                    >
+                                                        <div className="text-slate-300 text-sm mt-4 break-words">
+                                                            {transaction.notes || "No notes available for this transaction."}
+                                                        </div>
+                                                    </CustomDialog>
                                                 )}
                                             </TableCell>
                                         </TableRow>
