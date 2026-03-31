@@ -41,6 +41,7 @@ A comprehensive full-stack application for tracking and analyzing trade performa
 Trade-Performance-Tracker/
 ├── backend/                  # Go API Server
 │   ├── cmd/                  # Entry point for the application (main.go)
+│   │   ├── api/              # Where main.go located
 │   ├── internal/             # Application code (Clean Architecture)
 │   │   ├── config/           # Configuration loaders
 │   │   ├── delivery/         # HTTP handlers and routing
@@ -53,7 +54,8 @@ Trade-Performance-Tracker/
 └── frontend/                 # Next.js Application
     ├── app/                  # App Router pages and layouts
     │   ├── (account)/        # Auth pages (login, register)
-    │   └── admin/            # Dashboard, Profile, Stocks, Transactions, Assistant
+    │   ├── admin/            # Dashboard, Profile, Stocks, Transactions, Assistant, Tracker, Journals
+    │   └── components/       # Shared & Local Page UI Components (for pages, etc.)
     ├── components/           # Reusable UI components (shadcn, charts, etc.)
     ├── hooks/                # Custom React hooks for API and state management
     ├── lib/                  # Utility functions
