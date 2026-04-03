@@ -64,11 +64,11 @@ The application heavily relies on custom hooks (located in `app/hooks/`) to abst
 
 ## ⚙️ Environment Configuration
 
-To run the application locally, you may need to configure the API URL if your backend is not running on the default `localhost:8080`.
+To run the application locally, you may need to configure the API URL if your backend is not running on the default `{url}/api`.
 
 Since the application uses `axios` (`app/lib/axios.tsx`), by default it tries to connect to:
 ```typescript
-baseURL: `http://${typeof window !== 'undefined' ? window.location.hostname : "localhost"}:8080/api`
+baseURL: process.env.NEXT_PUBLIC_API_URL || `/api`
 ```
 
 *(No `.env.local` file is strictly required out-of-the-box as it auto-detects the hostname, but ensure your backend is running on port `8080`).*
