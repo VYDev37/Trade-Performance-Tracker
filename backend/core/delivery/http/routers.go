@@ -1,8 +1,11 @@
 package http
 
 import (
-	"trade-tracker/internal/delivery/handlers"
-	"trade-tracker/internal/services"
+	"fmt"
+	"os"
+
+	"trade-tracker/core/delivery/handlers"
+	"trade-tracker/core/services"
 	"trade-tracker/pkg/middleware"
 
 	"github.com/gofiber/fiber/v3"
@@ -30,7 +33,16 @@ func InitRoutes(uService services.UserService, pService services.PositionService
 		return c.Next()
 	})
 
-	api := app.Group("/api")
+	app.Options("/*", func(c fiber.Ctx) error {
+		return c.SendStatus(fiber.StatusNoContent)
+	})
+
+	app.Use(func(c fiber.Ctx) error {
+		fmt.Printf("Method: %s, Path: %s, Origin: %s\n", c.Method(), c.Path(), c.Get("Origin"))
+		return c.Next()
+	})
+
+	api := app.Group(os.Getenv("API_GROUP_NAME"))
 	api.Get("/", func(c fiber.Ctx) error {
 		return c.SendString("Hello World!")
 	})

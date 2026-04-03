@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"trade-tracker/internal/domain"
+	"trade-tracker/core/domain"
 
 	"gorm.io/gorm"
 )

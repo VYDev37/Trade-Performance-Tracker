@@ -3,8 +3,8 @@ package handlers
 import (
 	"fmt"
 	"strconv"
-	"trade-tracker/internal/domain"
-	"trade-tracker/internal/services"
+	"trade-tracker/core/domain"
+	"trade-tracker/core/services"
 	"trade-tracker/pkg/utils/format"
 
 	"github.com/go-playground/validator/v10"

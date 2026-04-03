@@ -1,8 +1,8 @@
 package services
 
 import (
-	"trade-tracker/internal/domain"
-	"trade-tracker/internal/repository"
+	"trade-tracker/core/domain"
+	"trade-tracker/core/repository"
 )
 
 type NoteService interface {

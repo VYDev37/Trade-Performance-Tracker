@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"trade-tracker/internal/domain"
-	"trade-tracker/internal/integrations/providers"
-	"trade-tracker/internal/repository"
+	"trade-tracker/core/domain"
+	"trade-tracker/core/integrations/providers"
+	"trade-tracker/core/repository"
 	"trade-tracker/pkg/utils/format"
 
 	"gorm.io/gorm"

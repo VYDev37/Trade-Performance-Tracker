@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"trade-tracker/internal/services"
+	"trade-tracker/core/services"
 
 	"github.com/gofiber/fiber/v3"
 )
