@@ -58,7 +58,7 @@ Trade-Performance-Tracker/
 └── frontend/                 # Next.js Application
 │   ├── app/                  # App Router pages and layouts
 │   │   ├── (account)/        # Auth pages (login, register)
-│   │   ├── admin/            # Dashboard, Profile, Stocks, Transactions, Assistant, Tracker, Journals
+│   │   ├── admin/            # Dashboard, Profile, Stocks, Transactions, Assistant, Tracker, Calculator, Journals
 │   │   └── components/       # Shared & Local Page UI Components (for pages, etc.)
 │   ├── components/           # Reusable UI components (shadcn, charts, etc.)
 │   ├── hooks/                # Custom React hooks for API and state management

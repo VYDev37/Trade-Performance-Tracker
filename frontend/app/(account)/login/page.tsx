@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useLogin } from "@/app/hooks";
 import { useRouter } from "next/navigation";
 
-import AuthForm from "@/app/components/AuthForm";
+import { AuthForm } from "@/app/components/user";
 
 export default function Login() {
     const [identifier, setIdentifier] = useState<string>("");

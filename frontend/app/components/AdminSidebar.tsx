@@ -14,7 +14,7 @@ import { useUser } from "@/app/context/UserContext";
 
 import {
     LayoutDashboard, TrendingUp, MessageSquareText, ArrowLeftRight,
-    User, Code2, LogOut, NotebookPen, Wallet2, LucideIcon
+    User, Code2, LogOut, NotebookPen, Wallet2, LucideIcon, Calculator
 } from "lucide-react";
 
 interface SidebarMenus {
@@ -34,6 +34,7 @@ export default function AdminSidebar() {
         { label: "Financial Tracker", link: "/admin/tracker", icon: Wallet2 },
         { label: "My Journals", link: "/admin/journals", icon: NotebookPen },
         { label: "Transactions", link: "/admin/transactions", icon: ArrowLeftRight },
+        { label: "Calculator", link: "/admin/calculator", icon: Calculator },
         { label: "User Profile", link: "/admin/profile", icon: User }
     ];
 
