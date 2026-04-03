@@ -5,11 +5,11 @@ import (
 	"log"
 	"os"
 
-	"trade-tracker/internal/config"
-	"trade-tracker/internal/delivery/http"
-	"trade-tracker/internal/integrations/providers"
-	"trade-tracker/internal/repository"
-	"trade-tracker/internal/services"
+	"trade-tracker/core/config"
+	"trade-tracker/core/delivery/http"
+	"trade-tracker/core/integrations/providers"
+	"trade-tracker/core/repository"
+	"trade-tracker/core/services"
 
 	"github.com/joho/godotenv"
 )
@@ -41,6 +41,11 @@ func main() {
 	pService := services.NewPositionService(posRepo, userRepo, priceProvider, tService, bService)
 	uService := services.NewUserService(userRepo, pService, tService, bService)
 
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
 	app := http.InitRoutes(uService, pService, tService, nService, bService)
-	log.Fatal(app.Listen(fmt.Sprintf(":%s", os.Getenv("SERVER_PORT"))))
+	log.Fatal(app.Listen(fmt.Sprintf(":%s", port)))
 }

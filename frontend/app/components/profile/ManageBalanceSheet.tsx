@@ -141,12 +141,12 @@ export default function ManageBalanceSheet({ children, mode }: ManageBalanceShee
                 </SheetHeader>
 
                 <Tabs value={formData.mode} onValueChange={(v) => handleFormChange("mode", v as any)} className="w-[90%] ms-5">
-                    <TabsList className={`grid w-full grid-cols-${mode === "stock" ? 3 : 2} h-12 bg-white/5 p-1 rounded-xl border border-white/5`}>
+                    <TabsList className={`grid w-full ${mode === "stock" ? "grid-cols-3" : "grid-cols-2"} h-12 bg-white/5 p-1 rounded-xl border border-white/5`}>
                         <TabsTrigger value="add" className="rounded-lg data-[state=active]:bg-green-500/20 data-[state=active]:text-green-400">
                             <ArrowUpCircle className="w-4 h-4 mr-1" /> {mode !== "stock" ? "Income" : "Add"}
                         </TabsTrigger>
                         <TabsTrigger value="rem" className="rounded-lg data-[state=active]:bg-red-500/20 data-[state=active]:text-red-400">
-                            <ArrowDownCircle className="w-4 h-4 mr-1" /> {mode !== "stock" ? "Expense" : "Add"}
+                            <ArrowDownCircle className="w-4 h-4 mr-1" /> {mode !== "stock" ? "Expense" : "Remove"}
                         </TabsTrigger>
                         {mode === "stock" && (<TabsTrigger value="mod" className="rounded-lg data-[state=active]:bg-blue-500/20 data-[state=active]:text-blue-400">
                             <RefreshCw className="w-4 h-4 mr-1" /> Mod

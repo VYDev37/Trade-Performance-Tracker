@@ -26,6 +26,9 @@ func AuthMiddleware() fiber.Handler {
 
 		tokenStr = strings.Replace(tokenStr, "Bearer ", "", 1)
 		token, err := jwt.Parse(tokenStr, func(t *jwt.Token) (interface{}, error) {
+			if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
+			}
 			return []byte(os.Getenv("JWT_SECRET")), nil
 		})
 
@@ -34,13 +37,20 @@ func AuthMiddleware() fiber.Handler {
 			return c.Status(401).JSON(fiber.Map{"message": "Invalid token."})
 		}
 
-		claims := token.Claims.(jwt.MapClaims)
-		if userID, ok := claims["user_id"]; ok {
-			c.Locals("user_id", uint64(userID.(float64)))
-		} else {
-			return c.Status(401).JSON(fiber.Map{"message": "User ID not found in token."})
+		claims, ok := token.Claims.(jwt.MapClaims)
+		if !ok {
+			return c.Status(401).JSON(fiber.Map{"message": "Invalid token claims."})
 		}
 
+		if val, ok := claims["user_id"]; ok {
+			if userID, ok := val.(float64); ok {
+				c.Locals("user_id", uint64(userID))
+			} else {
+				return c.Status(401).JSON(fiber.Map{"message": "Invalid user_id."})
+			}
+		} else {
+			return c.Status(401).JSON(fiber.Map{"message": "User ID missing from claims."})
+		}
 		return c.Next()
 	}
 }

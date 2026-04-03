@@ -18,6 +18,8 @@ export default function Login() {
         const success = await login({ identifier, password });
         if (success)
             router.push("/");
+
+        // console.log(`DEBUG NEXT_API_URL: ${process.env.NEXT_PUBLIC_API_URL}`)
     };
 
     return (

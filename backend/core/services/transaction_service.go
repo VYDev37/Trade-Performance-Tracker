@@ -2,8 +2,8 @@ package services
 
 import (
 	"fmt"
-	"trade-tracker/internal/domain"
-	"trade-tracker/internal/repository"
+	"trade-tracker/core/domain"
+	"trade-tracker/core/repository"
 
 	"gorm.io/gorm"
 )

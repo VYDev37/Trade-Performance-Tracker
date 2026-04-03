@@ -2,9 +2,11 @@ package handlers
 
 import (
 	"log"
+	"os"
+	"time"
 
-	"trade-tracker/internal/domain"
-	"trade-tracker/internal/services"
+	"trade-tracker/core/domain"
+	"trade-tracker/core/services"
 	"trade-tracker/pkg/utils/auth"
 	"trade-tracker/pkg/utils/format"
 
@@ -75,6 +77,16 @@ func (h *UserHandler) HandleLogin(c fiber.Ctx) error {
 		log.Printf("Error when trying to generate token: %v.\n", err.Error())
 		return c.Status(500).JSON(fiber.Map{"message": "Internal server error."})
 	}
+
+	c.Cookie(&fiber.Cookie{
+		Name:     "token",
+		Value:    token,
+		Expires:  time.Now().Add(24 * time.Hour),
+		HTTPOnly: true,
+		Secure:   os.Getenv("PRODUCTION_MODE") == "true",
+		SameSite: "None",
+		Path:     "/",
+	})
 
 	return c.Status(200).JSON(fiber.Map{"message": "Login success.", "token": token})
 }
