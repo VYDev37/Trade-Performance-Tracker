@@ -11,7 +11,6 @@ interface NoteEmptyProps {
 
 export default function NoteEmpty({ onRefresh }: NoteEmptyProps) {
     const [open, setOpen] = useState(false);
-
     return (
         <div className="flex flex-col items-center justify-center min-h-[400px] w-full rounded-xl border-2 border-dashed border-white/5 bg-zinc-900/20 p-8 text-center animate-in fade-in duration-500">
             <div className="flex h-20 w-20 items-center justify-center rounded-full bg-zinc-900/50 border border-white/10 mb-6">
