@@ -105,3 +105,18 @@ func (h *UserHandler) HandleGetMe(c fiber.Ctx) error {
 
 	return c.Status(200).JSON(fiber.Map{"data": res})
 }
+
+func (h *UserHandler) Logout(c fiber.Ctx) error {
+	c.Cookie(&fiber.Cookie{
+		Name:     "token",
+		Value:    "",
+		Expires:  time.Unix(0, 0),
+		HTTPOnly: true,
+		Secure:   (os.Getenv("PRODUCTION_MODE") == "true"),
+		SameSite: "None",
+		Path:     "/",
+	})
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Logged out from server",
+	})
+}

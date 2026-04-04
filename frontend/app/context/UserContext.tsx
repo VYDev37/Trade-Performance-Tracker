@@ -45,11 +45,18 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         router.push("/admin/dashboard");
     };
 
-    const logout = () => {
-        Cookies.remove("token");
-        setUser(null);
+    const logout = async () => {
+        try {
+            await axios.post("/account/logout");
+        } catch (err) {
+            console.error("Logout from server failed: ", err);
+        }
+        finally {
+            Cookies.remove("token");
+            setUser(null);
 
-        router.push("/login");
+            router.push("/login");
+        }
     };
 
     const value = useMemo(

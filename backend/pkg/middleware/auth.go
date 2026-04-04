@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/golang-jwt/jwt/v5"
@@ -33,7 +34,15 @@ func AuthMiddleware() fiber.Handler {
 		})
 
 		if err != nil || !token.Valid {
-			fmt.Println(err)
+			c.Cookie(&fiber.Cookie{
+				Name:     "token",
+				Value:    "",
+				Expires:  time.Unix(0, 0),
+				Path:     "/",
+				HTTPOnly: true,
+				Secure:   (os.Getenv("PRODUCTION_MODE") == "true"),
+				SameSite: "None",
+			})
 			return c.Status(401).JSON(fiber.Map{"message": "Invalid token."})
 		}
 

@@ -43,6 +43,7 @@ The backend uses **Fiber** for routing. CORS is pre-configured to accept request
 - **`GET /api/`** - Health check / Hello World
 - **`POST /api/account/register`** - Register a new user
 - **`POST /api/account/login`** - Authenticate user and return a JWT
+- **`POST /api/account/logout`** - Instantly removes user's cookie and authentication
 
 ### Protected Routes (Requires JWT Auth Middleware)
 

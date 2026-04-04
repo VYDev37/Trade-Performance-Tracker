@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.6] - 2026-04-04
+### Added
+- Logout route
+- Auto kick in middleware when the token is invalid or expired
+
 ## [0.1.5] - 2026-04-03
 ### Added
 - Added missing functionalities on design (`NoteEmpty`)

@@ -9,10 +9,11 @@ const api = axios.create({
 });
 
 api.interceptors.response.use(
-    (response) => response,
-    (error: AxiosError<{ message: string }>) => {
-        if (error.response && error.response.data && error.response.data.message) {
-            error.message = error.response.data.message;
+    response => response,
+    error => {
+        if (error.response?.status === 401) {
+            document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"; // reset
+            window.location.href = "/login";
         }
         return Promise.reject(error);
     }

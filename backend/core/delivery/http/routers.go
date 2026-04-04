@@ -52,6 +52,7 @@ func InitRoutes(uService services.UserService, pService services.PositionService
 
 	accountApi.Post("/register", userService.HandleRegister)
 	accountApi.Post("/login", userService.HandleLogin)
+	accountApi.Post("/logout", userService.Logout)
 
 	userApi := api.Group("/user", middleware.AuthMiddleware())
 
