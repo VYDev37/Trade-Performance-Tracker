@@ -113,7 +113,7 @@ export default function Journal() {
                     </div>
                 </>
             ) : (
-                <NoteEmpty />
+                <NoteEmpty onRefresh={refreshNote} />
             )}
         </div>
     )

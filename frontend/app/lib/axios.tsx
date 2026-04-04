@@ -1,7 +1,7 @@
 import axios, { AxiosError } from "axios";
 
 const api = axios.create({
-    baseURL: `http://${typeof window !== 'undefined' ? window.location.hostname : "localhost"}:8080/api`,
+    baseURL: process.env.NEXT_PUBLIC_API_URL || "/api",
     withCredentials: true,
     headers: {
         "Content-Type": "application/json",

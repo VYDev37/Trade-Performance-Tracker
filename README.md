@@ -41,6 +41,7 @@ A comprehensive full-stack application for tracking and analyzing trade performa
 Trade-Performance-Tracker/
 ├── backend/                  # Go API Server
 │   ├── cmd/                  # Entry point for the application (main.go)
+│   │   ├── api/              # Where main.go located
 │   ├── internal/             # Application code (Clean Architecture)
 │   │   ├── config/           # Configuration loaders
 │   │   ├── delivery/         # HTTP handlers and routing
@@ -48,18 +49,39 @@ Trade-Performance-Tracker/
 │   │   ├── repository/       # Database interactions
 │   │   └── services/         # Business logic
 │   ├── pkg/                  # Shared utilities and helpers
+│   ├── .dockerignore         # Ignored files (Docker)
 │   ├── .env.example          # Example environment variables
-│   └── go.mod                # Go module dependencies
+│   ├── .gitignore            # Ignored files (Git)
+│   ├── go.mod                # Go module dependencies
+│   ├── go.sum                # Another Go file
+│   └── README.md             # README
 └── frontend/                 # Next.js Application
-    ├── app/                  # App Router pages and layouts
-    │   ├── (account)/        # Auth pages (login, register)
-    │   └── admin/            # Dashboard, Profile, Stocks, Transactions, Assistant
-    ├── components/           # Reusable UI components (shadcn, charts, etc.)
-    ├── hooks/                # Custom React hooks for API and state management
-    ├── lib/                  # Utility functions
-    ├── types/                # TypeScript interface definitions
-    ├── package.json          # Node dependencies
-    └── pnpm-lock.yaml        # pnpm lockfile
+│   ├── app/                  # App Router pages and layouts
+│   │   ├── (account)/        # Auth pages (login, register)
+│   │   ├── admin/            # Dashboard, Profile, Stocks, Transactions, Assistant, Tracker, Calculator, Journals
+│   │   └── components/       # Shared & Local Page UI Components (for pages, etc.)
+│   ├── components/           # Reusable UI components (shadcn, charts, etc.)
+│   ├── hooks/                # Custom React hooks for API and state management
+│   ├── lib/                  # Utility functions
+│   ├── types/                # TypeScript interface definitions
+│   ├── .env.example          # Example environment variables for frontend
+│   ├── Dockerfile            # Docker instructions for frontend deployment
+│   ├── eslint.config.mjs     # Linting rules and code style configuration
+│   ├── next.env-d.ts         # TypeScript definitions for Next.js
+│   ├── next.config.ts        # Next.js specific configuration
+│   ├── package.json          # Node dependencies
+│   ├── pnpm-lock.yaml        # pnpm lockfile
+│   ├── pnpm-workspace.yaml   # Monorepo workspace configuration for pnpm
+│   ├── postcss.config.mjs    # Tailwind CSS and PostCSS configuration
+│   ├── proxy.ts              # Local development proxy settings
+│   ├── README.md             # README
+│   └── tsconfig.json         # TypeScript compiler configuration
+├── .gitignore                # Ignored files for the entire workspace (Git)
+├── backup-trade-tracker.sql  # Database snapshot or backup file
+├── CHANGELOG.md              # Record of all notable changes to the project
+├── docker-compose.yml        # Docker orchestration for local development
+├── README.md                 # Main project documentation
+└── vercel.json               # Vercel config file
 ```
 
 ---

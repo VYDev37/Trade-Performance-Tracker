@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useLogin } from "@/app/hooks";
 import { useRouter } from "next/navigation";
 
-import AuthForm from "@/app/components/AuthForm";
+import { AuthForm } from "@/app/components/user";
 
 export default function Login() {
     const [identifier, setIdentifier] = useState<string>("");
@@ -18,6 +18,8 @@ export default function Login() {
         const success = await login({ identifier, password });
         if (success)
             router.push("/");
+
+        // console.log(`DEBUG NEXT_API_URL: ${process.env.NEXT_PUBLIC_API_URL}`)
     };
 
     return (

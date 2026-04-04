@@ -40,3 +40,5 @@ frontend/*.tsbuildinfo
 
 # misc
 frontend/*.pem
+.vercel
+.env*.local

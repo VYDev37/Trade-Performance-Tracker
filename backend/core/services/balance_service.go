@@ -1,0 +1,133 @@
+package services
+
+import (
+	"math"
+	"strings"
+	"trade-tracker/core/domain"
+	"trade-tracker/core/repository"
+
+	"gorm.io/gorm"
+)
+
+type BalanceService interface {
+	CreateBalance(balance *domain.Balance, trx *gorm.DB) error
+	RemoveBalance(id uint64, userID uint64, trx *gorm.DB) error
+	AdjustBalance(userID uint64, req domain.BalanceUpdateReq) error
+	UpdateBalance(userID uint64, amount float64, assetType string, tx *gorm.DB) error
+
+	GetBalanceByType(userID uint64, balanceType string, trx *gorm.DB) (float64, error)
+	GetBalances(userID uint64, trx *gorm.DB) (*domain.BalanceResponse, error)
+}
+
+type balanceService struct {
+	repo repository.BalanceRepository
+}
+
+func NewBalanceService(repo repository.BalanceRepository) BalanceService {
+	return &balanceService{repo: repo}
+}
+
+func (s *balanceService) CreateBalance(balance *domain.Balance, trx *gorm.DB) error {
+	return s.repo.CreateBalance(balance, trx)
+}
+
+func (s *balanceService) RemoveBalance(id uint64, userID uint64, trx *gorm.DB) error {
+	if balance, err := s.repo.GetBalance(id, trx); err != nil || balance.UserID != userID {
+		return domain.ErrMismatchInfo
+	}
+
+	return s.repo.RemoveBalance(id, trx)
+}
+
+func (s *balanceService) UpdateBalance(userID uint64, amount float64, assetType string, tx *gorm.DB) error {
+	if amount < 0 {
+		current, _ := s.repo.GetBalanceByType(userID, assetType, tx)
+		if current < math.Abs(amount) {
+			return domain.ErrInsufficientBalance
+		}
+	}
+	return s.repo.UpdateBalance(&domain.Balance{
+		UserID:    userID,
+		Amount:    amount,
+		AssetType: assetType,
+	}, tx)
+}
+
+func (s *balanceService) AdjustBalance(userID uint64, req domain.BalanceUpdateReq) error {
+	db := s.repo.GetDB()
+
+	return db.Transaction(func(tx *gorm.DB) error { // TODO: Separate cashflow logging with this modifier
+		bal, err := s.repo.GetBalanceByType(userID, req.AssetType, tx)
+		if err != nil {
+			return err
+		}
+
+		var logged float64
+
+		tType := ""
+		switch strings.ToLower(req.Mode) {
+		case "add":
+			logged = req.Amount
+			if req.AssetType == "cash_balance" {
+				tType = "income"
+			}
+		case "rem":
+			if bal < req.Amount {
+				return domain.ErrInsufficientBalance
+			}
+			logged = -req.Amount
+			if req.AssetType == "cash_balance" {
+				tType = "expense"
+			}
+		case "mod":
+			logged = req.Amount - bal
+		}
+
+		if err := s.UpdateBalance(userID, logged, req.AssetType, tx); err != nil {
+			return err
+		}
+
+		note := req.Note
+		if note == "" {
+			note = req.Mode + " Cash"
+		}
+
+		if tType == "" {
+			tType = "cashflow"
+		}
+
+		return tx.Create(&domain.Transaction{
+			OwnerID:         userID,
+			TransactionType: tType,
+			BasePrice:       logged,
+			Price:           logged + req.Fee,
+			TransactionFee:  req.Fee,
+			Ticker:          req.BankSource,
+			Notes:           note,
+			Title:           req.Title,
+		}).Error
+	})
+}
+
+func (s *balanceService) GetBalanceByType(userID uint64, balanceType string, trx *gorm.DB) (float64, error) {
+	return s.repo.GetBalanceByType(userID, balanceType, trx)
+}
+
+func (s *balanceService) GetBalances(userID uint64, trx *gorm.DB) (*domain.BalanceResponse, error) {
+	balances, err := s.repo.GetBalances(userID, trx)
+	if err != nil {
+		return nil, err
+	}
+
+	res := &domain.BalanceResponse{}
+	for _, b := range balances {
+		switch b.AssetType {
+		case "stock_balance":
+			res.StockBalance = b.Amount
+		case "cash_balance":
+			res.CashBalance = b.Amount
+		}
+	}
+
+	return res, nil
+}
