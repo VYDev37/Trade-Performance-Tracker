@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Ghost, Plus } from "lucide-react";
+import { Ghost } from "lucide-react";
 
 import NoteSheet from "./NoteSheet";
 

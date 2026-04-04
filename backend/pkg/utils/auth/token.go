@@ -23,7 +23,7 @@ func GenerateToken(userID uint) (string, error) {
 	claims := AuthClaims{
 		UserID: userID,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(1 * time.Hour)), // 1h expires
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)), // 24h expires
 			Issuer:    "trade-tracker",
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		},

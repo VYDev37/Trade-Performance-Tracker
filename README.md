@@ -92,7 +92,10 @@ Trade-Performance-Tracker/
 - [Go](https://go.dev/doc/install) (1.25 or higher)
 - [Node.js](https://nodejs.org/) (20 or higher)
 - [pnpm](https://pnpm.io/installation) (Preferred package manager)
-- [PostgreSQL](https://www.postgresql.org/download/)
+- [PostgreSQL](https://www.postgresql.org/download/) (Main database)
+- [Cloudinary](https://console.cloudinary.com/) (Media management for image uploads and CDN.)
+- [Vercel](https://vercel.com) (Managed PostgreSQL & Connection Pooling.)
+- [Supabase](https://supabase.com/) (Managed PostgreSQL & Connection Pooling, use this if you're going to online)
 
 ### 1. Backend Setup
 
@@ -109,7 +112,11 @@ Trade-Performance-Tracker/
    ```bash
    go mod tidy
    ```
-4. Run the Go server:
+4. Run migrations:
+   ```bash
+   go run core/script/auto-migrate.go
+   ```
+5. Run the Go server:
    ```bash
    go run cmd/api/main.go
    ```
@@ -127,13 +134,48 @@ Trade-Performance-Tracker/
    ```
 3. Set up environment variables (if required for API endpoint URLs):
    ```bash
-   # Create a .env.local if you need to override the default API URL
+   # Create a .env.local if you need to override the default API URL (Schemas can be obtained from .env.example)
    ```
 4. Start the Next.js development server:
    ```bash
    pnpm run dev
    ```
    *The frontend will be available at [http://localhost:3000](http://localhost:3000).*
+
+---
+
+## 🛠️ Environment Variables Setup
+
+Copy the `.env.example` file to `.env` in both `/frontend` and `/backend` directories, then fill in the following variables:
+
+### 🌐 Frontend (`/frontend`)
+| Variable | Description | How to Obtain |
+| :--- | :--- | :--- |
+| `NEXT_PUBLIC_API_URL` | Your Go Backend URL | Usually `http://localhost:8080` for local or your Vercel deployment URL. Default: `{url}/api` |
+| `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` | Cloudinary Cloud Name | Get it from [Cloudinary Dashboard](https://console.cloudinary.com/console/) after sign up. |
+
+### ⚙️ Backend (`/backend`)
+| Variable | Description | How to Obtain |
+| :--- | :--- | :--- |
+| `DB_CONNECTION` | PostgreSQL Connection String | See [Database Setup Guide](#🔧-database-setup-guide) |
+| `PORT` | Server Port | Default: `8080`. |
+| `JWT_SECRET` | Secret key for JWT signing | Create a random secure string (e.g., using `openssl rand -base64 32`). |
+| `PRODUCTION_MODE` | App environment state | Set to `false` for local dev, `true` for production/Vercel. |
+| `API_GROUP_NAME` | Fiber route prefix | Default: `/api`. |
+
+---
+
+## 🔧 Database Setup Guide
+
+- Cloud: Go to Supabase > Connect > Transaction Pooler. Use Port 6543. For more information, see images.
+
+- Local: Use your local PostgreSQL URI (e.g., postgres://user:pass@localhost:5432/db)
+
+---
+
+## 🌍 Deployment
+
+For comprehensive production deployment instructions on Vercel, including our seamless "Zero-Config" True Monorepo setup, please refer to the [Deployment Guide](DEPLOYMENT.md).
 
 ---
 

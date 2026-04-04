@@ -7,11 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.5] - 2026-04-03
 ### Added
-- Deployment is now supported in Vercel
+- Added missing functionalities on design (`NoteEmpty`)
+- Deployment is now supported in Vercel with setup tutorial
 - Calculator page for simple calculation
+- Financial tracker page (actually done in [v0.1.4]([0.1.4]-2026-03-30))
 ### Changed
+- JWT Token lifetime (1h -> 24h)
+- Moved some files to ensure consistency
 - Optimized backend functions (to make sure it works well in serverless environment)
 - Fixed typo & error in design
+- Auto migrate is now separated with the main program. (Run `go run cmd/script/auto-migrate.go` in `backend` folder to do database migration)
 
 ## [0.1.4] - 2026-03-30
 ### Added

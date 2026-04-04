@@ -1,9 +1,6 @@
 "use client";
 
-import { useState } from "react";
-
 import { Button } from "@/components/ui/button";
-
 import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter } from "@/components/ui/sheet";
 
 import { useAddNote, useUpdateNote } from "@/app/hooks";
