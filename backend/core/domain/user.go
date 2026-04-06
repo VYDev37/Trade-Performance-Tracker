@@ -8,14 +8,14 @@ type User struct {
 	gorm.Model
 
 	Name     string `gorm:"not null" json:"name"`
-	Email    string `gorm:"not null;email" json:"email"`
-	Username string `gorm:"not null" json:"username"`
+	Email    string `gorm:"not null;email;index" json:"email"`
+	Username string `gorm:"not null;index" json:"username"`
 	Password string `gorm:"not null"`
 	Verified bool   `gorm:"not null;default:false" json:"verified"`
 
 	Balances []Balance  `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"balances"`
 	Notes    []Note     `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"notes"`
-	Position []Position `gorm:"foreignKey:OwnerID;reference:OwnerID;not null;default:0" json:"positions"`
+	Position []Position `gorm:"foreignKey:OwnerID;reference:ID;not null;default:0" json:"positions"`
 }
 
 type UserRegisterReq struct {

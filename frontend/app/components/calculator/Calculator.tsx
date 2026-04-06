@@ -18,7 +18,7 @@ export default function Calculator() {
         storedValue={calculator.storedValue}
         operator={calculator.operator}
         clear={calculator.clear}
-        toggleSign={calculator.toggleSign}
+        erase={calculator.erase}
         inputPercent={calculator.inputPercent}
         performOperation={calculator.performOperation}
         inputDigit={calculator.inputDigit}

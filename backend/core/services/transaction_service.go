@@ -51,13 +51,19 @@ func (s *transactionService) GetLocalTransactions(userID uint64) ([]domain.Trans
 	}
 
 	for _, t := range trans {
+		isTrade := t.TransactionType == "sell" || t.TransactionType == "buy"
+		if isTrade && t.Quantity <= 0 {
+			continue
+		}
+
 		realizedPnl := t.Price - t.BasePrice - t.TransactionFee
 		if t.TransactionType != "sell" {
 			realizedPnl = 0
 		}
 
 		ppu := t.BasePrice / t.Quantity
-		if t.TransactionType == "cashflow" || t.TransactionType == "expense" || t.TransactionType == "income" {
+		//if t.TransactionType == "cashflow" || t.TransactionType == "expense" || t.TransactionType == "income"
+		if !isTrade {
 			ppu = 0
 		}
 

@@ -10,7 +10,7 @@ type Transaction struct {
 	gorm.Model
 
 	ID              uint    `json:"id"`
-	OwnerID         uint64  `gorm:"not null" json:"owner_id"`
+	OwnerID         uint64  `gorm:"not null;index" json:"owner_id"`
 	TransactionType string  `gorm:"not null;default:'buy'" json:"transaction_type"`
 	TransactionFee  float64 `gorm:"not null" json:"transaction_fee"`
 	Quantity        float64 `gorm:"not null" json:"quantity"`

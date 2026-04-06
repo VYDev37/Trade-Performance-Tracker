@@ -20,7 +20,7 @@ export default function Tracker() {
     const visibleIncomes = incomes.slice(0, limit);
     const visibleExpenses = expenses.slice(0, limit);
 
-    const balanceTransactions = [...incomes, ...expenses].sort((a,b) => new Date(b.created_at!).getTime() - new Date(a.created_at!).getTime());
+    const balanceTransactions = [...incomes, ...expenses].sort((a, b) => new Date(b.created_at!).getTime() - new Date(a.created_at!).getTime());
     const visibleBalanceTransactions = balanceTransactions.slice(0, limit);
 
     useEffect(() => {
@@ -49,7 +49,6 @@ export default function Tracker() {
                     title="Inflow Details"
                     type="inflow"
                     items={visibleIncomes}
-                    totalCount={incomes.length}
                     onViewAll={() => setLimit(Math.max(incomes.length, expenses.length))}
                 />
 
@@ -57,7 +56,6 @@ export default function Tracker() {
                     title="Outflow Details"
                     type="outflow"
                     items={visibleExpenses}
-                    totalCount={expenses.length}
                     onViewAll={() => setLimit(Math.max(incomes.length, expenses.length))}
                 />
             </div>

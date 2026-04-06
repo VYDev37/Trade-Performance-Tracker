@@ -70,7 +70,7 @@ func (r *noteRepo) GetNotes(userID uint64) ([]domain.Note, error) {
 
 func (r *noteRepo) GetNote(noteID uint) (*domain.Note, error) {
 	var notes domain.Note
-	if err := r.DB.Where("id = ?", noteID).Find(&notes).Error; err != nil {
+	if err := r.DB.Where("id = ?", noteID).Take(&notes).Error; err != nil {
 		return nil, err
 	}
 

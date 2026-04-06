@@ -15,12 +15,12 @@ func NewTransactionHandler(service services.TransactionService) *TransactionHand
 }
 
 func (h *TransactionHandler) HandleGetLocalTransaction(c fiber.Ctx) error {
-	rawUid := c.Locals("user_id")
-	if rawUid == nil {
+	uid, ok := c.Locals("user_id").(uint64)
+	if !ok {
 		return c.Status(401).JSON(fiber.Map{"message": "Unauthorized."})
 	}
 
-	data, err := h.service.GetLocalTransactions(rawUid.(uint64))
+	data, err := h.service.GetLocalTransactions(uid)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{"message": err.Error()})
 	}

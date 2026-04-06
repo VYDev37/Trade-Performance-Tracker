@@ -10,12 +10,19 @@ const api = axios.create({
 
 api.interceptors.response.use(
     response => response,
-    error => {
+    async (error) => {
         if (error.response?.status === 401) {
             document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"; // reset
-            window.location.href = "/login";
+            if (window.location.pathname !== "/login")
+                window.location.href = "/login";
+            return Promise.reject(new Error("Session expired. Please login again."));
         }
-        return Promise.reject(error);
+
+        if (axios.isAxiosError(error)) {
+            const customMessage = error.response?.data?.message || error.message || 'Something went wrong.';
+            return Promise.reject(new Error(customMessage));
+        }
+        return Promise.reject(new Error('Unexpected error occurred.'));
     }
 );
 

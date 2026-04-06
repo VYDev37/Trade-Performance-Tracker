@@ -33,8 +33,14 @@ export default function useCalculator() {
     setWaitingForNewValue(false);
   };
 
-  const toggleSign = () => {
-    setDisplay((parseFloat(display) * -1).toString());
+  const erase = () => {
+    if (waitingForNewValue) return;
+    if (display.length > 1) {
+      const newDisplay = display.slice(0, -1);
+      setDisplay(newDisplay === "-" ? "0" : newDisplay);
+    } else {
+      setDisplay("0");
+    }
   };
 
   const inputPercent = () => {
@@ -123,7 +129,7 @@ export default function useCalculator() {
     inputDigit,
     inputDot,
     clear,
-    toggleSign,
+    erase,
     inputPercent,
     performOperation,
     calculateEqual

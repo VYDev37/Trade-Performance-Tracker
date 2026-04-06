@@ -4,6 +4,7 @@ import (
 	"trade-tracker/core/domain"
 
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type PositionRepository interface {
@@ -12,7 +13,7 @@ type PositionRepository interface {
 	UpdatePosition(pos *domain.Position, trx *gorm.DB) error
 
 	GetPositions(userID uint64) ([]domain.Position, error)
-	GetPosByTicker(userID uint64, ticker string) (*domain.Position, error)
+	GetPosByTicker(userID uint64, ticker string, tx *gorm.DB) (*domain.Position, error)
 	GetDB() *gorm.DB
 }
 
@@ -32,11 +33,21 @@ func (r *positionRepo) AddPosition(pos *domain.Position, trx *gorm.DB) error {
 	return db.Create(&pos).Error
 }
 
-func (r *positionRepo) GetPosByTicker(userID uint64, ticker string) (*domain.Position, error) {
+func (r *positionRepo) GetPosByTicker(userID uint64, ticker string, tx *gorm.DB) (*domain.Position, error) {
 	var pos domain.Position
-	err := r.DB.Where("owner_id = ? AND ticker ILIKE ?", userID, ticker).First(&pos).Error
+	db := r.DB
+	if tx != nil {
+		db = tx
+	}
 
-	return &pos, err
+	err := db.Clauses(clause.Locking{Strength: "UPDATE"}).
+		Where("owner_id = ? AND ticker = ?", userID, ticker).
+		Take(&pos).Error
+
+	if err != nil {
+		return nil, err
+	}
+	return &pos, nil
 }
 
 func (r *positionRepo) GetPositions(userID uint64) ([]domain.Position, error) {

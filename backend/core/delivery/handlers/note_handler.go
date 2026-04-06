@@ -12,17 +12,20 @@ import (
 )
 
 type NoteHandler struct {
-	service services.NoteService
+	service  services.NoteService
+	validate *validator.Validate
 }
 
 func NewNoteHandler(service services.NoteService) *NoteHandler {
-	return &NoteHandler{service: service}
+	return &NoteHandler{
+		service:  service,
+		validate: validator.New(),
+	}
 }
 
 func (h *NoteHandler) HandleAddNote(c fiber.Ctx) error {
-	rawUid := c.Locals("user_id")
-
-	if rawUid == nil {
+	uid, ok := c.Locals("user_id").(uint64)
+	if !ok {
 		return c.Status(401).JSON(fiber.Map{"message": "Unauthorized."})
 	}
 
@@ -32,8 +35,7 @@ func (h *NoteHandler) HandleAddNote(c fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"message": "Failed to parse body."})
 	}
 
-	validate := validator.New()
-	if err := validate.Struct(req); err != nil {
+	if err := h.validate.Struct(req); err != nil {
 		if validationErrors, ok := err.(validator.ValidationErrors); ok {
 			errFirst := validationErrors[0]
 			return c.Status(400).JSON(fiber.Map{"message": format.FormatError(errFirst)})
@@ -42,7 +44,7 @@ func (h *NoteHandler) HandleAddNote(c fiber.Ctx) error {
 	}
 
 	if err := h.service.AddNote(&domain.Note{
-		UserID:      rawUid.(uint64),
+		UserID:      uid,
 		Title:       req.Title,
 		Description: req.Description,
 		Category:    req.Category,
@@ -56,13 +58,12 @@ func (h *NoteHandler) HandleAddNote(c fiber.Ctx) error {
 }
 
 func (h *NoteHandler) HandleUpdateNote(c fiber.Ctx) error {
-	rawUid := c.Locals("user_id")
-	noteId, err := strconv.Atoi(c.Params("nId"))
-
-	if rawUid == nil {
+	uid, ok := c.Locals("user_id").(uint64)
+	if !ok {
 		return c.Status(401).JSON(fiber.Map{"message": "Unauthorized."})
 	}
 
+	noteId, err := strconv.Atoi(c.Params("nId"))
 	if err != nil {
 		return c.Status(401).JSON(fiber.Map{"message": err.Error()})
 	}
@@ -73,8 +74,7 @@ func (h *NoteHandler) HandleUpdateNote(c fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"message": "Failed to parse body."})
 	}
 
-	validate := validator.New()
-	if err := validate.Struct(req); err != nil {
+	if err := h.validate.Struct(req); err != nil {
 		if validationErrors, ok := err.(validator.ValidationErrors); ok {
 			errFirst := validationErrors[0]
 			return c.Status(400).JSON(fiber.Map{"message": format.FormatError(errFirst)})
@@ -83,7 +83,7 @@ func (h *NoteHandler) HandleUpdateNote(c fiber.Ctx) error {
 	}
 
 	note := &domain.Note{
-		UserID:      rawUid.(uint64),
+		UserID:      uid,
 		Title:       req.Title,
 		Description: req.Description,
 		Category:    req.Category,
@@ -100,13 +100,12 @@ func (h *NoteHandler) HandleUpdateNote(c fiber.Ctx) error {
 }
 
 func (h *NoteHandler) HandleGetNotes(c fiber.Ctx) error {
-	rawUid := c.Locals("user_id")
-
-	if rawUid == nil {
+	uid, ok := c.Locals("user_id").(uint64)
+	if !ok {
 		return c.Status(401).JSON(fiber.Map{"message": "Unauthorized."})
 	}
 
-	data, err := h.service.GetNotes(rawUid.(uint64))
+	data, err := h.service.GetNotes(uid)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{"message": err.Error()})
 	}
@@ -115,18 +114,17 @@ func (h *NoteHandler) HandleGetNotes(c fiber.Ctx) error {
 }
 
 func (h *NoteHandler) HandleRemoveNote(c fiber.Ctx) error {
-	rawUid := c.Locals("user_id")
-	noteId, err := strconv.Atoi(c.Params("nId"))
-
-	if rawUid == nil {
+	uid, ok := c.Locals("user_id").(uint64)
+	if !ok {
 		return c.Status(401).JSON(fiber.Map{"message": "Unauthorized."})
 	}
 
+	noteId, err := strconv.Atoi(c.Params("nId"))
 	if err != nil {
 		return c.Status(401).JSON(fiber.Map{"message": err.Error()})
 	}
 
-	if err := h.service.RemoveNote(uint(noteId), rawUid.(uint64)); err != nil {
+	if err := h.service.RemoveNote(uint(noteId), uid); err != nil {
 		return c.Status(400).JSON(fiber.Map{"message": err.Error()})
 	}
 

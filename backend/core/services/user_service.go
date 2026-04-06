@@ -1,11 +1,10 @@
 package services
 
 import (
+	"strings"
 	"trade-tracker/core/domain"
 	"trade-tracker/core/repository"
 	"trade-tracker/pkg/utils/hash"
-
-	"strings"
 
 	"gorm.io/gorm"
 )
@@ -30,6 +29,9 @@ func NewUserService(repo repository.UserRepository, posService PositionService, 
 }
 
 func (s *userService) CreateUser(user *domain.User) error {
+	user.Username = strings.ToLower(user.Username)
+	user.Email = strings.ToLower(user.Email)
+
 	if _, err := s.repo.GetUserByUsernameOrEmail(user.Username, user.Email); err == nil {
 		return domain.ErrAlreadyExist
 	}
@@ -39,7 +41,6 @@ func (s *userService) CreateUser(user *domain.User) error {
 		return domain.ErrInvalidInput
 	}
 
-	user.Username = strings.ToLower(user.Username)
 	user.Password = hashed
 
 	db := s.repo.GetDB()
@@ -64,6 +65,8 @@ func (s *userService) CreateUser(user *domain.User) error {
 }
 
 func (s *userService) Login(identifier, password string) (*domain.User, error) {
+	identifier = strings.ToLower(identifier)
+
 	user, err := s.repo.GetUserByUsernameOrEmail(identifier, identifier)
 	if err != nil {
 		return nil, domain.ErrWrongCredential
@@ -80,7 +83,7 @@ func (s *userService) Login(identifier, password string) (*domain.User, error) {
 }
 
 func (s *userService) GetUserByUsernameOrEmail(username, email string) (*domain.User, error) {
-	return s.repo.GetUserByUsernameOrEmail(username, email)
+	return s.repo.GetUserByUsernameOrEmail(strings.ToLower(username), strings.ToLower(email))
 }
 
 func (s *userService) GetProfile(userID uint64) (*domain.UserProfileResponse, error) {
@@ -95,7 +98,7 @@ func (s *userService) GetProfile(userID uint64) (*domain.UserProfileResponse, er
 	}
 
 	balance, err := s.balService.GetBalances(userID, nil)
-	if err != nil {
+	if err != nil || balance == nil {
 		return nil, err
 	}
 

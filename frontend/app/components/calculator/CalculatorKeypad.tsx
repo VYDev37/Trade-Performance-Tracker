@@ -1,3 +1,5 @@
+"use client"
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 
 interface CalculatorKeypadProps {
@@ -5,7 +7,7 @@ interface CalculatorKeypadProps {
   storedValue: number | null;
   operator: string | null;
   clear: () => void;
-  toggleSign: () => void;
+  erase: () => void;
   inputPercent: () => void;
   performOperation: (op: string) => void;
   inputDigit: (digit: string) => void;
@@ -18,7 +20,7 @@ export default function CalculatorKeypad({
   storedValue,
   operator,
   clear,
-  toggleSign,
+  erase,
   inputPercent,
   performOperation,
   inputDigit,
@@ -27,7 +29,7 @@ export default function CalculatorKeypad({
 }: CalculatorKeypadProps) {
   const buttons = [
     { label: display === "0" && !storedValue ? "AC" : "C", onClick: clear, variant: "special" },
-    { label: "+/-", onClick: toggleSign, variant: "special" },
+    { label: "⌫", onClick: erase, variant: "special" },
     { label: "%", onClick: inputPercent, variant: "special" },
     { label: "÷", onClick: () => performOperation("/"), variant: "op", op: "/" },
     { label: "7", onClick: () => inputDigit("7"), variant: "num" },
@@ -46,6 +48,45 @@ export default function CalculatorKeypad({
     { label: ".", onClick: inputDot, variant: "num" },
     { label: "=", onClick: calculateEqual, variant: "equal" },
   ];
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const { key } = event;
+      if (/[0-9]/.test(key)) {
+        inputDigit(key);
+      }
+
+      switch (key) {
+        case "+": case "-": case "*": case "/": {
+          event.preventDefault();
+          performOperation(key);
+          break;
+        }
+        case "Enter": case "=": {
+          event.preventDefault();
+          calculateEqual();
+          break;
+        }
+        case ".": case ",": {
+          inputDot();
+          break;
+        }
+        case "Escape": case "c": case "C": {
+          clear();
+          break;
+        }
+        case "Backspace": {
+          event.preventDefault();
+          erase();
+          break;
+        }
+      }
+
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [inputDigit, performOperation, calculateEqual, inputDot, clear]);
 
   return (
     <div className="grid grid-cols-4 gap-3">

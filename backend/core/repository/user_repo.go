@@ -33,7 +33,7 @@ func (r *userRepo) CreateUser(user *domain.User, trx *gorm.DB) error {
 
 func (r *userRepo) GetUserByUsernameOrEmail(username, email string) (*domain.User, error) {
 	var user domain.User
-	if err := r.db.Where("username ILIKE ? OR email ILIKE ?", username, email).Take(&user).Error; err != nil {
+	if err := r.db.Where("username = ? OR email = ?", username, email).Take(&user).Error; err != nil {
 		return nil, err
 	}
 	return &user, nil
@@ -41,7 +41,7 @@ func (r *userRepo) GetUserByUsernameOrEmail(username, email string) (*domain.Use
 
 func (r *userRepo) GetUserByID(userID uint64) (*domain.User, error) {
 	var user domain.User
-	if err := r.db.First(&user, userID).Error; err != nil {
+	if err := r.db.Take(&user, userID).Error; err != nil {
 		return nil, err
 	}
 	return &user, nil

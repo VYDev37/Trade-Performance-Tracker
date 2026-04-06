@@ -12,43 +12,45 @@ import (
 )
 
 type PositionHandler struct {
-	service services.PositionService
+	service  services.PositionService
+	validate *validator.Validate
 }
 
 func NewPositionHandler(service services.PositionService) *PositionHandler {
-	return &PositionHandler{service: service}
+	return &PositionHandler{
+		service:  service,
+		validate: validator.New(),
+	}
 }
 
 func (h *PositionHandler) HandleGetTickerMarketPrice(c fiber.Ctx) error {
 	ticker := strings.ToUpper(c.Params("ticker"))
 	if ticker == "" {
-		return c.Status(401).JSON(fiber.Map{"message": "Please input ticker."})
+		return c.Status(401).JSON(fiber.Map{"message": "Ticker is required."})
 	}
 
 	price, err := h.service.GetTickerCurrentPrice(ticker)
 	if err != nil {
-		return c.Status(400).JSON(fiber.Map{"message": err.Error()})
+		return c.Status(400).JSON(fiber.Map{"message": "Ticker not found."})
 	}
 
 	return c.Status(200).JSON(fiber.Map{"message": "Success", "price": price})
 }
 
 func (h *PositionHandler) HandleAddPosition(c fiber.Ctx) error {
+	var req domain.PositionAddReq
 	directionType := c.Params("type")
-	rawUid := c.Locals("user_id")
 
-	if rawUid == nil {
+	uid, ok := c.Locals("user_id").(uint64)
+	if !ok {
 		return c.Status(401).JSON(fiber.Map{"message": "Unauthorized."})
 	}
-
-	var req domain.PositionAddReq
 
 	if err := c.Bind().Body(&req); err != nil {
 		return c.Status(400).JSON(fiber.Map{"message": "Failed to parse body."})
 	}
 
-	validate := validator.New()
-	if err := validate.Struct(req); err != nil {
+	if err := h.validate.Struct(req); err != nil {
 		if validationErrors, ok := err.(validator.ValidationErrors); ok {
 			errFirst := validationErrors[0]
 			return c.Status(400).JSON(fiber.Map{"message": format.FormatError(errFirst)})
@@ -57,7 +59,7 @@ func (h *PositionHandler) HandleAddPosition(c fiber.Ctx) error {
 	}
 
 	if err := h.service.AddPosition(directionType, &domain.Position{
-		OwnerID:       rawUid.(uint64),
+		OwnerID:       uid,
 		TotalQty:      req.TotalQty,
 		Ticker:        req.Ticker,
 		InvestedTotal: req.InvestedTotal,
@@ -71,13 +73,12 @@ func (h *PositionHandler) HandleAddPosition(c fiber.Ctx) error {
 }
 
 func (h *PositionHandler) HandleGetPortfolio(c fiber.Ctx) error {
-	rawUid := c.Locals("user_id")
-
-	if rawUid == nil {
+	uid, ok := c.Locals("user_id").(uint64)
+	if !ok {
 		return c.Status(401).JSON(fiber.Map{"message": "Unauthorized."})
 	}
 
-	data, err := h.service.GetPositions(rawUid.(uint64))
+	data, err := h.service.GetPositions(uid)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{"message": err.Error()})
 	}

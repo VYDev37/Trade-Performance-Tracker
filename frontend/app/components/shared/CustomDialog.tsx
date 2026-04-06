@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogHeader } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogHeader, DialogDescription } from "@/components/ui/dialog";
 import { VisuallyHidden } from "radix-ui";
 import { cn } from "@/lib/utils";
 
@@ -33,7 +33,7 @@ export default function CustomDialog({
             <DialogTrigger asChild className={triggerClassName}>
                 {trigger}
             </DialogTrigger>
-            <DialogContent 
+            <DialogContent
                 onPointerDownOutside={onPointerDownOutside}
                 onInteractOutside={onInteractOutside}
                 className={cn("bg-zinc-950 text-white border-white/10", contentClassName)}
@@ -50,6 +50,9 @@ export default function CustomDialog({
                     )
                 )}
                 {children}
+                <DialogDescription className="sr-only">
+                    Form to edit your trading notes.
+                </DialogDescription>
             </DialogContent>
         </Dialog>
     );

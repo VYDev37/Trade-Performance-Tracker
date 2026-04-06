@@ -30,5 +30,5 @@ type NoteRequest struct {
 	Title       string   `json:"title" validate:"required,min=2,max=50"`
 	Description string   `json:"description" validate:"required"`
 	Category    string   `json:"category"`
-	ImageURL    []string `json:"image_url"`
+	ImageURL    []string `json:"image_url" validate:"max=5,dive,url"`
 }

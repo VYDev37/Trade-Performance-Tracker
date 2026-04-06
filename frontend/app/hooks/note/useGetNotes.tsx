@@ -16,7 +16,7 @@ export default function useGetNotes() {
 
         try {
             const result = await axios.get("/notes/get");
-            console.log(result.data);
+            // console.log(result.data);
             setNotes(result.data.notes);
             return true;
         } catch (err: any) {

@@ -4,6 +4,7 @@ import (
 	"trade-tracker/core/domain"
 
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type BalanceRepository interface {
@@ -56,7 +57,19 @@ func (r *balanceRepo) UpdateBalance(balance *domain.Balance, trx *gorm.DB) error
 	if trx != nil {
 		db = trx
 	}
-	return db.Model(&domain.Balance{}).Where("user_id = ? AND asset_type = ?", balance.UserID, balance.AssetType).Update("amount", gorm.Expr("amount + ?", balance.Amount)).Error
+	result := db.Model(&domain.Balance{}).
+		Where("user_id = ? AND asset_type = ?", balance.UserID, balance.AssetType).
+		Update("amount", gorm.Expr("amount + ?", balance.Amount))
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return domain.ErrItemNotFound
+	}
+
+	return nil
 }
 
 func (r *balanceRepo) GetBalances(userID uint64, trx *gorm.DB) ([]domain.Balance, error) {
@@ -80,7 +93,7 @@ func (r *balanceRepo) GetBalance(balanceID uint64, trx *gorm.DB) (*domain.Balanc
 		db = trx
 	}
 
-	if err := db.Where("id = ?", balanceID).Find(&balances).Error; err != nil {
+	if err := db.Where("id = ?", balanceID).Take(&balances).Error; err != nil {
 		return nil, err
 	}
 
@@ -94,7 +107,9 @@ func (r *balanceRepo) GetBalanceByType(userID uint64, assetType string, trx *gor
 		db = trx
 	}
 
-	if err := db.Where("user_id = ? AND asset_type = ?", userID, assetType).Find(&balance).Error; err != nil {
+	if err := db.Clauses(clause.Locking{Strength: "UPDATE"}).
+		Where("user_id = ? AND asset_type = ?", userID, assetType).
+		Take(&balance).Error; err != nil {
 		return 0, err
 	}
 

@@ -10,16 +10,20 @@ import (
 )
 
 type BalanceHandler struct {
-	service services.BalanceService
+	service  services.BalanceService
+	validate *validator.Validate
 }
 
 func NewBalanceHandler(service services.BalanceService) *BalanceHandler {
-	return &BalanceHandler{service: service}
+	return &BalanceHandler{
+		service:  service,
+		validate: validator.New(),
+	}
 }
 
 func (h *BalanceHandler) HandleUpdateBalance(c fiber.Ctx) error {
-	rawUid := c.Locals("user_id")
-	if rawUid == nil {
+	uid, ok := c.Locals("user_id").(uint64)
+	if !ok {
 		return c.Status(401).JSON(fiber.Map{"message": "Unauthorized."})
 	}
 
@@ -28,8 +32,7 @@ func (h *BalanceHandler) HandleUpdateBalance(c fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"message": "Failed to parse body."})
 	}
 
-	validate := validator.New()
-	if err := validate.Struct(req); err != nil {
+	if err := h.validate.Struct(req); err != nil {
 		if validationErrors, ok := err.(validator.ValidationErrors); ok {
 			errFirst := validationErrors[0]
 			return c.Status(400).JSON(fiber.Map{"message": format.FormatError(errFirst)})
@@ -37,7 +40,7 @@ func (h *BalanceHandler) HandleUpdateBalance(c fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"message": "Invalid request."})
 	}
 
-	if err := h.service.AdjustBalance(rawUid.(uint64), req); err != nil {
+	if err := h.service.AdjustBalance(uid, req); err != nil {
 		return c.Status(400).JSON(fiber.Map{"message": err.Error()})
 	}
 

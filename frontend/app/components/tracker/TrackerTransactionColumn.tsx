@@ -8,11 +8,10 @@ interface TrackerTransactionColumnProps {
     title: string;
     type: 'inflow' | 'outflow';
     items: TransactionInfo[];
-    totalCount: number;
     onViewAll: () => void;
 }
 
-export default function TrackerTransactionColumn({ title, type, items, totalCount, onViewAll }: TrackerTransactionColumnProps) {
+export default function TrackerTransactionColumn({ title, type, items, onViewAll }: TrackerTransactionColumnProps) {
     const isIncome = type === 'inflow';
     const Icon = isIncome ? ArrowUpRight : ArrowDownRight;
     const colorClass = isIncome ? "text-emerald-500" : "text-red-500";

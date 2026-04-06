@@ -15,26 +15,35 @@ func InitDBConnection(dbConnection string) (*gorm.DB, error) {
 		log.New(os.Stdout, "\r\n", log.LstdFlags),
 		logger.Config{
 			SlowThreshold:             500 * time.Millisecond,
-			LogLevel:                  logger.Warn,
+			LogLevel:                  logger.Info,
 			IgnoreRecordNotFoundError: true,
 			Colorful:                  true,
 		},
 	)
 
 	isProduction := (os.Getenv("PRODUCTION_MODE") == "true")
+	gormConfig := &gorm.Config{Logger: nil, PrepareStmt: !isProduction}
+	if !isProduction {
+		gormConfig.Logger = newLogger
+	}
+
 	db, err := gorm.Open(postgres.New(postgres.Config{
 		DSN:                  dbConnection,
 		PreferSimpleProtocol: true,
-	}), &gorm.Config{Logger: newLogger, PrepareStmt: isProduction})
+	}), gormConfig)
 
 	if err != nil {
 		return nil, err
 	}
 
 	sqlDB, _ := db.DB()
+	if err := sqlDB.Ping(); err != nil {
+		log.Fatal("Database unreachable")
+	}
+
 	if isProduction {
-		sqlDB.SetMaxIdleConns(1)
-		sqlDB.SetMaxOpenConns(2)
+		sqlDB.SetMaxIdleConns(3)
+		sqlDB.SetMaxOpenConns(15)
 		sqlDB.SetConnMaxLifetime(5 * time.Minute)
 	} else {
 		sqlDB.SetMaxIdleConns(10)

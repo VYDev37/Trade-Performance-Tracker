@@ -15,11 +15,15 @@ import (
 )
 
 type UserHandler struct {
-	service services.UserService
+	service  services.UserService
+	validate *validator.Validate
 }
 
 func NewUserHandler(service services.UserService) *UserHandler {
-	return &UserHandler{service: service}
+	return &UserHandler{
+		service:  service,
+		validate: validator.New(),
+	}
 }
 
 func (h *UserHandler) HandleRegister(c fiber.Ctx) error {
@@ -36,8 +40,7 @@ func (h *UserHandler) HandleRegister(c fiber.Ctx) error {
 		Email:    req.Email,
 	}
 
-	validate := validator.New()
-	if err := validate.Struct(req); err != nil {
+	if err := h.validate.Struct(req); err != nil {
 		if validationErrors, ok := err.(validator.ValidationErrors); ok {
 			errFirst := validationErrors[0]
 			return c.Status(400).JSON(fiber.Map{"message": format.FormatError(errFirst)})
@@ -58,8 +61,7 @@ func (h *UserHandler) HandleLogin(c fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"message": "Failed to parse body."})
 	}
 
-	validate := validator.New()
-	if err := validate.Struct(req); err != nil {
+	if err := h.validate.Struct(req); err != nil {
 		if validationErrors, ok := err.(validator.ValidationErrors); ok {
 			errFirst := validationErrors[0]
 			return c.Status(400).JSON(fiber.Map{"message": format.FormatError(errFirst)})
@@ -92,12 +94,11 @@ func (h *UserHandler) HandleLogin(c fiber.Ctx) error {
 }
 
 func (h *UserHandler) HandleGetMe(c fiber.Ctx) error {
-	rawUid := c.Locals("user_id")
-	if rawUid == nil {
+	uid, ok := c.Locals("user_id").(uint64)
+	if !ok {
 		return c.Status(401).JSON(fiber.Map{"message": "Unauthorized."})
 	}
-
-	res, err := h.service.GetProfile(rawUid.(uint64))
+	res, err := h.service.GetProfile(uid)
 	if err != nil {
 		log.Printf("Error when trying to get profile: %v.\n", err.Error())
 		return c.Status(500).JSON(fiber.Map{"message": "Internal server error."})

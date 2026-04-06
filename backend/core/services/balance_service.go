@@ -20,11 +20,12 @@ type BalanceService interface {
 }
 
 type balanceService struct {
-	repo repository.BalanceRepository
+	repo        repository.BalanceRepository
+	tranService TransactionService
 }
 
-func NewBalanceService(repo repository.BalanceRepository) BalanceService {
-	return &balanceService{repo: repo}
+func NewBalanceService(repo repository.BalanceRepository, tranService TransactionService) BalanceService {
+	return &balanceService{repo: repo, tranService: tranService}
 }
 
 func (s *balanceService) CreateBalance(balance *domain.Balance, trx *gorm.DB) error {
@@ -96,16 +97,10 @@ func (s *balanceService) AdjustBalance(userID uint64, req domain.BalanceUpdateRe
 			tType = "cashflow"
 		}
 
-		return tx.Create(&domain.Transaction{
-			OwnerID:         userID,
-			TransactionType: tType,
-			BasePrice:       logged,
-			Price:           logged + req.Fee,
-			TransactionFee:  req.Fee,
-			Ticker:          req.BankSource,
-			Notes:           note,
-			Title:           req.Title,
-		}).Error
+		return s.tranService.LogActivity(&domain.Position{
+			OwnerID: userID,
+			Ticker:  req.BankSource,
+		}, 0, req.Amount, req.Fee, 0, tType, req.Note, tx)
 	})
 }
 

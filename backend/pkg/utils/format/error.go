@@ -15,6 +15,8 @@ func FormatError(err validator.FieldError) string {
 		return fmt.Sprintf("%s must not be empty.", field)
 	case "email":
 		return "Email format is not valid."
+	case "url":
+		return fmt.Sprintf("%s must be a valid URL format.", field)
 	case "gte", "min":
 		if err.Kind().String() == "string" {
 			return fmt.Sprintf("%s must be at least %s characters.", field, param)
