@@ -16,7 +16,7 @@ export default function useUpdateNote() {
             await axios.put(`/notes/update/${id}`, data);
             return true;
         } catch (err: any) {
-            setError(err.response?.data?.message || "Failed to add note.");
+            setError(err.message || "Failed to add note.");
             return false;
         } finally {
             setLoading(false);

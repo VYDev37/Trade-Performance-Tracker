@@ -20,7 +20,9 @@ func main() {
 		log.Println("No .env file found, relying on environment variables")
 	}
 
-	db, err := config.InitDBConnection(os.Getenv("DB_CONNECTION"))
+	connStr := os.Getenv("DB_CONNECTION")
+	// log.Printf("Connection string: %s\n", connStr)
+	db, err := config.InitDBConnection(connStr)
 	if err != nil {
 		log.Fatalf("Error connecting to database: %v", err)
 	}

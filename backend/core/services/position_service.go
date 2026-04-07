@@ -65,8 +65,16 @@ func (s *positionService) handleSellMode(existing *domain.Position, sellData *do
 		}
 	}
 
-	return s.transactionService.LogActivity(existing, sellData.TotalQty, sellData.InvestedTotal, fee, basePrice,
-		"sell", fmt.Sprintf("Sold %.f lot of %s for %s.", sellData.TotalQty, sellData.Ticker, format.FormatNumber(sellData.InvestedTotal)), tx)
+	return s.transactionService.LogActivity(LogActivityParams{
+		Position:  existing,
+		Quantity:  sellData.TotalQty,
+		Price:     sellData.InvestedTotal,
+		Fee:       fee,
+		BasePrice: basePrice,
+		Action:    "sell",
+		Notes:     fmt.Sprintf("Sold %.f lot of %s for %s.", sellData.TotalQty, sellData.Ticker, format.FormatNumber(sellData.InvestedTotal)),
+		Title:     "",
+	}, tx)
 }
 
 func (s *positionService) handleBuyMode(existing *domain.Position, buyData *domain.Position, fee float64, tx *gorm.DB) error {
@@ -100,8 +108,16 @@ func (s *positionService) handleBuyMode(existing *domain.Position, buyData *doma
 		}
 	}
 
-	return s.transactionService.LogActivity(buyData, buyData.TotalQty, buyData.InvestedTotal+fee, fee, buyData.InvestedTotal, "buy",
-		fmt.Sprintf("Bought %.f lot of %s for %s.", buyData.TotalQty, buyData.Ticker, format.FormatNumber(buyData.InvestedTotal)), tx)
+	return s.transactionService.LogActivity(LogActivityParams{
+		Position:  buyData,
+		Quantity:  buyData.TotalQty,
+		Price:     buyData.InvestedTotal + fee,
+		Fee:       fee,
+		BasePrice: buyData.InvestedTotal,
+		Action:    "buy",
+		Notes:     fmt.Sprintf("Bought %.f lot of %s for %s.", buyData.TotalQty, buyData.Ticker, format.FormatNumber(buyData.InvestedTotal)),
+		Title:     "",
+	}, tx)
 }
 
 func (s *positionService) AddPosition(directionType string, pos *domain.Position, fee float64) error {

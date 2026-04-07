@@ -27,7 +27,7 @@ export default function useAddPosition() {
             await refreshProfile();
             return true;
         } catch (err: any) {
-            setError(err.response?.data?.message || "Failed to add position");
+            setError(err.message || "Failed to add position");
             return false;
         } finally {
             setLoading(false);

@@ -9,7 +9,7 @@ import (
 )
 
 type TransactionService interface {
-	LogActivity(pos *domain.Position, qty, price, fee, basePrice float64, action, notes string, txx *gorm.DB) error
+	LogActivity(params LogActivityParams, txx *gorm.DB) error
 	GetLocalTransactions(userID uint64) ([]domain.TransactionResponse, error)
 }
 
@@ -17,20 +17,32 @@ type transactionService struct {
 	repo repository.TransactionRepository
 }
 
+type LogActivityParams struct {
+	Position  *domain.Position
+	Quantity  float64
+	Price     float64
+	Fee       float64
+	BasePrice float64
+	Action    string
+	Notes     string
+	Title     string
+}
+
 func NewTransactionService(repo repository.TransactionRepository) TransactionService {
 	return &transactionService{repo: repo}
 }
 
-func (s *transactionService) LogActivity(pos *domain.Position, qty, price, fee, basePrice float64, action, notes string, tx *gorm.DB) error {
+func (s *transactionService) LogActivity(params LogActivityParams, tx *gorm.DB) error {
 	log := &domain.Transaction{
-		OwnerID:         pos.OwnerID,
-		Ticker:          pos.Ticker,
-		TransactionType: action,
-		Quantity:        qty,
-		Price:           price,
-		BasePrice:       basePrice,
-		TransactionFee:  fee,
-		Notes:           notes,
+		OwnerID:         params.Position.OwnerID,
+		Ticker:          params.Position.Ticker,
+		TransactionType: params.Action,
+		Quantity:        params.Quantity,
+		Price:           params.Price,
+		BasePrice:       params.BasePrice,
+		TransactionFee:  params.Fee,
+		Notes:           params.Notes,
+		Title:           params.Title,
 	}
 
 	err := s.repo.AddTransaction(log, tx)

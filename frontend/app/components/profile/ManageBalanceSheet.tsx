@@ -6,13 +6,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Wallet, ArrowUpCircle, ArrowDownCircle, RefreshCw } from "lucide-react"; // Ikon tambahan
+import { Wallet, ArrowUpCircle, ArrowDownCircle, RefreshCw } from "lucide-react";
 
 import { useUser } from "@/app/context/UserContext";
 import { useTransaction } from "@/app/context/TransactionContext";
 
 import { useUpdateBalance } from "@/app/hooks";
 import type { UserBalanceReq } from "@/app/types/http/UserRequest";
+import { Textarea } from "@/components/ui/textarea";
 
 interface ManageBalanceSheetProps {
     children?: React.ReactNode;
@@ -70,7 +71,7 @@ export default function ManageBalanceSheet({ children, mode }: ManageBalanceShee
                 <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 font-medium">Rp</span>
                     <Input id="amount" type="text" placeholder="0.00" value={formData.amount} min={0} max={formData.mode === "rem" ? formData.amount : undefined}
-                        onChange={(e) => handleFormChange("amount", e.target.value)} className="pl-10 bg-transparent border-none text-2xl h-14 focus-visible:ring-0 focus-visible:ring-offset-0 font-bold"
+                        onChange={(e) => handleFormChange("amount", e.target.value)} className="pl-10 bg-transparent border-none text-md h-14 focus-visible:ring-0 focus-visible:ring-offset-0 font-bold"
                         required />
                 </div>
                 <Label htmlFor="bank_src" className="text-xs font-semibold uppercase tracking-wider text-slate-400">
@@ -89,7 +90,7 @@ export default function ManageBalanceSheet({ children, mode }: ManageBalanceShee
                         <div className="relative">
                             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 font-medium">Rp</span>
                             <Input id="fee" type="text" placeholder="0.00" value={formData.fee} min={0}
-                                onChange={(e) => handleFormChange("fee", e.target.value)} className="pl-10 bg-transparent border-none text-2xl h-14 focus-visible:ring-0 focus-visible:ring-offset-0 font-bold" />
+                                onChange={(e) => handleFormChange("fee", e.target.value)} className="pl-10 bg-transparent border-none text-md h-14 focus-visible:ring-0 focus-visible:ring-offset-0 font-bold" />
                         </div>
                     </>
                 )}
@@ -97,8 +98,8 @@ export default function ManageBalanceSheet({ children, mode }: ManageBalanceShee
                     Note (Optional)
                 </Label>
                 <div className="relative">
-                    <Input id="notes" type="text" placeholder="Your notes here..." value={formData.note} onChange={(e) => handleFormChange("note", e.target.value)}
-                        className="bg-transparent border-none text-md h-14 focus-visible:ring-0 focus-visible:ring-offset-0 font-bold" />
+                    <Textarea id="notes" placeholder="Your notes here..." value={formData.note} onChange={(e) => handleFormChange("note", e.target.value)}
+                        className="bg-transparent border-none text-sm h-14 focus-visible:ring-0 focus-visible:ring-offset-0 font-bold" />
                 </div>
             </div>
 

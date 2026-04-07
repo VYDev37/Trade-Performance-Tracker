@@ -22,7 +22,7 @@ func InitDBConnection(dbConnection string) (*gorm.DB, error) {
 	)
 
 	isProduction := (os.Getenv("PRODUCTION_MODE") == "true")
-	gormConfig := &gorm.Config{Logger: nil, PrepareStmt: !isProduction}
+	gormConfig := &gorm.Config{Logger: nil, PrepareStmt: false}
 	if !isProduction {
 		gormConfig.Logger = newLogger
 	}
@@ -42,8 +42,8 @@ func InitDBConnection(dbConnection string) (*gorm.DB, error) {
 	}
 
 	if isProduction {
-		sqlDB.SetMaxIdleConns(3)
-		sqlDB.SetMaxOpenConns(15)
+		sqlDB.SetMaxIdleConns(2)
+		sqlDB.SetMaxOpenConns(10)
 		sqlDB.SetConnMaxLifetime(5 * time.Minute)
 	} else {
 		sqlDB.SetMaxIdleConns(10)

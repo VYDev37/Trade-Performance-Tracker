@@ -15,7 +15,7 @@ export default function useRemoveNote() {
             await axios.delete(`/notes/remove/${id}`);
             return true;
         } catch (err: any) {
-            setError(err.response?.data?.message || "Failed to add note.");
+            setError(err.message || "Failed to add note.");
             return false;
         } finally {
             setLoading(false);

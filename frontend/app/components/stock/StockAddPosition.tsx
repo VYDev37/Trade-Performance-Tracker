@@ -222,7 +222,7 @@ export default function StockAddPosition() {
 
                     {submissionError && (
                         <div className="flex items-center rounded-lg bg-destructive/10 p-3 text-sm text-destructive border border-destructive/20 animate-in fade-in zoom-in duration-300">
-                            <CircleAlert className="h-4 w-4" /> {submissionError}
+                            <CircleAlert className="h-4 w-4 mr-2" /> {submissionError}
                         </div>
                     )}
                 </div>

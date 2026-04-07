@@ -57,7 +57,7 @@ func (s *balanceService) UpdateBalance(userID uint64, amount float64, assetType 
 func (s *balanceService) AdjustBalance(userID uint64, req domain.BalanceUpdateReq) error {
 	db := s.repo.GetDB()
 
-	return db.Transaction(func(tx *gorm.DB) error { // TODO: Separate cashflow logging with this modifier
+	return db.Transaction(func(tx *gorm.DB) error {
 		bal, err := s.repo.GetBalanceByType(userID, req.AssetType, tx)
 		if err != nil {
 			return err
@@ -97,10 +97,19 @@ func (s *balanceService) AdjustBalance(userID uint64, req domain.BalanceUpdateRe
 			tType = "cashflow"
 		}
 
-		return s.tranService.LogActivity(&domain.Position{
-			OwnerID: userID,
-			Ticker:  req.BankSource,
-		}, 0, req.Amount, req.Fee, 0, tType, req.Note, tx)
+		return s.tranService.LogActivity(LogActivityParams{
+			Position: &domain.Position{
+				OwnerID: userID,
+				Ticker:  req.BankSource,
+			},
+			Action:    tType,
+			Title:     req.Title,
+			Price:     req.Amount,
+			Fee:       req.Fee,
+			Quantity:  0,
+			BasePrice: 0,
+			Notes:     req.Note,
+		}, tx)
 	})
 }
 
