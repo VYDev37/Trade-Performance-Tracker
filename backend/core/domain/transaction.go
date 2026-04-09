@@ -29,3 +29,9 @@ type TransactionResponse struct {
 	RealizedPnl  float64 `json:"realized_pnl"`
 	PricePerUnit float64 `json:"price_per_unit"`
 }
+
+type TransactionUpdateReq struct {
+	Title string  `json:"title"`
+	Notes string  `json:"notes"`
+	Price float64 `json:"price" validate:"gte=0"`
+}

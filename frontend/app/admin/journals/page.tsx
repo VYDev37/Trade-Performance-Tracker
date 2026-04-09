@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 
 export default function Journal() {
     const [open, setOpen] = useState(false);
-    const { notes, refreshNote } = useGetNotes();
+    const { notes, refreshNote, loading } = useGetNotes();
 
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 20;
@@ -113,7 +113,7 @@ export default function Journal() {
                     </div>
                 </>
             ) : (
-                <NoteEmpty onRefresh={refreshNote} />
+                <NoteEmpty onRefresh={refreshNote} isLoading={loading} />
             )}
         </div>
     )

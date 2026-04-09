@@ -103,7 +103,7 @@ export default function TransactionCard({ transactions, loading }: TranCardProps
                                 {isCashflow ? (
                                     <>
                                         <span className="text-slate-400 text-sm">Notes</span>
-                                        <div className={`font-medium text-sm text-right ${color}`}>
+                                        <div className={`font-medium text-sm text-right whitespace-pre-wrap ${color}`}>
                                             {!transaction.notes ? "-" : transaction.notes}
                                         </div></>
                                 ) : (

@@ -119,7 +119,7 @@ export default function TransactionTable({ transactions, loading, username, togg
                                                         title="Transaction Notes"
                                                         contentClassName="sm:max-w-md"
                                                     >
-                                                        <div className="text-slate-300 text-sm mt-4 break-words">
+                                                        <div className="text-slate-300 text-sm mt-4 break-words whitespace-pre-wrap">
                                                             {transaction.notes || "No notes available for this transaction."}
                                                         </div>
                                                     </CustomDialog>

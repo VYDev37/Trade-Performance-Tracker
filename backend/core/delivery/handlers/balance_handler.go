@@ -41,7 +41,7 @@ func (h *BalanceHandler) HandleUpdateBalance(c fiber.Ctx) error {
 	}
 
 	if err := h.service.AdjustBalance(uid, req); err != nil {
-		return c.Status(400).JSON(fiber.Map{"message": err.Error()})
+		return format.ErrorResponse(c, err)
 	}
 
 	return c.Status(200).JSON(fiber.Map{"message": "Balance updated."})

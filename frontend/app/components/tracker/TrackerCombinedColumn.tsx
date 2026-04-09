@@ -1,8 +1,11 @@
-import { ArrowUpRight, ArrowDownRight, Info } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowUpRight, ArrowDownRight, Info, PenIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Formatter } from '@/app/lib';
 import { CustomDialog } from '@/app/components/shared';
 import type { TransactionInfo } from '@/app/types/user/TransactionInfo';
+import { useTransaction } from '@/app/context/TransactionContext';
+import { TrackerEditSheet } from './index';
 
 interface TrackerCombinedColumnProps {
     title: string;
@@ -12,6 +15,9 @@ interface TrackerCombinedColumnProps {
 }
 
 export default function TrackerCombinedColumn({ title, items, totalCount, onViewAll }: TrackerCombinedColumnProps) {
+    const { refetch } = useTransaction();
+    const [editingItem, setEditingItem] = useState<TransactionInfo | null>(null);
+
     return (
         <div className="space-y-3 md:space-y-4">
             <div className="flex justify-between items-center px-1">
@@ -27,7 +33,7 @@ export default function TrackerCombinedColumn({ title, items, totalCount, onView
                     const Icon = isIncome ? ArrowUpRight : ArrowDownRight;
                     const colorClass = isIncome ? "text-emerald-500" : "text-red-500";
                     const bgClass = isIncome ? "bg-emerald-500/5 border-emerald-500/10" : "bg-red-500/5 border-red-500/10";
-                    const sign = isIncome ? "+" : "";
+                    const sign = isIncome ? "+" : "-";
 
                     return (
                         <div key={item.id} className="group flex items-center justify-between p-3 bg-[#14181f]/50 hover:bg-[#14181f] border border-slate-800/50 rounded-xl transition-all">
@@ -50,6 +56,9 @@ export default function TrackerCombinedColumn({ title, items, totalCount, onView
                                                 {item.notes || "No notes available for this transaction."}
                                             </div>
                                         </CustomDialog>
+                                        <Button variant="ghost" className="h-5 w-5 p-0 flex-shrink-0 text-slate-500 hover:text-white hover:bg-slate-800" onClick={() => setEditingItem(item)}>
+                                            <PenIcon className="h-3 w-3" />
+                                        </Button>
                                     </div>
                                     <p className="text-[10px] text-slate-500 truncate">{isIncome ? 'To' : 'From'}: {item.ticker}</p>
                                 </div>
@@ -70,6 +79,14 @@ export default function TrackerCombinedColumn({ title, items, totalCount, onView
                     </div>
                 )}
             </div>
+            {editingItem && (
+                <TrackerEditSheet
+                    isOpen={!!editingItem}
+                    onOpenChange={(open) => !open && setEditingItem(null)}
+                    existingData={editingItem}
+                    onRefresh={refetch}
+                />
+            )}
         </div>
     );
 }

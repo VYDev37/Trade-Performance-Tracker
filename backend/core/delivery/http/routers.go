@@ -69,6 +69,7 @@ func InitRoutes(uService services.UserService, pService services.PositionService
 	trxService := handlers.NewTransactionHandler(tService)
 
 	trxApi.Get("/my-info", trxService.HandleGetLocalTransaction)
+	trxApi.Put("/update/:id", trxService.HandleUpdateTransaction)
 
 	noteApi := api.Group("/notes", middleware.AuthMiddleware())
 	noteService := handlers.NewNoteHandler(nService)

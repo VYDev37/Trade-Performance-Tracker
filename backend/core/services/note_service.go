@@ -51,7 +51,7 @@ func (s *noteService) GetNotes(userID uint64) ([]domain.NoteResponse, error) {
 	for _, note := range notes {
 		myNotes = append(myNotes, domain.NoteResponse{
 			ID:          note.ID,
-			CreatedAt:   note.CreatedAt,
+			UpdatedAt:   note.UpdatedAt,
 			Title:       note.Title,
 			Description: note.Description,
 			Category:    note.Category,

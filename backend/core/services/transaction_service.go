@@ -1,7 +1,6 @@
 package services
 
 import (
-	"fmt"
 	"trade-tracker/core/domain"
 	"trade-tracker/core/repository"
 
@@ -11,10 +10,12 @@ import (
 type TransactionService interface {
 	LogActivity(params LogActivityParams, txx *gorm.DB) error
 	GetLocalTransactions(userID uint64) ([]domain.TransactionResponse, error)
+	UpdateTransaction(id uint, userID uint64, req domain.TransactionUpdateReq) error
 }
 
 type transactionService struct {
-	repo repository.TransactionRepository
+	repo    repository.TransactionRepository
+	balRepo repository.BalanceRepository
 }
 
 type LogActivityParams struct {
@@ -28,8 +29,8 @@ type LogActivityParams struct {
 	Title     string
 }
 
-func NewTransactionService(repo repository.TransactionRepository) TransactionService {
-	return &transactionService{repo: repo}
+func NewTransactionService(repo repository.TransactionRepository, balRepo repository.BalanceRepository) TransactionService {
+	return &transactionService{repo: repo, balRepo: balRepo}
 }
 
 func (s *transactionService) LogActivity(params LogActivityParams, tx *gorm.DB) error {
@@ -47,7 +48,6 @@ func (s *transactionService) LogActivity(params LogActivityParams, tx *gorm.DB) 
 
 	err := s.repo.AddTransaction(log, tx)
 	if err != nil {
-		fmt.Println(err.Error())
 		return err
 	}
 
@@ -87,4 +87,50 @@ func (s *transactionService) GetLocalTransactions(userID uint64) ([]domain.Trans
 	}
 
 	return result, nil
+}
+
+func (s *transactionService) UpdateTransaction(id uint, userID uint64, req domain.TransactionUpdateReq) error {
+	db := s.repo.GetDB()
+
+	return db.Transaction(func(tx *gorm.DB) error {
+		trx, err := s.repo.GetTransactionByID(id, tx)
+		if err != nil {
+			return domain.ErrItemNotFound
+		}
+
+		if trx.OwnerID != userID || (trx.TransactionType != "income" && trx.TransactionType != "expense") {
+			return domain.ErrMismatchInfo
+		}
+
+		oldPrice := trx.Price
+		if trx.Price != oldPrice {
+			delta := trx.Price - oldPrice
+			if trx.TransactionType == "expense" {
+				delta *= -1
+			}
+
+			bal, err := s.balRepo.GetBalanceByType(userID, "cash_balance", tx)
+			if err != nil {
+				return err
+			}
+
+			if bal+delta < 0 {
+				return domain.ErrInsufficientBalance
+			}
+
+			if err := s.balRepo.UpdateBalance(&domain.Balance{
+				UserID:    userID,
+				AssetType: "cash_balance",
+				Amount:    delta,
+			}, tx); err != nil {
+				return err
+			}
+		}
+
+		trx.Title = req.Title
+		trx.Notes = req.Notes
+		trx.Price = req.Price
+
+		return s.repo.UpdateTransaction(trx, tx)
+	})
 }

@@ -49,7 +49,7 @@ func (h *UserHandler) HandleRegister(c fiber.Ctx) error {
 	}
 
 	if err := h.service.CreateUser(user); err != nil {
-		return c.Status(400).JSON(fiber.Map{"message": err.Error()})
+		return format.ErrorResponse(c, err)
 	}
 
 	return c.Status(200).JSON(fiber.Map{"message": "Registration success."})
@@ -71,7 +71,7 @@ func (h *UserHandler) HandleLogin(c fiber.Ctx) error {
 
 	user, err := h.service.Login(req.Identifier, req.Password)
 	if err != nil {
-		return c.Status(400).JSON(fiber.Map{"message": err.Error()})
+		return format.ErrorResponse(c, err)
 	}
 
 	token, err := auth.GenerateToken(user.ID)
@@ -100,8 +100,7 @@ func (h *UserHandler) HandleGetMe(c fiber.Ctx) error {
 	}
 	res, err := h.service.GetProfile(uid)
 	if err != nil {
-		log.Printf("Error when trying to get profile: %v.\n", err.Error())
-		return c.Status(500).JSON(fiber.Map{"message": "Internal server error."})
+		return format.ErrorResponse(c, err)
 	}
 
 	return c.Status(200).JSON(fiber.Map{"data": res})

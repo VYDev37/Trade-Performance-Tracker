@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"strconv"
 	"trade-tracker/core/domain"
 	"trade-tracker/core/services"
@@ -50,8 +49,7 @@ func (h *NoteHandler) HandleAddNote(c fiber.Ctx) error {
 		Category:    req.Category,
 		ImageURL:    req.ImageURL,
 	}); err != nil {
-		fmt.Println(err.Error())
-		return c.Status(400).JSON(fiber.Map{"message": err.Error()})
+		return format.ErrorResponse(c, err)
 	}
 
 	return c.Status(200).JSON(fiber.Map{"message": "Note added."})
@@ -92,8 +90,7 @@ func (h *NoteHandler) HandleUpdateNote(c fiber.Ctx) error {
 	note.ID = uint(noteId)
 
 	if err := h.service.UpdateNote(note); err != nil {
-		fmt.Println(err.Error())
-		return c.Status(400).JSON(fiber.Map{"message": err.Error()})
+		return format.ErrorResponse(c, err)
 	}
 
 	return c.Status(200).JSON(fiber.Map{"message": "Note added."})
@@ -107,7 +104,7 @@ func (h *NoteHandler) HandleGetNotes(c fiber.Ctx) error {
 
 	data, err := h.service.GetNotes(uid)
 	if err != nil {
-		return c.Status(400).JSON(fiber.Map{"message": err.Error()})
+		return format.ErrorResponse(c, err)
 	}
 
 	return c.Status(200).JSON(fiber.Map{"notes": data})
@@ -125,7 +122,7 @@ func (h *NoteHandler) HandleRemoveNote(c fiber.Ctx) error {
 	}
 
 	if err := h.service.RemoveNote(uint(noteId), uid); err != nil {
-		return c.Status(400).JSON(fiber.Map{"message": err.Error()})
+		return format.ErrorResponse(c, err)
 	}
 
 	return c.Status(200).JSON(fiber.Map{"message": "success"})

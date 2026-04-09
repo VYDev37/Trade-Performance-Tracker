@@ -15,8 +15,8 @@ export default function useUpdateBalance() {
 
         try {
             await axios.post("/balance/update-balance", {
-                amount: Number(formData.amount),
-                fee: Number(formData.fee),
+                amount: Math.abs(Number(formData.amount)),
+                fee: Math.abs(Number(formData.fee)),
                 mode: formData.mode,
                 bank_src: formData.bank_src,
                 asset_type: formData.asset_type,

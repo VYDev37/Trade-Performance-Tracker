@@ -59,7 +59,7 @@ export default function NoteForm({ existingData, loading, onSubmit }: NoteFormPr
                     value={data.description}
                     onChange={(e) => handleChangeData('description', e.target.value)}
                     required
-                    className="min-h-[120px] bg-zinc-900 border-white/10 text-white placeholder:text-zinc-500"
+                    className="whitespace-pre-line min-h-[120px] bg-zinc-900 border-white/10 text-white placeholder:text-zinc-500"
                 />
             </div>
             <div className="space-y-2 mx-5">

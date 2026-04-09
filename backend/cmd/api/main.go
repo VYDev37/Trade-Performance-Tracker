@@ -38,7 +38,7 @@ func main() {
 	priceProvider := providers.NewPriceProvider()
 
 	nService := services.NewNoteService(noteRepo)
-	tService := services.NewTransactionService(tranRepo)
+	tService := services.NewTransactionService(tranRepo, balRepo)
 	bService := services.NewBalanceService(balRepo, tService)
 	pService := services.NewPositionService(posRepo, userRepo, priceProvider, tService, bService)
 	uService := services.NewUserService(userRepo, pService, tService, bService)

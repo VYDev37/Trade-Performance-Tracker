@@ -15,7 +15,7 @@ export default function Tracker() {
     const income = incomes.reduce((acc, val) => acc + val.price, 0);
     const expense = expenses.reduce((acc, val) => acc + val.price, 0);
 
-    const net = income + expense;
+    const net = income - expense;
 
     const visibleIncomes = incomes.slice(0, limit);
     const visibleExpenses = expenses.slice(0, limit);

@@ -1,8 +1,11 @@
-import { ArrowUpRight, ArrowDownRight, Info } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowUpRight, ArrowDownRight, Info, PenIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Formatter } from '@/app/lib';
 import { CustomDialog } from '@/app/components/shared';
 import type { TransactionInfo } from '@/app/types/user/TransactionInfo';
+import { useTransaction } from '@/app/context/TransactionContext';
+import { TrackerEditSheet } from './index';
 
 interface TrackerTransactionColumnProps {
     title: string;
@@ -12,11 +15,14 @@ interface TrackerTransactionColumnProps {
 }
 
 export default function TrackerTransactionColumn({ title, type, items, onViewAll }: TrackerTransactionColumnProps) {
+    const { refetch } = useTransaction();
+    const [editingItem, setEditingItem] = useState<TransactionInfo | null>(null);
+
     const isIncome = type === 'inflow';
     const Icon = isIncome ? ArrowUpRight : ArrowDownRight;
     const colorClass = isIncome ? "text-emerald-500" : "text-red-500";
     const bgClass = isIncome ? "bg-emerald-500/5 border-emerald-500/10" : "bg-red-500/5 border-red-500/10";
-    const sign = isIncome ? "+" : "";
+    const sign = isIncome ? "+" : "-";
 
     return (
         <div className="space-y-3 md:space-y-4">
@@ -49,6 +55,9 @@ export default function TrackerTransactionColumn({ title, type, items, onViewAll
                                             {item.notes || "No notes available for this transaction."}
                                         </div>
                                     </CustomDialog>
+                                    <Button variant="ghost" className="h-5 w-5 p-0 flex-shrink-0 text-slate-500 hover:text-white hover:bg-slate-800" onClick={() => setEditingItem(item)}>
+                                        <PenIcon className="h-3 w-3" />
+                                    </Button>
                                 </div>
                                 <p className="text-[10px] text-slate-500 truncate">{isIncome ? 'To' : 'From'}: {item.ticker}</p>
                             </div>
@@ -68,6 +77,14 @@ export default function TrackerTransactionColumn({ title, type, items, onViewAll
                     </div>
                 )}
             </div>
+            {editingItem && (
+                <TrackerEditSheet
+                    isOpen={!!editingItem}
+                    onOpenChange={(open) => !open && setEditingItem(null)}
+                    existingData={editingItem}
+                    onRefresh={refetch}
+                />
+            )}
         </div>
     );
 }

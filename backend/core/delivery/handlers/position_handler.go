@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"strings"
 	"trade-tracker/core/domain"
 	"trade-tracker/core/services"
@@ -31,7 +30,7 @@ func (h *PositionHandler) HandleGetTickerMarketPrice(c fiber.Ctx) error {
 
 	price, err := h.service.GetTickerCurrentPrice(ticker)
 	if err != nil {
-		return c.Status(400).JSON(fiber.Map{"message": "Ticker not found."})
+		return format.ErrorResponse(c, err)
 	}
 
 	return c.Status(200).JSON(fiber.Map{"message": "Success", "price": price})
@@ -65,8 +64,7 @@ func (h *PositionHandler) HandleAddPosition(c fiber.Ctx) error {
 		InvestedTotal: req.InvestedTotal,
 		PositionType:  req.PositionType,
 	}, req.Fee); err != nil {
-		fmt.Println(err.Error())
-		return c.Status(400).JSON(fiber.Map{"message": err.Error()})
+		return format.ErrorResponse(c, err)
 	}
 
 	return c.Status(200).JSON(fiber.Map{"message": "Position added."})
@@ -80,7 +78,7 @@ func (h *PositionHandler) HandleGetPortfolio(c fiber.Ctx) error {
 
 	data, err := h.service.GetPositions(uid)
 	if err != nil {
-		return c.Status(400).JSON(fiber.Map{"message": err.Error()})
+		return format.ErrorResponse(c, err)
 	}
 
 	return c.Status(200).JSON(fiber.Map{"portfolio": data})

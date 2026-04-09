@@ -82,7 +82,7 @@ export default function ManageBalanceSheet({ children, mode }: ManageBalanceShee
                         className="bg-transparent border-none text-xs h-14 focus-visible:ring-0 focus-visible:ring-offset-0 font-bold"
                         required />
                 </div>
-                {modeLabel.toLowerCase() !== "adjust" && (
+                {modeLabel.toLowerCase() !== "adjust" && formData.asset_type !== "cash_balance" && (
                     <>
                         <Label htmlFor="fee" className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                             Transaction Fee
@@ -99,7 +99,7 @@ export default function ManageBalanceSheet({ children, mode }: ManageBalanceShee
                 </Label>
                 <div className="relative">
                     <Textarea id="notes" placeholder="Your notes here..." value={formData.note} onChange={(e) => handleFormChange("note", e.target.value)}
-                        className="bg-transparent border-none text-sm h-14 focus-visible:ring-0 focus-visible:ring-offset-0 font-bold" />
+                        className="bg-transparent border-none text-sm min-h-[80px] focus-visible:ring-0 focus-visible:ring-offset-0 font-bold" />
                 </div>
             </div>
 

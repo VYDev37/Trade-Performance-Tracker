@@ -23,7 +23,7 @@ type NoteResponse struct {
 	Description string    `json:"description"`
 	Category    string    `json:"category"`
 	ImageURL    []string  `json:"image_url"`
-	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 }
 
 type NoteRequest struct {

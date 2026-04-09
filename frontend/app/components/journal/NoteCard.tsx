@@ -91,12 +91,12 @@ export default function NoteCard({ note, onRefresh }: NoteCardProps) {
                                 {note.title}
                             </CardTitle>
                             <CardDescription className="text-[10px] md:text-xs text-zinc-500 font-medium">
-                                {Formatter.toDate(note.created_at!)}
+                                {Formatter.toDate(note.updated_at!)}
                             </CardDescription>
                         </CardHeader>
 
                         <CardContent className="px-3 pb-3 flex-grow">
-                            <p className="text-[11px] md:text-sm text-zinc-400 line-clamp-2 italic leading-relaxed min-h-[3rem]">
+                            <p className="text-[11px] md:text-sm text-zinc-400 line-clamp-2 italic leading-relaxed min-h-[3rem] whitespace-pre-wrap">
                                 "{note.description}"
                             </p>
                         </CardContent>
@@ -115,18 +115,18 @@ export default function NoteCard({ note, onRefresh }: NoteCardProps) {
                 onInteractOutside={(e) => e.preventDefault()}
             >
 
-                    <div className="flex flex-col gap-3 mt-4">
-                        <div className="text-slate-300 text-sm mt-4 break-words leading-relaxed">
-                            {note.description || "No notes available for this transaction."}
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            {note.image_url && note.image_url.map((url, index) => (
-                                <div key={index} className="relative aspect-video rounded-lg overflow-hidden border border-white/10 bg-zinc-900">
-                                    <ImageBox src={url} alt={`Image #${index}`} />
-                                </div>
-                            ))}
-                        </div>
+                <div className="flex flex-col gap-3 mt-4">
+                    <div className="text-slate-300 text-sm mt-4 break-words leading-relaxed whitespace-pre-wrap">
+                        {note.description || "No notes available for this transaction."}
                     </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {note.image_url && note.image_url.map((url, index) => (
+                            <div key={index} className="relative aspect-video rounded-lg overflow-hidden border border-white/10 bg-zinc-900">
+                                <ImageBox src={url} alt={`Image #${index}`} />
+                            </div>
+                        ))}
+                    </div>
+                </div>
             </CustomDialog>
 
             <NoteSheet onRefresh={onRefresh} existingData={note} isOpen={open} onOpenChange={setOpen} />

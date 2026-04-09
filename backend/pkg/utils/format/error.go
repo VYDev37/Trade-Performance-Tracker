@@ -1,9 +1,12 @@
 package format
 
 import (
+	"errors"
 	"fmt"
+	"trade-tracker/core/domain"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/gofiber/fiber/v3"
 )
 
 func FormatError(err validator.FieldError) string {
@@ -33,4 +36,27 @@ func FormatError(err validator.FieldError) string {
 		return fmt.Sprintf("%s must be at most %s.", field, param)
 	}
 	return fmt.Sprintf("%s is invalid.", field)
+}
+
+func ErrorResponse(c fiber.Ctx, err error) error {
+	switch {
+	case errors.Is(err, domain.ErrInvalidInput),
+		errors.Is(err, domain.ErrInsufficientAmount),
+		errors.Is(err, domain.ErrInsufficientBalance),
+		errors.Is(err, domain.ErrMismatchInfo),
+		errors.Is(err, domain.ErrInvalidAction),
+		errors.Is(err, domain.ErrAlreadyExist):
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": err.Error()})
+
+	case errors.Is(err, domain.ErrWrongCredential):
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"message": err.Error()})
+
+	case errors.Is(err, domain.ErrItemNotFound),
+		errors.Is(err, domain.ErrUserNotFound):
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message": err.Error()})
+
+	default:
+		fmt.Printf("[Internal Server Error] %v\n", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": domain.ErrInternalServerError.Error()})
+	}
 }
