@@ -102,29 +102,34 @@ func (s *transactionService) UpdateTransaction(id uint, userID uint64, req domai
 			return domain.ErrMismatchInfo
 		}
 
-		oldPrice := trx.Price
-		if trx.Price != oldPrice {
-			delta := trx.Price - oldPrice
-			if trx.TransactionType == "expense" {
-				delta *= -1
+		if req.ReverseMode {
+			if trx.TransactionType == "income" {
+				trx.TransactionType = "expense"
+			} else {
+				trx.TransactionType = "income"
 			}
+		}
 
-			bal, err := s.balRepo.GetBalanceByType(userID, "cash_balance", tx)
-			if err != nil {
-				return err
-			}
+		delta := trx.Price - req.Price
+		if trx.TransactionType == "expense" {
+			delta *= -1
+		}
 
-			if bal+delta < 0 {
-				return domain.ErrInsufficientBalance
-			}
+		bal, err := s.balRepo.GetBalanceByType(userID, "cash_balance", tx)
+		if err != nil {
+			return err
+		}
 
-			if err := s.balRepo.UpdateBalance(&domain.Balance{
-				UserID:    userID,
-				AssetType: "cash_balance",
-				Amount:    delta,
-			}, tx); err != nil {
-				return err
-			}
+		if bal+delta < 0 {
+			return domain.ErrInsufficientBalance
+		}
+
+		if err := s.balRepo.UpdateBalance(&domain.Balance{
+			UserID:    userID,
+			AssetType: "cash_balance",
+			Amount:    delta,
+		}, tx); err != nil {
+			return err
 		}
 
 		trx.Title = req.Title

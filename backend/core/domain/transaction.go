@@ -31,7 +31,8 @@ type TransactionResponse struct {
 }
 
 type TransactionUpdateReq struct {
-	Title string  `json:"title"`
-	Notes string  `json:"notes"`
-	Price float64 `json:"price" validate:"gte=0"`
+	Title       string  `json:"title" validate:"gte=0,lte=50"`
+	Notes       string  `json:"notes" validate:"gte=0,lte=255"`
+	Price       float64 `json:"price" validate:"gte=0"`
+	ReverseMode bool    `json:"reverse"`
 }

@@ -1,5 +1,6 @@
 import type { PortfolioItem } from "@/app/types/user/PortfolioInfo";
 import { Formatter } from "@/app/lib";
+import { useMemo } from "react";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { buttonVariants } from "@/components/ui/button";
@@ -12,9 +13,11 @@ interface PortfolioOverviewCardProps {
 }
 
 export default function PortfolioOverviewCard({ portfolio }: PortfolioOverviewCardProps) {
-    const topPerformers = portfolio
-        ? [...portfolio].sort((a, b) => b.unrealized_pnl - a.unrealized_pnl).slice(0, 5)
-        : [];
+    const topPerformers = useMemo(() => {
+        return portfolio
+            ? [...portfolio].sort((a, b) => b.unrealized_pnl - a.unrealized_pnl).slice(0, 5)
+            : [];
+    }, [portfolio]);
 
     return (
         <Card className="border-slate-800 bg-slate-900/50 backdrop-blur-sm shadow-xl flex flex-col">

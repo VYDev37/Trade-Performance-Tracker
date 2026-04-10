@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-04-10
+### Added
+- Lazy Loading Implementation: Integrated next/dynamic for high-overhead components to reduce initial bundle size and improve TTI (Time to Interactive).
+- Export Profile to Excel button. (Beta)
+- Unrealized PnL Report Card for running positions (only supported in realized profits before).
+- Revert mode (Income <-> Expense) for transaction update.
+
+### Changed
+- Implemented useMemo and useCallback across core modules (Transactions, Notes, Dashboard, Stocks, and Profile) to minimize redundant re-renders.
+- Optimized PortfolioOverviewCard and PortfolioPieChart rendering logic.
+- Optimized PnL Report Card rendering logic & adjusted view (mobile-friendly).
+- Context Optimization: Memoized login and logout functions within UserContext to prevent unnecessary downstream component updates during auth state changes.
+- Code Splitting: Moved PortfolioPieChart to dynamic import mode with SSR disabled for better hydration performance.
+
 ## [0.1.9] - 2026-04-08
 ### Added
 - Edit button in Financial Tracker card

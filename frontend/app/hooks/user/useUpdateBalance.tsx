@@ -18,6 +18,7 @@ export default function useUpdateBalance() {
                 amount: Math.abs(Number(formData.amount)),
                 fee: Math.abs(Number(formData.fee)),
                 mode: formData.mode,
+                reverse: formData.reverse,
                 bank_src: formData.bank_src,
                 asset_type: formData.asset_type,
                 note: formData.note,

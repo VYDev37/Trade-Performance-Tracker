@@ -1,5 +1,7 @@
 import { FolderOpen } from "lucide-react";
 import { Formatter } from "@/app/lib";
+import { useUser } from "@/app/context/UserContext";
+import { PnLReportModal } from "@/app/components/trades";
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -16,6 +18,7 @@ interface StockMobileCardProps {
 }
 
 export default function StockDesktopTable({ stocks, loading, handleAddRedirect, handleTickerChange }: StockMobileCardProps) {
+    const { user } = useUser();
     return (
         <div className="hidden md:block overflow-x-auto">
             <Table className="mt-5">
@@ -73,6 +76,7 @@ export default function StockDesktopTable({ stocks, loading, handleAddRedirect, 
                                     </TableCell>
                                     <TableCell>{Formatter.toDate(stock.updated_at)}</TableCell>
                                     <TableCell className="flex gap-2">
+                                        <PnLReportModal stock={stock} username={user?.username || ""} />
                                         <Button className="bg-green-600 text-white" onClick={() => handleAddRedirect("add", stock.ticker)}>Buy</Button>
                                         <Button className="bg-red-600 text-white" onClick={() => handleAddRedirect("sell", stock.ticker)}>Sell</Button>
                                     </TableCell>

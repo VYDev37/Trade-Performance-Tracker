@@ -6,4 +6,12 @@ export interface UserBalanceReq {
     note: string;
     bank_src: string;
     title?: string;
+    reverse?: boolean;
+}
+
+export interface UpdateTransactionReq {
+    title: string;
+    notes: string;
+    price: string;
+    reverse: boolean;
 }

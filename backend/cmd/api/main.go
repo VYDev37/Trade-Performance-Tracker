@@ -42,12 +42,13 @@ func main() {
 	bService := services.NewBalanceService(balRepo, tService)
 	pService := services.NewPositionService(posRepo, userRepo, priceProvider, tService, bService)
 	uService := services.NewUserService(userRepo, pService, tService, bService)
+	rService := services.NewReportService(posRepo, userRepo, tranRepo, priceProvider)
 
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
 	}
 
-	app := http.InitRoutes(uService, pService, tService, nService, bService)
+	app := http.InitRoutes(uService, pService, tService, nService, bService, rService)
 	log.Fatal(app.Listen(fmt.Sprintf(":%s", port)))
 }

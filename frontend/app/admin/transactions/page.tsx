@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { Search, History, AlertCircle, FilterIcon, ChevronLeft, ChevronRight } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
@@ -31,8 +31,8 @@ export default function TransactionHistoryPage() {
         if (!transactions)
             return [];
 
-        const tx = transactions.filter(x => x.transaction_type !== "income" && x.transaction_type !== "expense")
-        let result = [...tx];
+        const tx = transactions.filter(x => x.transaction_type !== "income" && x.transaction_type !== "expense");
+        let result = tx;
 
         if (filterType !== "all") {
             result = result.filter(t => {
@@ -47,13 +47,16 @@ export default function TransactionHistoryPage() {
         if (searchTerm)
             result = result.filter(t => t.ticker.toLowerCase().includes(searchTerm.toLowerCase()));
 
-        result.sort((a, b) => {
-            const dateA = new Date(a.created_at).getTime();
-            const dateB = new Date(b.created_at).getTime();
-            return sortDirection === 'asc' ? dateA - dateB : dateB - dateA;
+        const withTime = result.map(t => ({
+            ...t,
+            _time: new Date(t.created_at).getTime()
+        }));
+
+        withTime.sort((a, b) => {
+            return sortDirection === 'asc' ? a._time - b._time : b._time - a._time;
         });
 
-        return result;
+        return withTime.map(({ _time, ...t }) => t);
     }, [transactions, searchTerm, filterType, sortDirection]);
 
     const paginatedTransactions = useMemo(() => {
@@ -94,9 +97,9 @@ export default function TransactionHistoryPage() {
         });
     };
 
-    const toggleSort = () => {
+    const toggleSort = useCallback(() => {
         setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
-    };
+    }, []);
 
     return (
         <div className="container py-8 px-4 w-[90%] md:w-[95%] space-y-8">

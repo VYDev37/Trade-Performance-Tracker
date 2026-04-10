@@ -1,3 +1,4 @@
+import React from "react";
 import type { TransactionInfo } from "@/app/types/user/TransactionInfo";
 
 import { Button } from "@/components/ui/button";
@@ -19,7 +20,7 @@ interface TranTableProps {
     toggleSort: () => void;
 }
 
-export default function TransactionTable({ transactions, loading, username, toggleSort }: TranTableProps) {
+export default React.memo(function TransactionTable({ transactions, loading, username, toggleSort }: TranTableProps) {
     return (
         <Card className="hidden md:block border-slate-800 bg-slate-950/50 backdrop-blur-sm shadow-xl">
             <CardContent className="p-0">
@@ -141,4 +142,4 @@ export default function TransactionTable({ transactions, loading, username, togg
             </CardContent>
         </Card>
     )
-}
+});

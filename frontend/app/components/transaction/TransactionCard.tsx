@@ -1,3 +1,4 @@
+import React from "react";
 import type { TransactionInfo } from "@/app/types/user/TransactionInfo";
 
 import { Formatter } from "@/app/lib";
@@ -11,7 +12,7 @@ interface TranCardProps {
     loading: boolean;
 }
 
-export default function TransactionCard({ transactions, loading }: TranCardProps) {
+export default React.memo(function TransactionCard({ transactions, loading }: TranCardProps) {
     return loading ? (
         Array.from({ length: 5 }).map((_, i) => (
             <Skeleton key={i} className="h-28 w-full bg-slate-800/50 rounded-xl" />
@@ -129,4 +130,4 @@ export default function TransactionCard({ transactions, loading }: TranCardProps
             No transactions found.
         </div>
     )
-}
+});

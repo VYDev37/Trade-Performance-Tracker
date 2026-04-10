@@ -1,5 +1,7 @@
+"use client";
+
 import type { UserProfile } from "@/app/types/user/UserInfo";
-import { Formatter } from "@/app/lib";
+import { axios, Formatter } from "@/app/lib";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { buttonVariants, Button } from "@/components/ui/button";
@@ -7,33 +9,80 @@ import { buttonVariants, Button } from "@/components/ui/button";
 import { ManageBalanceSheet } from "@/app/components/profile";
 
 import Link from "next/link";
-import { Wallet, Landmark, UserCircle, PlusCircleIcon } from "lucide-react";
+import { Wallet, Landmark, UserCircle, PlusCircleIcon, DownloadIcon, InfoIcon } from "lucide-react";
 
 interface AccountSummaryCardProps {
     user: UserProfile;
 }
 
 export default function AccountSummaryCard({ user }: AccountSummaryCardProps) {
+    const downloadExcel = async () => {
+        try {
+            const response = await axios.get('/report/get', { responseType: 'blob' });
+            const url = window.URL.createObjectURL(response.data);
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = "report.xlsx";
+            document.body.appendChild(a);
+            a.click();
+
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        } catch (error) {
+            console.error("Error when trying to download: ", error);
+        }
+    };
     return (
         <Card className="border-slate-800 bg-slate-900/50 backdrop-blur-sm shadow-xl">
             <CardHeader className="pb-4 border-b border-slate-800/50">
                 <CardTitle className="text-xl flex flex-col sm:flex-row text-white justify-between gap-4 sm:items-center">
-                    <div className="flex flex-row items-center gap-3">
-                        <UserCircle className="h-8 w-8 shrink-0 text-blue-500" />
-                        <div className="min-w-0">
-                            <div className="font-bold tracking-tight truncate">@{user.username}</div>
-                            <div className="text-sm font-normal text-slate-400 mt-0.5 truncate">{user.name}</div>
+                    <div className="w-full flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                        {/* Section Kiri: User Info */}
+                        <div className="flex items-center gap-3 min-w-0">
+                            <div className="relative">
+                                <UserCircle className="h-10 w-10 shrink-0 text-blue-500" />
+                                <div className="absolute bottom-0 right-0 h-3 w-3 bg-emerald-500 border-2 border-slate-900 rounded-full"></div>
+                            </div>
+                            <div className="min-w-0">
+                                <div className="font-bold tracking-tight text-white truncate text-base md:text-lg">
+                                    @{user.username}
+                                </div>
+                                <div className="text-xs md:text-sm font-normal text-slate-400 truncate">
+                                    {user.name}
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div className="flex flex-row gap-2 sm:gap-3 w-full sm:w-auto">
-                        <ManageBalanceSheet mode="stock">
-                            <Button variant="secondary" className="flex-1 sm:flex-none gap-2 px-2 sm:px-4 shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_8px_30px_rgba(59,130,246,0.3)] transition-all active:scale-95 text-xs sm:text-sm">
-                                <PlusCircleIcon className="w-4 h-4 shrink-0" /> <span className="truncate">Add Cash</span>
+
+                        {/* Section Kanan: Action Buttons */}
+                        <div className="flex flex-col sm:flex-row items-center gap-2 w-full lg:w-auto">
+                            {/* Add Cash - Secondary Style */}
+                            <ManageBalanceSheet mode="stock">
+                                <Button
+                                    variant="secondary"
+                                    className="w-full sm:w-auto gap-2 h-9 text-xs sm:text-sm shadow-sm active:scale-95 transition-transform"
+                                >
+                                    <PlusCircleIcon className="w-4 h-4" />
+                                    <span>Add Cash</span>
+                                </Button>
+                            </ManageBalanceSheet>
+
+                            {/* More Info - Ghost/Outline Style */}
+                            <Link href="/admin/dashboard" className={`w-full sm:w-auto h-9 gap-2 ${buttonVariants({ variant: "outline" })} border-slate-700 bg-slate-800/40 text-xs sm:text-sm hover:bg-slate-800`}>
+                                <InfoIcon className="w-4 h-4" />
+                                <span>More info</span>
+                            </Link>
+
+                            {/* Download - Gradient Style (Call to Action) */}
+                            <Button
+                                variant="gradient"
+                                className="w-full sm:w-auto h-9 gap-2 text-xs sm:text-sm shadow-[0_0_20px_rgba(59,130,246,0.2)]"
+                                onClick={downloadExcel}
+                            >
+                                <DownloadIcon className="w-4 h-4" />
+                                <span>Download</span>
                             </Button>
-                        </ManageBalanceSheet>
-                        <Link href="/admin/dashboard" className={`flex-1 sm:flex-none text-xs sm:text-sm px-2 sm:px-4 ${buttonVariants({ variant: "gradient" })}`}>
-                            <span className="truncate">More details</span>
-                        </Link>
+                        </div>
                     </div>
                 </CardTitle>
             </CardHeader>

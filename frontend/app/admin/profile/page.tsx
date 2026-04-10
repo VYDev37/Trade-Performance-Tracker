@@ -1,12 +1,18 @@
 "use client";
 
 import { useUser } from "@/app/context/UserContext";
-import { AccountSummaryCard, PortfolioOverviewCard, PortfolioPieChart } from "@/app/components/profile";
+import { AccountSummaryCard, PortfolioOverviewCard } from "@/app/components/profile";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
 
 import { UserCircle, AlertCircle } from "lucide-react";
+import dynamic from "next/dynamic";
+
+const PortfolioPieChart = dynamic(() => import('@/app/components/profile/PortfolioPieChart'), {
+    ssr: false,
+    loading: () => <Skeleton className="w-full h-[350px] bg-slate-900/40 rounded-2xl border border-white/10" />
+});
 
 export default function ProfilePage() {
     const { user, isLoading } = useUser();

@@ -37,15 +37,15 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         refreshProfile();
     }, [refreshProfile]);
 
-    const login = async (token: string) => {
+    const login = useCallback(async (token: string) => {
         Cookies.set("token", token, { path: "/" });
         setIsLoading(true);
 
         await refreshProfile();
         router.push("/admin/dashboard");
-    };
+    }, [refreshProfile, router]);
 
-    const logout = async () => {
+    const logout = useCallback(async () => {
         try {
             await axios.post("/account/logout");
         } catch (err) {
@@ -57,7 +57,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
             router.push("/login");
         }
-    };
+    }, [router]);
 
     const value = useMemo(
         () => ({
@@ -68,7 +68,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
             logout,
             refreshProfile,
         }),
-        [user, isLoading, refreshProfile]
+        [user, isLoading, refreshProfile, login, logout]
     );
 
     return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

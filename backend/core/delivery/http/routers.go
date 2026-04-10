@@ -13,7 +13,8 @@ import (
 )
 
 func InitRoutes(uService services.UserService, pService services.PositionService,
-	tService services.TransactionService, nService services.NoteService, bService services.BalanceService) *fiber.App {
+	tService services.TransactionService, nService services.NoteService,
+	bService services.BalanceService, rService services.ReportService) *fiber.App {
 	app := fiber.New()
 	app.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:3000"},
@@ -83,6 +84,11 @@ func InitRoutes(uService services.UserService, pService services.PositionService
 	balanceService := handlers.NewBalanceHandler(bService)
 
 	balanceApi.Post("/update-balance", balanceService.HandleUpdateBalance)
+
+	reportApi := api.Group("/report", middleware.AuthMiddleware())
+	reportService := handlers.NewReportHandler(rService)
+
+	reportApi.Get("/get", reportService.ExportProfile)
 
 	return app
 }

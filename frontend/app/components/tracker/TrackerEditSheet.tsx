@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { Loader2 } from "lucide-react";
+
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 
 import { useUpdateTransaction } from "@/app/hooks/transaction";
 import type { TransactionInfo } from "@/app/types/user/TransactionInfo";
-import { Loader2 } from "lucide-react";
+import type { UpdateTransactionReq } from "@/app/types/http/UserRequest";
 
 interface TrackerEditSheetProps {
     onRefresh: () => void;
@@ -20,26 +22,31 @@ interface TrackerEditSheetProps {
 export default function TrackerEditSheet({ onRefresh, existingData, isOpen, onOpenChange }: TrackerEditSheetProps) {
     const { updateTransaction, loading } = useUpdateTransaction();
 
-    const [title, setTitle] = useState(existingData.title || "");
-    const [notes, setNotes] = useState(existingData.notes || "");
-    const [price, setPrice] = useState(existingData.price?.toString() || "0");
+    const [data, setData] = useState<UpdateTransactionReq>({
+        title: existingData.title || "",
+        notes: existingData.notes || "",
+        price: existingData.price?.toString() || "",
+        reverse: false
+    });
+
+    const handleChangeData = (key: keyof UpdateTransactionReq, value: any) => {
+        setData((prev) => ({ ...prev, [key]: typeof value === "function" ? value(prev[key as keyof UpdateTransactionReq]) : value }));
+    }
 
     const handleUpdate = async () => {
-        if (!title.trim() || loading) return;
+        if (!data.title.trim() || loading)
+            return;
 
-        const numPrice = parseFloat(price);
-        if (isNaN(numPrice) || numPrice < 0) return;
+        const numPrice = parseFloat(data.price);
+        if (isNaN(numPrice) || numPrice < 0)
+            return;
 
         try {
-            const success = await updateTransaction(existingData.id, {
-                title,
-                notes,
-                price: numPrice
-            });
-
+            const success = await updateTransaction(existingData.id, data);
             if (success) {
                 onOpenChange(false);
-                if (onRefresh) onRefresh();
+                if (onRefresh)
+                    onRefresh();
             }
         } catch (err) {
             console.error(err);
@@ -64,8 +71,8 @@ export default function TrackerEditSheet({ onRefresh, existingData, isOpen, onOp
                     <div className="space-y-2">
                         <label className="text-sm font-medium text-slate-300">Title</label>
                         <Input
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
+                            value={data.title}
+                            onChange={(e) => handleChangeData("title", e.target.value)}
                             placeholder="Transaction title"
                             className="bg-black/50 border-white/10 text-white"
                         />
@@ -76,8 +83,8 @@ export default function TrackerEditSheet({ onRefresh, existingData, isOpen, onOp
                         <Input
                             type="number"
                             step="0.01"
-                            value={price}
-                            onChange={(e) => setPrice(e.target.value)}
+                            value={data.price}
+                            onChange={(e) => handleChangeData("price", e.target.value)}
                             placeholder="0.00"
                             className="bg-black/50 border-white/10 text-white"
                         />
@@ -86,18 +93,27 @@ export default function TrackerEditSheet({ onRefresh, existingData, isOpen, onOp
                     <div className="space-y-2">
                         <label className="text-sm font-medium text-slate-300">Notes</label>
                         <Textarea
-                            value={notes}
-                            onChange={(e) => setNotes(e.target.value)}
+                            value={data.notes}
+                            onChange={(e) => handleChangeData("notes", e.target.value)}
                             placeholder="Add notes..."
                             className="bg-black/50 border-white/10 text-white min-h-[120px] whitespace-pre-wrap"
                         />
                     </div>
 
-                    <Button
-                        onClick={handleUpdate}
-                        disabled={loading || !title.trim()}
-                        className="mt-4 bg-emerald-600 hover:bg-emerald-700 text-white"
-                    >
+                    <div className="flex space-y-2 items-center space-x-2">
+                        <Input type="checkbox"
+                            id="inv2"
+                            checked={data.reverse}
+                            className="w-4 h-4 mt-[10px] accent-blue-500"
+                            onChange={(e) => handleChangeData("reverse", e.target.checked)}
+                        />
+                        <label htmlFor="inv2" className="text-sm cursor-pointer">
+                            Reverse type (Income {"<->"} Expense)
+                        </label>
+                    </div>
+
+                    <Button onClick={handleUpdate} disabled={loading || !data.title.trim()}
+                        className="mt-4 bg-emerald-600 hover:bg-emerald-700 text-white">
                         {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                         Save Changes
                     </Button>

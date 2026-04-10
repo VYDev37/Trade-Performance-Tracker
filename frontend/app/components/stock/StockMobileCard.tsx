@@ -1,4 +1,6 @@
 import { ChartLine } from "lucide-react";
+import { useUser } from "@/app/context/UserContext";
+import { PnLReportModal } from "@/app/components/trades";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -17,6 +19,7 @@ interface StockMobileCardProps {
 }
 
 export default function StockMobileCard({ stocks, loading, handleAddRedirect, handleTickerChange }: StockMobileCardProps) {
+    const { user } = useUser();
     return (
         <div className="grid grid-cols-1 gap-4 md:hidden">
             {loading ? (
@@ -108,6 +111,7 @@ export default function StockMobileCard({ stocks, loading, handleAddRedirect, ha
                         </div>
 
                         <div className="flex gap-2 pt-2">
+                            <PnLReportModal stock={stock} username={user?.username || ""} />
                             <Button className="flex-1 bg-green-600/20 text-green-400 border border-green-600/30 hover:bg-green-600 hover:text-white transition-all"
                                 onClick={() => handleAddRedirect("add", stock.ticker)}>Buy</Button>
                             <Button className="flex-1 bg-red-600/20 text-red-400 border border-red-600/30 hover:bg-red-600 hover:text-white transition-all"
