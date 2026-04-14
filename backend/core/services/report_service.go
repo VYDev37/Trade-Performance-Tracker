@@ -3,6 +3,7 @@ package services
 import (
 	"fmt"
 	"math"
+	"strings"
 	"trade-tracker/core/integrations/providers"
 	"trade-tracker/core/repository"
 	"trade-tracker/pkg/utils/excel"
@@ -29,29 +30,46 @@ func NewReportService(pRepo repository.PositionRepository, uRepo repository.User
 }
 
 func (s *reportService) exportTransactions(f *excelize.File, userID uint64) {
-	sheetName := "Transactions"
-	f.NewSheet(sheetName)
+	sectionName := "Transactions"
+	f.NewSheet(sectionName)
 
-	writer := excel.NewWriter(f, sheetName, 1)
-	writer.WriteRow([]interface{}{"ID", "Date", "Ticker", "Amount"})
+	writer := excel.NewWriter(f, sectionName, 1)
+	writer.WriteRow([]interface{}{"My Transactions"})
+
+	startRow := writer.CurrentRow
+
+	header := []interface{}{"ID", "Date", "Ticker", "Amount", "Fee", "Action"}
+	writer.WriteRow(header)
 
 	txs, _ := s.tRepo.GetTransactions(userID)
 	for _, t := range txs {
-		writer.WriteRow([]interface{}{fmt.Sprintf("#%d", t.ID), t.CreatedAt, t.Ticker, t.Price})
+		if t.TransactionType != "buy" && t.TransactionType != "sell" {
+			continue
+		}
+		writer.WriteRow([]interface{}{
+			fmt.Sprintf("#%d", t.ID),
+			t.CreatedAt,
+			t.Ticker,
+			format.FormatCurrency(t.Price),
+			format.FormatCurrency(t.TransactionFee),
+			strings.ToUpper(t.TransactionType),
+		})
 	}
+
+	writer.BuildTable(sectionName, startRow, len(header))
 }
 
 func (s *reportService) exportPositions(f *excelize.File, userID uint64) {
-	sheetName := "Portfolio"
-	f.NewSheet(sheetName)
+	sectionName := "Portfolio"
+	f.NewSheet(sectionName)
 
-	writer := excel.NewWriter(f, sheetName, 1)
+	writer := excel.NewWriter(f, sectionName, 1)
 	writer.WriteRow([]interface{}{"My Open Positions"})
 
 	startRow := writer.CurrentRow
 	header := []interface{}{
 		"No", "Ticker", "AvgPrice", "Invested Amount",
-		"Lot", "Market Value", "PnL Unrealized", "PnL Unrealized (Percentage)",
+		"Quantity", "Market Value", "PnL Unrealized", "PnL Unrealized (Percentage)",
 	}
 
 	writer.WriteHeader(header)
@@ -86,19 +104,27 @@ func (s *reportService) exportPositions(f *excelize.File, userID uint64) {
 		writer.WriteRow([]interface{}{
 			i + 1,
 			p.Ticker,
-			format.FormatNumber(p.InvestedTotal / p.TotalQty),
-			format.FormatNumber(p.InvestedTotal),
+			format.FormatCurrency(p.InvestedTotal / p.TotalQty),
+			format.FormatCurrency(p.InvestedTotal),
 			format.FormatNumber(p.TotalQty),
-			format.FormatNumber(currentPrice),
-			fmt.Sprintf("%.2f", delta),
+			format.FormatCurrency(currentPrice),
+			format.FormatCurrency(delta),
 			percentStr,
 		})
 	}
 
-	writer.BuildTable("Positions", startRow, len(header))
+	writer.BuildTable(sectionName, startRow, len(header))
+	writer.SkipRow()
 
-	writer.WriteRow([]interface{}{"Total invested amount: " + format.FormatNumber(investedTotal)})
-	writer.WriteRow([]interface{}{"Market value: " + format.FormatNumber(currentValue)})
+	header2 := []interface{}{"NAME", "AMOUNT"}
+	startRow2 := writer.CurrentRow
+
+	writer.WriteHeader(header2)
+
+	writer.WriteRow([]interface{}{"Total invested amount", format.FormatCurrency(investedTotal)})
+	writer.WriteRow([]interface{}{"Market value", format.FormatCurrency(currentValue)})
+
+	writer.BuildTable(sectionName+"_2", startRow2, len(header2))
 }
 
 func (s *reportService) ExportProfile(userID uint64) (*excelize.File, error) {

@@ -76,3 +76,7 @@ func (w *ExcelWriter) BuildTable(tableName string, startRow int, colCount int) e
 
 	return err
 }
+
+func (w *ExcelWriter) SkipRow() {
+	w.CurrentRow++
+}
