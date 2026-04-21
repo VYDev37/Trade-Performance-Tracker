@@ -65,7 +65,7 @@ export default React.memo(function TransactionTable({ transactions, loading, use
                                     const color = transaction.realized_pnl === 0 ? "" : sign === "+" ? "text-emerald-500" : "text-red-500";
                                     const rPnlPercentage = (transaction.realized_pnl / transaction.base_price) * 100;
 
-                                    const isCashflow = transaction.transaction_type === "cashflow";
+                                    const isSell = transaction.transaction_type.toLowerCase() === "sell";
                                     return (
                                         <TableRow key={transaction.id} className="border-slate-800 hover:bg-slate-900/30 transition-colors">
                                             <TableCell className="font-medium text-slate-300">
@@ -89,7 +89,7 @@ export default React.memo(function TransactionTable({ transactions, loading, use
                                                 {Formatter.toLocale(transaction.quantity / 100)}
                                             </TableCell>
                                             <TableCell className="text-right text-slate-300">
-                                                {Formatter.toCurrency(transaction.price_per_unit)}
+                                                {Formatter.toCurrency(isSell ? transaction.sell_price_unit : transaction.entry_price_unit)}
                                             </TableCell>
                                             <TableCell className="text-right font-medium text-white">
                                                 {Formatter.toCurrency(transaction.base_price)}

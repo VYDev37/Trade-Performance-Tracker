@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"math"
 	"strings"
+
 	"trade-tracker/core/integrations/providers"
-	"trade-tracker/core/repository"
 	"trade-tracker/pkg/utils/excel"
 	"trade-tracker/pkg/utils/format"
 
@@ -17,16 +17,55 @@ type ReportService interface {
 }
 
 type reportService struct {
-	pRepo repository.PositionRepository
-	uRepo repository.UserRepository
-	tRepo repository.TransactionRepository
+	pService PositionService
+	uService UserService
+	tService TransactionService
 
 	provider providers.PriceProvider
 }
 
-func NewReportService(pRepo repository.PositionRepository, uRepo repository.UserRepository,
-	tRepo repository.TransactionRepository, provider providers.PriceProvider) ReportService {
-	return &reportService{pRepo: pRepo, uRepo: uRepo, tRepo: tRepo, provider: provider}
+func NewReportService(pService PositionService, uService UserService,
+	tService TransactionService, provider providers.PriceProvider) ReportService {
+	return &reportService{pService: pService, uService: uService, tService: tService, provider: provider}
+}
+
+func (s *reportService) exportFinancialLog(f *excelize.File, userID uint64) {
+	sectionName := "Financial"
+	f.NewSheet(sectionName)
+
+	writer := excel.NewWriter(f, sectionName, 1)
+	writer.WriteHeader([]interface{}{"My Financial Log"})
+
+	startRow := writer.CurrentRow
+
+	writer.SetFormat(2, excel.FormatDate)     // 2nd col: date
+	writer.SetFormat(4, excel.FormatCurrency) // 4th col: amt
+	writer.SetFormat(5, excel.FormatCurrency) // 5th col: fee
+
+	header := []interface{}{"ID", "Date", "Source", "Amount", "Fee", "Flow type", "Note"}
+	writer.WriteHeader(header)
+
+	txs, err := s.tService.GetLocalTransactions(userID)
+	if err != nil {
+		return
+	}
+
+	for _, t := range txs {
+		if t.TransactionType != "income" && t.TransactionType != "expense" {
+			continue
+		}
+		writer.WriteRow([]interface{}{
+			fmt.Sprintf("#%d", t.ID),
+			t.CreatedAt,
+			t.Ticker,
+			t.Price,
+			t.TransactionFee,
+			strings.ToUpper(t.TransactionType),
+			t.Notes,
+		})
+	}
+
+	writer.BuildTable(sectionName, startRow, len(header))
 }
 
 func (s *reportService) exportTransactions(f *excelize.File, userID uint64) {
@@ -34,14 +73,17 @@ func (s *reportService) exportTransactions(f *excelize.File, userID uint64) {
 	f.NewSheet(sectionName)
 
 	writer := excel.NewWriter(f, sectionName, 1)
-	writer.WriteRow([]interface{}{"My Transactions"})
+	writer.WriteHeader([]interface{}{"My Transactions"})
 
 	startRow := writer.CurrentRow
 
 	header := []interface{}{"ID", "Date", "Ticker", "Amount", "Fee", "Action"}
-	writer.WriteRow(header)
+	writer.WriteHeader(header)
 
-	txs, _ := s.tRepo.GetTransactions(userID)
+	txs, err := s.tService.GetLocalTransactions(userID)
+	if err != nil {
+		return
+	}
 	for _, t := range txs {
 		if t.TransactionType != "buy" && t.TransactionType != "sell" {
 			continue
@@ -64,7 +106,7 @@ func (s *reportService) exportPositions(f *excelize.File, userID uint64) {
 	f.NewSheet(sectionName)
 
 	writer := excel.NewWriter(f, sectionName, 1)
-	writer.WriteRow([]interface{}{"My Open Positions"})
+	writer.WriteHeader([]interface{}{"My Open Positions"})
 
 	startRow := writer.CurrentRow
 	header := []interface{}{
@@ -74,15 +116,19 @@ func (s *reportService) exportPositions(f *excelize.File, userID uint64) {
 
 	writer.WriteHeader(header)
 
-	pos, _ := s.pRepo.GetPositions(userID)
+	pos, _ := s.pService.GetPositions(userID)
 	tickers := []string{}
 
 	for _, p := range pos {
 		tickers = append(tickers, p.Ticker)
 	}
 
-	var investedTotal float64
 	var currentValue float64
+
+	portfolio, err := s.pService.GetPortfolio(userID)
+	if portfolio == nil || err != nil {
+		return
+	}
 
 	prices, _ := s.provider.GetBatchPrices(tickers)
 	for i, p := range pos {
@@ -90,8 +136,6 @@ func (s *reportService) exportPositions(f *excelize.File, userID uint64) {
 		if currentPrice <= 0 || p.InvestedTotal <= 0 {
 			continue
 		}
-
-		investedTotal += p.InvestedTotal
 		currentValue += currentPrice
 
 		delta := currentPrice - p.InvestedTotal
@@ -121,7 +165,7 @@ func (s *reportService) exportPositions(f *excelize.File, userID uint64) {
 
 	writer.WriteHeader(header2)
 
-	writer.WriteRow([]interface{}{"Total invested amount", format.FormatCurrency(investedTotal)})
+	writer.WriteRow([]interface{}{"Total invested amount", format.FormatCurrency(portfolio.TotalEquity)})
 	writer.WriteRow([]interface{}{"Market value", format.FormatCurrency(currentValue)})
 
 	writer.BuildTable(sectionName+"_2", startRow2, len(header2))
@@ -132,6 +176,7 @@ func (s *reportService) ExportProfile(userID uint64) (*excelize.File, error) {
 
 	s.exportTransactions(f, userID)
 	s.exportPositions(f, userID)
+	s.exportFinancialLog(f, userID)
 
 	index, _ := f.GetSheetIndex("Transactions")
 

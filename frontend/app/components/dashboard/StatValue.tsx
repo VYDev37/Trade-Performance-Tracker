@@ -45,7 +45,7 @@ export default function UserStatValue({ field, subfield, isCurrency, useDynamicC
             totalLoss,
             totalCount: transaction.length
         };
-    }, [user?.positions]);
+    }, [user?.positions.items]);
 
     let value: number | string;
     if (isLoading || loading)
@@ -82,6 +82,9 @@ export default function UserStatValue({ field, subfield, isCurrency, useDynamicC
         case "balance":
             const balanceData = user?.balance;
             value = subfield ? (balanceData?.[subfield] || 0) : (user?.balance.stock_balance || 0);
+            break;
+        case "total_equity":
+            value = user?.positions.total_equity || 0;
             break;
         default:
             value = (user as any)?.[field] || 0;

@@ -5,8 +5,10 @@ export interface UserProfile {
     name: string;
     username: string;
     balance: BalanceInfo;
-    total_equity: number;
-    positions?: PortfolioItem[];
+    positions: {
+        items?: PortfolioItem[];
+        total_equity: number;
+    }
 }
 
 export interface UserContextType {

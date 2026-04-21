@@ -18,7 +18,7 @@ func FormatCurrency(amount float64) string {
 	formatted := p.Sprintf("%v", currency.Symbol(currency.IDR.Amount(math.Abs(amount))))
 
 	if amount < 0 {
-		return p.Sprintf("-%v", formatted)
+		return p.Sprintf("(%v)", formatted)
 	}
 
 	return formatted

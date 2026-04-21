@@ -7,7 +7,7 @@ import (
 
 	"trade-tracker/core/domain"
 	"trade-tracker/core/integrations/providers"
-	"trade-tracker/core/repository"
+	"trade-tracker/core/repositories"
 	"trade-tracker/pkg/utils/format"
 
 	"gorm.io/gorm"
@@ -17,20 +17,20 @@ type PositionService interface {
 	AddPosition(directionType string, pos *domain.Position, fee float64) error
 
 	GetPositions(userID uint64) ([]domain.Position, error)
-	GetPortfolio(userID uint64) ([]domain.PortfolioResponse, error)
+	GetPortfolio(userID uint64) (*domain.PortfolioResponse, error)
 	GetTickerCurrentPrice(ticker string) (float64, error)
 }
 
 type positionService struct {
-	repo     repository.PositionRepository
-	uRepo    repository.UserRepository
+	repo     repositories.PositionRepository
+	uRepo    repositories.UserRepository
 	provider providers.PriceProvider
 
 	balService         BalanceService
 	transactionService TransactionService
 }
 
-func NewPositionService(repo repository.PositionRepository, uRepo repository.UserRepository, provider providers.PriceProvider, transactionService TransactionService, balService BalanceService) PositionService {
+func NewPositionService(repo repositories.PositionRepository, uRepo repositories.UserRepository, provider providers.PriceProvider, transactionService TransactionService, balService BalanceService) PositionService {
 	return &positionService{repo: repo, uRepo: uRepo, provider: provider, transactionService: transactionService, balService: balService}
 }
 
@@ -161,7 +161,7 @@ func (s *positionService) GetPositions(userID uint64) ([]domain.Position, error)
 	return s.repo.GetPositions(userID)
 }
 
-func (s *positionService) GetPortfolio(userID uint64) ([]domain.PortfolioResponse, error) {
+func (s *positionService) GetPortfolio(userID uint64) (*domain.PortfolioResponse, error) {
 	positions, err := s.repo.GetPositions(userID)
 	if err != nil {
 		return nil, err
@@ -174,9 +174,11 @@ func (s *positionService) GetPortfolio(userID uint64) ([]domain.PortfolioRespons
 
 	prices, _ := s.provider.GetBatchPrices(tickers)
 
-	var portfolio []domain.PortfolioResponse
+	var totalEquity float64
+	var portfolio []domain.PortfolioItem
 	for _, p := range positions {
 		currentPrice := prices[p.Ticker] * p.TotalQty // price per lot (only for IDX now)
+		totalEquity += currentPrice
 
 		unrealizedPnL := (currentPrice - p.InvestedTotal)
 		pnlPercentage := 0.0
@@ -184,7 +186,7 @@ func (s *positionService) GetPortfolio(userID uint64) ([]domain.PortfolioRespons
 			pnlPercentage = (unrealizedPnL / p.InvestedTotal) * 100
 		}
 
-		portfolio = append(portfolio, domain.PortfolioResponse{
+		portfolio = append(portfolio, domain.PortfolioItem{
 			Ticker:             p.Ticker,
 			TotalQty:           p.TotalQty,
 			InvestedTotal:      p.InvestedTotal,
@@ -195,7 +197,10 @@ func (s *positionService) GetPortfolio(userID uint64) ([]domain.PortfolioRespons
 		})
 	}
 
-	return portfolio, nil
+	return &domain.PortfolioResponse{
+		Items:       portfolio,
+		TotalEquity: totalEquity,
+	}, nil
 }
 
 func (s *positionService) GetTickerCurrentPrice(ticker string) (float64, error) {

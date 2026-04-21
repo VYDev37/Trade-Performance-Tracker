@@ -28,7 +28,7 @@ type PositionAddReq struct {
 	Notes         string  `json:"notes" validate:"max=255"`
 }
 
-type PortfolioResponse struct {
+type PortfolioItem struct {
 	Ticker             string    `json:"ticker"`
 	TotalQty           float64   `json:"total_qty"`
 	InvestedTotal      float64   `json:"invested_total"`
@@ -36,4 +36,9 @@ type PortfolioResponse struct {
 	UnrealizedPnL      float64   `json:"unrealized_pnl"`
 	PnLPercentage      float64   `json:"pnl_percentage"`
 	UpdatedAt          time.Time `json:"updated_at"`
+}
+
+type PortfolioResponse struct {
+	Items       []PortfolioItem `json:"items"`
+	TotalEquity float64         `json:"total_equity"`
 }

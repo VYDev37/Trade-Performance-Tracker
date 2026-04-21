@@ -35,7 +35,7 @@ export default function StockAddPosition() {
     const action = searchParams.get("action"), ticker = searchParams.get("ticker");
     const isSellMode = action === "sell";
 
-    const currentStock = user?.positions?.find(p => p.ticker === ticker);
+    const currentStock = user?.positions?.items?.find(p => p.ticker === ticker);
     const maxLot = (currentStock?.total_qty || 0) / 100;
 
     const [customPrice, setCustomPrice] = useState(currentPrice);

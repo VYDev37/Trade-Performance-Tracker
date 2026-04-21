@@ -76,7 +76,7 @@ export default function PnLReport({ transaction, stock, userNickname, mode, card
                         {isStock ? "Avg Price" : "Entry Avg Price"}
                     </p>
                     <p className="text-xl font-bold font-mono">
-                        {isStock ? Formatter.toLocale((stock.invested_total / (stock.total_qty || 1))) : Formatter.toLocale(transaction?.price_per_unit || 0)}
+                        {isStock ? Formatter.toLocale((stock.invested_total / (stock.total_qty || 1))) : Formatter.toLocale(transaction?.entry_price_unit || 0)}
                     </p>
                 </div>
                 <div className="text-right">
@@ -84,7 +84,7 @@ export default function PnLReport({ transaction, stock, userNickname, mode, card
                         {isStock ? "Current Price" : "Sell Avg Price"}
                     </p>
                     <p className="text-xl font-bold font-mono">
-                        {isStock ? Formatter.toLocale((stock.current_price || 0) / stock.total_qty) : Formatter.toLocale((transaction?.price || 0) / (transaction?.quantity || 1))}
+                        {isStock ? Formatter.toLocale((stock.current_price || 0) / stock.total_qty) : Formatter.toLocale(transaction?.sell_price_unit || 0)}
                     </p>
                 </div>
                 <div>

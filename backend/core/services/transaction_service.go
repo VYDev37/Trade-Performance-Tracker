@@ -2,7 +2,7 @@ package services
 
 import (
 	"trade-tracker/core/domain"
-	"trade-tracker/core/repository"
+	"trade-tracker/core/repositories"
 
 	"gorm.io/gorm"
 )
@@ -14,8 +14,8 @@ type TransactionService interface {
 }
 
 type transactionService struct {
-	repo    repository.TransactionRepository
-	balRepo repository.BalanceRepository
+	repo    repositories.TransactionRepository
+	balRepo repositories.BalanceRepository
 }
 
 type LogActivityParams struct {
@@ -29,7 +29,7 @@ type LogActivityParams struct {
 	Title     string
 }
 
-func NewTransactionService(repo repository.TransactionRepository, balRepo repository.BalanceRepository) TransactionService {
+func NewTransactionService(repo repositories.TransactionRepository, balRepo repositories.BalanceRepository) TransactionService {
 	return &transactionService{repo: repo, balRepo: balRepo}
 }
 
@@ -73,16 +73,20 @@ func (s *transactionService) GetLocalTransactions(userID uint64) ([]domain.Trans
 			realizedPnl = 0
 		}
 
-		ppu := t.BasePrice / t.Quantity
+		var entryPU, sellPU float64
 		//if t.TransactionType == "cashflow" || t.TransactionType == "expense" || t.TransactionType == "income"
-		if !isTrade {
-			ppu = 0
+		if isTrade {
+			entryPU = t.BasePrice / t.Quantity
+		}
+		if t.TransactionType == "sell" {
+			sellPU = t.Price / t.Quantity
 		}
 
 		result = append(result, domain.TransactionResponse{
-			Transaction:  t,
-			PricePerUnit: ppu,
-			RealizedPnl:  realizedPnl,
+			Transaction:    t,
+			EntryPriceUnit: entryPU,
+			SellPriceUnit:  sellPU,
+			RealizedPnl:    realizedPnl,
 		})
 	}
 

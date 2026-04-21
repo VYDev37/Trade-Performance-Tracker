@@ -24,6 +24,7 @@ export default React.memo(function TransactionCard({ transactions, loading }: Tr
             const rPnlPercentage = (transaction.realized_pnl / transaction.base_price) * 100;
 
             const isCashflow = transaction.transaction_type === "cashflow";
+            const isSell = transaction.transaction_type.toLowerCase() === "sell";
             return (
                 <Sheet key={transaction.id}>
                     <SheetTrigger asChild>
@@ -43,7 +44,8 @@ export default React.memo(function TransactionCard({ transactions, loading }: Tr
                                         </span>
                                     </div>
                                     <span className="text-sm font-medium text-white">
-                                        {Formatter.toCurrency(isCashflow ? transaction.base_price : transaction.price_per_unit)}
+                                        {Formatter.toCurrency(isCashflow ? transaction.base_price
+                                            : isSell ? transaction.sell_price_unit : transaction.entry_price_unit)}
                                     </span>
                                 </div>
                                 <div className="flex justify-between items-center text-xs text-slate-400">
@@ -84,7 +86,7 @@ export default React.memo(function TransactionCard({ transactions, loading }: Tr
                                     </div>
                                     <div className="flex justify-between items-center py-3 border-b border-slate-800/50">
                                         <span className="text-slate-400 text-sm">Price per unit</span>
-                                        <span className="font-medium text-white text-sm">{Formatter.toCurrency(transaction.price_per_unit)}</span>
+                                        <span className="font-medium text-white text-sm">{Formatter.toCurrency(isSell ? transaction.sell_price_unit : transaction.entry_price_unit)}</span>
                                     </div>
                                     <div className="flex justify-between items-center py-3 border-b border-slate-800/50">
                                         <span className="text-slate-400 text-sm">Fee</span>

@@ -4,7 +4,7 @@ import (
 	"math"
 	"strings"
 	"trade-tracker/core/domain"
-	"trade-tracker/core/repository"
+	"trade-tracker/core/repositories"
 
 	"gorm.io/gorm"
 )
@@ -20,11 +20,11 @@ type BalanceService interface {
 }
 
 type balanceService struct {
-	repo        repository.BalanceRepository
+	repo        repositories.BalanceRepository
 	tranService TransactionService
 }
 
-func NewBalanceService(repo repository.BalanceRepository, tranService TransactionService) BalanceService {
+func NewBalanceService(repo repositories.BalanceRepository, tranService TransactionService) BalanceService {
 	return &balanceService{repo: repo, tranService: tranService}
 }
 

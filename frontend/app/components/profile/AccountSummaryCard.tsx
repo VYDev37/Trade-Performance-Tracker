@@ -109,7 +109,7 @@ export default function AccountSummaryCard({ user }: AccountSummaryCardProps) {
                         <div className="min-w-0">
                             <p className="text-sm font-medium text-slate-400 mb-1 truncate">Total Equity</p>
                             <p className="text-xl md:text-2xl font-bold text-white tracking-tight truncate">
-                                {Formatter.toCurrency(user.total_equity)}
+                                {Formatter.toCurrency(user.positions.total_equity)}
                             </p>
                         </div>
                     </div>

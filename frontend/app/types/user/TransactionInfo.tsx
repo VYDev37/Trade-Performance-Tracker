@@ -8,7 +8,8 @@ export interface TransactionInfo {
     base_price: number;
     price: number;
     realized_pnl: number;
-    price_per_unit: number;
+    entry_price_unit: number;
+    sell_price_unit: number;
     notes: string;
     title?: string;
 

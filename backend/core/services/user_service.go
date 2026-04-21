@@ -3,7 +3,7 @@ package services
 import (
 	"strings"
 	"trade-tracker/core/domain"
-	"trade-tracker/core/repository"
+	"trade-tracker/core/repositories"
 	"trade-tracker/pkg/utils/hash"
 
 	"gorm.io/gorm"
@@ -18,13 +18,13 @@ type UserService interface {
 }
 
 type userService struct {
-	repo        repository.UserRepository
+	repo        repositories.UserRepository
 	posService  PositionService
 	tranService TransactionService
 	balService  BalanceService
 }
 
-func NewUserService(repo repository.UserRepository, posService PositionService, tranService TransactionService, balService BalanceService) UserService {
+func NewUserService(repo repositories.UserRepository, posService PositionService, tranService TransactionService, balService BalanceService) UserService {
 	return &userService{repo: repo, posService: posService, tranService: tranService, balService: balService}
 }
 
@@ -91,21 +91,17 @@ func (s *userService) GetProfile(userID uint64) (*domain.UserProfileResponse, er
 	if err != nil {
 		return nil, err
 	}
+	balance, err := s.balService.GetBalances(userID, nil)
+	if err != nil || balance == nil {
+		return nil, err
+	}
 
 	portfolio, err := s.posService.GetPortfolio(userID)
 	if err != nil {
 		return nil, err
 	}
 
-	balance, err := s.balService.GetBalances(userID, nil)
-	if err != nil || balance == nil {
-		return nil, err
-	}
-
-	totalEquity := balance.StockBalance
-	for _, p := range portfolio {
-		totalEquity += p.CurrentMarketPrice
-	}
+	totalEquity := balance.StockBalance + portfolio.TotalEquity
 
 	return &domain.UserProfileResponse{
 		Name:     user.Name,

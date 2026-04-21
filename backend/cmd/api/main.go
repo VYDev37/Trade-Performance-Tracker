@@ -8,7 +8,7 @@ import (
 	"trade-tracker/core/config"
 	"trade-tracker/core/delivery/http"
 	"trade-tracker/core/integrations/providers"
-	"trade-tracker/core/repository"
+	"trade-tracker/core/repositories"
 	"trade-tracker/core/services"
 
 	"github.com/joho/godotenv"
@@ -29,11 +29,11 @@ func main() {
 
 	log.Println("Database connection established.")
 
-	userRepo := repository.NewUserRepo(db)
-	posRepo := repository.NewPositionRepo(db)
-	tranRepo := repository.NewTransactionRepo(db)
-	noteRepo := repository.NewNoteRepo(db)
-	balRepo := repository.NewBalanceRepo(db)
+	userRepo := repositories.NewUserRepo(db)
+	posRepo := repositories.NewPositionRepo(db)
+	tranRepo := repositories.NewTransactionRepo(db)
+	noteRepo := repositories.NewNoteRepo(db)
+	balRepo := repositories.NewBalanceRepo(db)
 
 	priceProvider := providers.NewPriceProvider()
 
@@ -42,7 +42,7 @@ func main() {
 	bService := services.NewBalanceService(balRepo, tService)
 	pService := services.NewPositionService(posRepo, userRepo, priceProvider, tService, bService)
 	uService := services.NewUserService(userRepo, pService, tService, bService)
-	rService := services.NewReportService(posRepo, userRepo, tranRepo, priceProvider)
+	rService := services.NewReportService(pService, uService, tService, priceProvider)
 
 	port := os.Getenv("PORT")
 	if port == "" {

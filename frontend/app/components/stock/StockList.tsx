@@ -17,8 +17,8 @@ export default function StockList() {
     const itemsPerPage = 10;
 
     const stocks = useMemo(() => {
-        return [...(user?.positions || [])].sort((a, b) => a.ticker.localeCompare(b.ticker));
-    }, [user?.positions]);
+        return [...(user?.positions.items || [])].sort((a, b) => a.ticker.localeCompare(b.ticker));
+    }, [user?.positions.items]);
 
     const paginatedStocks = useMemo(() => {
         const startIndex = (currentPage - 1) * itemsPerPage;

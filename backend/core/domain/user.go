@@ -31,9 +31,9 @@ type UserLoginReq struct {
 }
 
 type UserProfileResponse struct {
-	Name        string              `json:"name"`
-	Username    string              `json:"username"`
-	Balance     BalanceDetail       `json:"balance"`
-	TotalEquity float64             `json:"total_equity"`
-	Portfolio   []PortfolioResponse `json:"positions"`
+	Name        string             `json:"name"`
+	Username    string             `json:"username"`
+	Balance     BalanceDetail      `json:"balance"`
+	TotalEquity float64            `json:"total_equity"`
+	Portfolio   *PortfolioResponse `json:"positions"`
 }
