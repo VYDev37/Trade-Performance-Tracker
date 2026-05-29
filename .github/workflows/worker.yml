@@ -1,0 +1,10 @@
+name: Market-Worker
+on:
+  schedule:
+    - cron: '*/15 2-9 * * 1-5' # every 15 minutes at market time (UTC)
+jobs:
+  hit-api:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Vercel API
+        run: curl -X GET "https://tpt-v3.vercel.app/api/worker/update-prices"
