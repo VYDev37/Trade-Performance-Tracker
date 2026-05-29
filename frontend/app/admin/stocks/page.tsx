@@ -12,8 +12,8 @@ export async function generateMetadata({ searchParams }: StockParams): Promise<M
     const params = await searchParams;
     const ticker = params.symbol || "COMPOSITE";
     return {
-        title: `Real-Time Market Charts & Stocks - Trade Tracker (${ticker})`,
-        description: `View and analyze real-time market data, custom charts, and manage your asset portfolio positions inside the Trade Performance Tracker admin panel.`,
+        title: `My Portfolio Detail - Trade Performance Tracker`,
+        description: `View what's happening with your assets and manage them.`,
     };
 }
 
