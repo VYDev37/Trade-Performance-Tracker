@@ -9,8 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
 import { useUpdateTransaction } from "@/app/hooks/transaction";
-import type { TransactionInfo } from "@/app/types/user/TransactionInfo";
-import type { UpdateTransactionReq } from "@/app/types/http/UserRequest";
+import { TransactionInfo, UpdateTransactionReq } from "@/app/schemas/transaction.schema";
 
 interface TrackerEditSheetProps {
     onRefresh: () => void;
@@ -25,19 +24,19 @@ export default function TrackerEditSheet({ onRefresh, existingData, isOpen, onOp
     const [data, setData] = useState<UpdateTransactionReq>({
         title: existingData.title || "",
         notes: existingData.notes || "",
-        price: existingData.price?.toString() || "",
+        price: existingData.price || 0,
         reverse: false
     });
 
     const handleChangeData = (key: keyof UpdateTransactionReq, value: any) => {
-        setData((prev) => ({ ...prev, [key]: typeof value === "function" ? value(prev[key as keyof UpdateTransactionReq]) : value }));
+        setData((prev: UpdateTransactionReq) => ({ ...prev, [key]: typeof value === "function" ? value(prev[key as keyof UpdateTransactionReq]) : value }));
     }
 
     const handleUpdate = async () => {
         if (!data.title.trim() || loading)
             return;
 
-        const numPrice = parseFloat(data.price);
+        const numPrice = data.price;
         if (isNaN(numPrice) || numPrice < 0)
             return;
 
@@ -81,7 +80,8 @@ export default function TrackerEditSheet({ onRefresh, existingData, isOpen, onOp
                     <div className="space-y-2">
                         <label className="text-sm font-medium text-slate-300">Amount</label>
                         <Input
-                            type="number"
+                            type="text"
+                            inputMode="numeric"
                             step="0.01"
                             value={data.price}
                             onChange={(e) => handleChangeData("price", e.target.value)}

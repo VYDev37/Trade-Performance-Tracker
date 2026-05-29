@@ -2,8 +2,8 @@ import Calculator from "@/app/components/calculator/Calculator";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Calculator | Trade Performance Tracker",
-  description: "A functional calculator for trading calculations",
+  title: "Calculator - Trade Tracker",
+  description: "Only a simple calculator, will be developed soon.",
 };
 
 export default function CalculatorPage() {

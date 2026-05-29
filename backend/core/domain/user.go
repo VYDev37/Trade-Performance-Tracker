@@ -1,15 +1,11 @@
 package domain
 
-import (
-	"gorm.io/gorm"
-)
-
 type User struct {
-	gorm.Model
+	BaseModel
 
 	Name     string `gorm:"not null" json:"name"`
-	Email    string `gorm:"not null;email;index" json:"email"`
-	Username string `gorm:"not null;index" json:"username"`
+	Email    string `gorm:"not null;email;uniqueIndex:idx_user_email" json:"email"`
+	Username string `gorm:"not null;uniqueIndex:idx_user_username" json:"username"`
 	Password string `gorm:"not null"`
 	Verified bool   `gorm:"not null;default:false" json:"verified"`
 

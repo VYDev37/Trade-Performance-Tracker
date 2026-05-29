@@ -13,7 +13,7 @@ type PositionRepository interface {
 	UpdatePosition(pos *domain.Position, trx *gorm.DB) error
 
 	GetPositions(userID uint64) ([]domain.Position, error)
-	GetPosByTicker(userID uint64, ticker string, tx *gorm.DB) (*domain.Position, error)
+	GetPosByTicker(userID uint64, ticker string, provider string, accountNo string, tx *gorm.DB) (*domain.Position, error)
 	GetDB() *gorm.DB
 }
 
@@ -33,7 +33,7 @@ func (r *positionRepo) AddPosition(pos *domain.Position, trx *gorm.DB) error {
 	return db.Create(&pos).Error
 }
 
-func (r *positionRepo) GetPosByTicker(userID uint64, ticker string, tx *gorm.DB) (*domain.Position, error) {
+func (r *positionRepo) GetPosByTicker(userID uint64, ticker string, provider string, accountNo string, tx *gorm.DB) (*domain.Position, error) {
 	var pos domain.Position
 	db := r.DB
 	if tx != nil {
@@ -41,7 +41,7 @@ func (r *positionRepo) GetPosByTicker(userID uint64, ticker string, tx *gorm.DB)
 	}
 
 	err := db.Clauses(clause.Locking{Strength: "UPDATE"}).
-		Where("owner_id = ? AND ticker = ?", userID, ticker).
+		Where("owner_id = ? AND ticker = ? AND provider = ? AND account_no = ?", userID, ticker, provider, accountNo).
 		Take(&pos).Error
 
 	if err != nil {

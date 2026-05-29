@@ -107,8 +107,6 @@ export default function AuthForm({ title, subtitle, fields, submitLabel, loading
                     </form>
                 </CardContent>
             </Card>
-
-
         </div>
     );
 }

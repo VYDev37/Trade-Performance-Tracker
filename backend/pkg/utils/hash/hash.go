@@ -6,8 +6,8 @@ import (
 
 func HashPassword(password string) (string, error) {
 	return argon2id.CreateHash(password, &argon2id.Params{ // optimization
-		Memory:      32 * 1024, // 32MB
-		Iterations:  1,
+		Memory:      64 * 1024, // 64MB
+		Iterations:  3,
 		Parallelism: 2,
 		SaltLength:  16,
 		KeyLength:   32,

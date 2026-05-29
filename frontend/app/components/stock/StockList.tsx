@@ -2,30 +2,62 @@
 
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { useUser } from "@/app/context/UserContext";
+import { useUser } from "@/app/stores";
 
 import { StockMobileCard, StockDesktopTable } from "@/app/components/stock";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { AvailableAccount } from "@/app/schemas/transaction.schema";
 
 export default function StockList() {
     const router = useRouter();
 
-    const { user, isLoading } = useUser();
+    const user = useUser((state) => state.user);
+    const isLoadingUser = useUser((state) => state.isLoading);
+    const isLoading = isLoadingUser || !user;
 
     const [currentPage, setCurrentPage] = useState(1);
+    const [selectedFilter, setSelectedFilter] = useState<string>("all");
     const itemsPerPage = 10;
 
-    const stocks = useMemo(() => {
-        return [...(user?.positions.items || [])].sort((a, b) => a.ticker.localeCompare(b.ticker));
-    }, [user?.positions.items]);
+    const uniqueAccounts = useMemo(() => {
+        const accs: AvailableAccount[] = [];
+        const seen = new Set<string>();
+
+        (user?.positions.items || []).forEach(item => {
+            if (item.provider && item.account_no) {
+                const key = `${item.provider}-${item.account_no}`;
+                if (!seen.has(key)) {
+                    seen.add(key);
+                    accs.push({ provider_name: item.provider, account_no: item.account_no });
+                }
+            }
+        });
+
+        console.log(accs)
+
+        return accs;
+    }, [user]);
+
+    const filteredStocks = useMemo(() => {
+        let items = [...(user?.positions.items || [])];
+        if (selectedFilter !== "all") {
+            const [prov, accNo] = selectedFilter.split("-");
+            const target = uniqueAccounts.find(x => `${x.provider_name}-${x.account_no}` === selectedFilter);
+            if (target) {
+                items = items.filter(p => p.provider === target.provider_name && p.account_no === target.account_no);
+            }
+        }
+        return items.sort((a, b) => a.ticker.localeCompare(b.ticker));
+    }, [user?.positions.items, selectedFilter, uniqueAccounts]);
 
     const paginatedStocks = useMemo(() => {
         const startIndex = (currentPage - 1) * itemsPerPage;
-        return stocks.slice(startIndex, startIndex + itemsPerPage);
-    }, [stocks, currentPage]);
+        return filteredStocks.slice(startIndex, startIndex + itemsPerPage);
+    }, [filteredStocks, currentPage]);
 
-    const totalPages = Math.ceil(stocks.length / itemsPerPage);
+    const totalPages = Math.ceil(filteredStocks.length / itemsPerPage);
 
     const renderPaginationDots = () => {
         let pages: (number | string)[] = [];
@@ -68,16 +100,42 @@ export default function StockList() {
 
     return (
         <div className="space-y-4">
+            {/* Filter Dropdown */}
+            {uniqueAccounts.length > 0 && !isLoading && (
+                <div className="flex flex-col sm:flex-row items-center justify-start gap-2 pb-2">
+                    <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Filter by Broker:</span>
+                    <Select value={selectedFilter} onValueChange={(val) => {
+                        setSelectedFilter(val);
+                        setCurrentPage(1);
+                    }} defaultValue={uniqueAccounts.length > 0 ? `${uniqueAccounts[0].provider_name}-${uniqueAccounts[0].account_no}` : ""}>
+                        <SelectTrigger className="w-full sm:w-64 bg-slate-900 border-white/10 text-xs font-bold text-white h-10 rounded-md focus:ring-1 focus:ring-blue-500">
+                            <SelectValue placeholder="All Brokers" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-zinc-950 text-white border-white/10">
+                            <SelectItem value="all" className="text-xs font-semibold">All Brokers</SelectItem>
+                            {uniqueAccounts.map((acc, index) => {
+                                const val = `${acc.provider_name}-${acc.account_no}`;
+                                return (
+                                    <SelectItem key={val + index} value={val} className="text-xs font-semibold">
+                                        {acc.provider_name} ({acc.account_no})
+                                    </SelectItem>
+                                );
+                            })}
+                        </SelectContent>
+                    </Select>
+                </div>
+            )}
+
             {/* Mobile */}
             <StockMobileCard stocks={paginatedStocks} loading={isLoading} handleAddRedirect={handleAddRedirect} handleTickerChange={handleTickerChange} />
 
             {/* Desktop */}
             <StockDesktopTable stocks={paginatedStocks} loading={isLoading} handleAddRedirect={handleAddRedirect} handleTickerChange={handleTickerChange} />
 
-            {stocks.length > 0 && !isLoading && (
+            {filteredStocks.length > 0 && !isLoading && (
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-2 pt-4">
                     <div className="text-sm text-slate-400">
-                        Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, stocks.length)} of {stocks.length} entries
+                        Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, filteredStocks.length)} of {filteredStocks.length} entries
                     </div>
                     <div className="flex items-center gap-2">
                         <Button

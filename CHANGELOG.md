@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-05-29
+### Added
+- Added page `Indonesian Market` to track stocks movement.
+- Added backend to get assets info (stocks).
+- Improved security on both frontend and backend.
+- Added multiple account system (multiple broker & multiple bank accounts) inside one user (support stocks & financial tracker).
+- Added new integration with `go-tvscanner-api`.
+- Enhanced UI/UX on sheets related with transactions.
+
+### Fixed
+- Fixed error message bug didn't display correctly.
+
+### Changed
+- Major refactor on frontend (especially for component decomposition, state management and schema definition).
+- Changed all main page to server component.
+- Changed max input size of note in transaction.
+
+### Deprecated
+- `types/` -> `schema/` 
+- `context/UserContext` -> `stores/useUserStore`
+- `context/TransactionContext` -> `stores/useTransactionStore`
+- `types/http/LoginInfo.ts` + `types/http/RegisterInfo.ts` & `types/http/UserInfo.ts` -> `schemas/auth.schema.ts`
+- `types/user/TransactionInfo.ts` + `types/user/UserRequest.ts` -> `schemas/transaction.schema.ts`
+- `types/user/JournalInfo.ts` -> `schemas/journal.schema.ts`
+- `types/user/PortfolioInfo.ts` + `types/user/BalanceInfo.ts` -> `schemas/balance.schema.ts`
+
 ## [0.2.2] - 2026-04-21
 ### Changed
 - Splitted `price_per_unit` to 2 mode (`entry_price_unit` (for entry avg price) & `sell_price_unit` (for sell avg price)) to ensure consistency.

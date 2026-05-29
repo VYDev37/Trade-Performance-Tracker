@@ -1,5 +1,5 @@
 import React from "react";
-import type { TransactionInfo } from "@/app/types/user/TransactionInfo";
+import type { TransactionInfo } from "@/app/schemas/transaction.schema";
 
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -57,6 +57,16 @@ export default React.memo(function TransactionTable({ transactions, loading, use
                                         <TableCell><Skeleton className="h-4 w-20 bg-slate-800 ml-auto" /></TableCell>
                                         <TableCell><Skeleton className="h-4 w-24 bg-slate-800 ml-auto" /></TableCell>
                                         <TableCell><Skeleton className="h-4 w-16 bg-slate-800 ml-auto" /></TableCell>
+                                        <TableCell>
+                                            <div className="flex flex-col items-end gap-1">
+                                                <Skeleton className="h-4 w-20 bg-slate-800" />
+                                                <Skeleton className="h-3 w-12 bg-slate-800" />
+                                            </div>
+                                        </TableCell>
+                                        <TableCell><Skeleton className="h-4 w-24 bg-slate-800 ml-auto" /></TableCell>
+                                        <TableCell className="text-center">
+                                            <Skeleton className="h-8 w-8 bg-slate-800 mx-auto rounded-md" />
+                                        </TableCell>
                                     </TableRow>
                                 ))
                             ) : (transactions && transactions.length > 0) ? (
@@ -69,7 +79,7 @@ export default React.memo(function TransactionTable({ transactions, loading, use
                                     return (
                                         <TableRow key={transaction.id} className="border-slate-800 hover:bg-slate-900/30 transition-colors">
                                             <TableCell className="font-medium text-slate-300">
-                                                {Formatter.toDate(transaction.created_at)}
+                                                {Formatter.formatDate(transaction.created_at)}
                                             </TableCell>
                                             <TableCell>
                                                 <span className="font-bold text-white bg-slate-800 px-2 py-1 rounded text-xs tracking-wide">
@@ -86,24 +96,31 @@ export default React.memo(function TransactionTable({ transactions, loading, use
                                                 </span>
                                             </TableCell>
                                             <TableCell className="text-right text-slate-300">
-                                                {Formatter.toLocale(transaction.quantity / 100)}
+                                                {Formatter.formatNumber(transaction.quantity / 100)}
                                             </TableCell>
                                             <TableCell className="text-right text-slate-300">
-                                                {Formatter.toCurrency(isSell ? transaction.sell_price_unit : transaction.entry_price_unit)}
+                                                {Formatter.formatCurrency(isSell ? transaction.sell_price_unit : transaction.entry_price_unit)}
                                             </TableCell>
                                             <TableCell className="text-right font-medium text-white">
-                                                {Formatter.toCurrency(transaction.base_price)}
+                                                {Formatter.formatCurrency(transaction.base_price)}
                                             </TableCell>
                                             <TableCell className="text-right text-slate-400 text-xs">
-                                                {Formatter.toCurrency(transaction.transaction_fee)}
+                                                {Formatter.formatCurrency(transaction.transaction_fee)}
                                             </TableCell>
                                             <TableCell className="text-right text-slate-400 text-xs">
-                                                {Formatter.toCurrency(transaction.price)}
+                                                <div className="flex flex-col items-end">
+                                                    <span className="font-mono">{Formatter.formatCurrency(transaction.price)}</span>
+                                                    {transaction.provider && (
+                                                        <span className="text-[9px] font-black bg-blue-500/10 text-blue-400 border border-blue-500/20 px-1.5 py-0.5 rounded mt-1 uppercase tracking-wider font-sans">
+                                                            {transaction.provider}
+                                                        </span>
+                                                    )}
+                                                </div>
                                             </TableCell>
                                             <TableCell className={`text-right text-slate-400 text-xs ${color}`}>
                                                 {transaction.realized_pnl === 0 ? "-" :
-                                                    `${sign}${Formatter.toCurrency(Math.abs(transaction.realized_pnl))} 
-                                                                (${sign}${Formatter.toLocale(Math.abs(rPnlPercentage))}%)`}
+                                                    `${sign}${Formatter.formatCurrency(Math.abs(transaction.realized_pnl))} 
+                                                                (${sign}${Formatter.formatNumber(Math.abs(rPnlPercentage))}%)`}
                                             </TableCell>
                                             <TableCell className="text-center text-slate-400 text-xs">
                                                 {transaction.transaction_type.toLowerCase() === 'sell' && (

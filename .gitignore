@@ -42,3 +42,8 @@ frontend/*.tsbuildinfo
 frontend/*.pem
 .vercel
 .env*.local
+.claudignore
+AUDIT_REPORT.md
+
+# Antigravity agent skills
+.agent/

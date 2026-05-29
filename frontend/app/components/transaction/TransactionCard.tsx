@@ -1,5 +1,5 @@
 import React from "react";
-import type { TransactionInfo } from "@/app/types/user/TransactionInfo";
+import type { TransactionInfo } from "@/app/schemas/transaction.schema";
 
 import { Formatter } from "@/app/lib";
 
@@ -44,13 +44,13 @@ export default React.memo(function TransactionCard({ transactions, loading }: Tr
                                         </span>
                                     </div>
                                     <span className="text-sm font-medium text-white">
-                                        {Formatter.toCurrency(isCashflow ? transaction.base_price
+                                        {Formatter.formatCurrency(isCashflow ? transaction.base_price
                                             : isSell ? transaction.sell_price_unit : transaction.entry_price_unit)}
                                     </span>
                                 </div>
                                 <div className="flex justify-between items-center text-xs text-slate-400">
-                                    <span>{Formatter.toDate(transaction.created_at)}</span>
-                                    {!isCashflow && (<span>{Formatter.toLocale(transaction.quantity / 100)} lot</span>)}
+                                    <span>{Formatter.formatDate(transaction.created_at)}</span>
+                                    {!isCashflow && (<span>{Formatter.formatNumber(transaction.quantity / 100)} lot</span>)}
                                 </div>
                             </CardContent>
                         </Card>
@@ -76,31 +76,31 @@ export default React.memo(function TransactionCard({ transactions, loading }: Tr
                         <div className="mt-6 space-y-2 pb-6">
                             <div className="flex justify-between items-center py-3 border-b border-slate-800/50">
                                 <span className="text-slate-400 text-sm">Date</span>
-                                <span className="font-medium text-white text-sm text-right">{Formatter.toDate(transaction.created_at)}</span>
+                                <span className="font-medium text-white text-sm text-right">{Formatter.formatDate(transaction.created_at)}</span>
                             </div>
                             {!isCashflow && (
                                 <>
                                     <div className="flex justify-between items-center py-3 border-b border-slate-800/50">
                                         <span className="text-slate-400 text-sm">Quantity</span>
-                                        <span className="font-medium text-white text-sm">{Formatter.toLocale(transaction.quantity / 100)} lot</span>
+                                        <span className="font-medium text-white text-sm">{Formatter.formatNumber(transaction.quantity / 100)} lot</span>
                                     </div>
                                     <div className="flex justify-between items-center py-3 border-b border-slate-800/50">
                                         <span className="text-slate-400 text-sm">Price per unit</span>
-                                        <span className="font-medium text-white text-sm">{Formatter.toCurrency(isSell ? transaction.sell_price_unit : transaction.entry_price_unit)}</span>
+                                        <span className="font-medium text-white text-sm">{Formatter.formatCurrency(isSell ? transaction.sell_price_unit : transaction.entry_price_unit)}</span>
                                     </div>
                                     <div className="flex justify-between items-center py-3 border-b border-slate-800/50">
                                         <span className="text-slate-400 text-sm">Fee</span>
-                                        <span className="font-medium text-white text-sm">{Formatter.toCurrency(transaction.transaction_fee)}</span>
+                                        <span className="font-medium text-white text-sm">{Formatter.formatCurrency(transaction.transaction_fee)}</span>
                                     </div>
                                 </>
                             )}
                             <div className="flex justify-between items-center py-3 border-b border-slate-800/50">
                                 <span className="text-slate-400 text-sm">Base Price</span>
-                                <span className="font-medium text-white text-sm">{transaction.base_price <= 0 ? "-" : Formatter.toCurrency(transaction.base_price)}</span>
+                                <span className="font-medium text-white text-sm">{transaction.base_price <= 0 ? "-" : Formatter.formatCurrency(transaction.base_price)}</span>
                             </div>
                             <div className="flex justify-between items-center py-3 border-b border-slate-800/50">
                                 <span className="text-slate-400 text-sm">Total Value</span>
-                                <span className="font-medium text-white text-sm">{Formatter.toCurrency(transaction.price)}</span>
+                                <span className="font-medium text-white text-sm">{Formatter.formatCurrency(transaction.price)}</span>
                             </div>
                             <div className="flex justify-between items-center py-3">
                                 {isCashflow ? (
@@ -108,18 +108,24 @@ export default React.memo(function TransactionCard({ transactions, loading }: Tr
                                         <span className="text-slate-400 text-sm">Notes</span>
                                         <div className={`font-medium text-sm text-right whitespace-pre-wrap ${color}`}>
                                             {!transaction.notes ? "-" : transaction.notes}
-                                        </div></>
+                                        </div>
+                                    </>
                                 ) : (
                                     <>
                                         <span className="text-slate-400 text-sm">Realized PnL</span>
                                         <div className={`font-medium text-sm text-right ${color}`}>
                                             {transaction.realized_pnl === 0 ? "-" :
-                                                `${sign}${Formatter.toCurrency(Math.abs(transaction.realized_pnl))} 
-                                                            (${sign}${Formatter.toLocale(Math.abs(rPnlPercentage))}%)`}
+                                                `${sign}${Formatter.formatCurrency(Math.abs(transaction.realized_pnl))} 
+                                                            (${sign}${Formatter.formatNumber(Math.abs(rPnlPercentage))}%)`}
                                         </div>
                                     </>
                                 )}
-
+                                <div>
+                                    <span className="text-slate-400 text-sm">Provider - Account</span>
+                                    <div className={`font-medium text-sm text-right whitespace-pre-wrap ${color}`}>
+                                        {`${transaction.provider} - ${transaction.account_no}`}
+                                    </div>
+                                </div>
                             </div>
 
                         </div>

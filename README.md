@@ -1,36 +1,40 @@
 # Trade Performance Tracker
 
-A comprehensive full-stack application for tracking and analyzing trade performance, managing stock portfolios, and monitoring transaction histories.
+A premium, full-stack, real-time portfolio management and financial auditing application tailored for tracking stock portfolios, analyzing trade performances, and monitoring personal cashflows.
 
-## 🌟 Features
+### ✨ Core Features
+- **Advanced Security & Authentication**: Secure login and registration system utilizing **JWT** verification and **Argon2id** password hashing, enhanced with automated skeleton suspense loaders for a seamless user experience.
+- **IDX Composite Terminal**: A high-performance trading terminal rendering real-time stock details, fundamental metrics, and interactive charts powered by **TradingView's `lightweight-charts`**.
+- **Automated Market Feeds**: Integration of background daemons and modules to fetch live tick prices and historical candlestick data directly from Yahoo Finance.
+- **Multi-Account Financial Tracker**: Manage multiple distinct broker portfolios and bank accounts under a single unified dashboard. Includes dynamic budget tracking, consolidated balance sheets, and mobile-responsive chronological cashflow views.
+- **Trade Management & Audits**: Record buy/sell actions with custom execution fee inputs. Track current holdings and live performance with detailed, paginated transaction histories equipped with server-side filtering and search.
+- **Interactive Analytics Dashboard**: A visual overview of account balances and portfolio allocations with interactive data visualization powered by **Recharts**.
+- **Shareable Trade Cards**: Instant generation of clean, professional PnL and ROI performance report cards, perfect for sharing trading results.
+- **Comprehensive Trading Journals**: Document trading plans and personal notes with rich-text support, cloud-backed image attachments, and responsive card-based layouts for both desktop and mobile.
+- **Profile Configuration**: Manage user settings and adjust balance sheet structures dynamically to fit evolving financial needs.
+- **AI Portfolio Auditor (Coming Soon)**: A built-in intelligent agent designed to analyze trading habits, detect performance anomalies, and offer custom advisory insights..
 
-- **User Authentication**: Secure Login and Registration system using JWT.
-- **Interactive Dashboard**: Overview of account balance and portfolio allocation with visual charts (Recharts).
-- **Transaction Management**: Record buy/sell actions with detailed, paginated history (including fee by percentage input).
-- **Stock Positions**: Track current holdings and live performance with auto-updating market prices.
-- **Trade Results**: Generate and share comprehensive trade result (PnL & ROI) report cards.
-- **Journals & Notes**: Personal note page with image and long-text support.
-- **Financial Tracker**: Manage and track personal financial activities through a dedicated dashboard with mobile-responsive consolidated views.
-- **Profile Management**: Manage user settings and adjust balance sheets dynamically.
-- **AI Assistant**: Built-in assistant to help analyze trading patterns and offer insights. (Coming soon)
+---
 
 ## 🛠 Tech Stack
 
-### Backend
-- **Language**: Go 1.25+
-- **Framework**: Fiber v3
-- **Database ORM**: GORM
-- **Database**: PostgreSQL
-- **Security**: Argon2id for password hashing, Validator for struct validation
-- **Architecture**: Domain-Driven Design / Clean Architecture (`delivery`, `domain`, `repository`, `services`)
+### Backend (Go Engine)
+- **Language & Runtime**: Go 1.25+
+- **Core HTTP Engine**: Fiber v3 (High-performance, low-overhead routing)
+- **Database Engine**: PostgreSQL with connection pooling
+- **ORM Persistence Layer**: GORM (Auto-migrations and relational bindings)
+- **Data Validation & Security**: Argon2id crypt hashes, struct validations
+- **Architecture**: Domain-Driven Design (DDD) & Clean Architecture
 
-### Frontend
-- **Framework**: Next.js 16 (App Router)
-- **Library**: React 19
-- **Styling**: Tailwind CSS v4
-- **UI Components**: shadcn/ui (Radix UI), Lucide Icons
+### Frontend (Next.js Platform)
+- **Core Platform**: Next.js 16 (App Router, Server Components by default)
+- **View Layer**: React 19
+- **State Management**: Zustand
+- **Data Validation**: Zod (Type-safe schemas)
+- **Styling & UI**: Vanilla CSS and Tailwind CSS v4
+- **Components System**: shadcn/ui (Radix UI), Lucide Icons
 - **Data Fetching**: Axios
-- **Charts**: Recharts
+- **Interactive Visualizers**: Recharts & TradingView Lightweight Charts
 - **Package Manager**: pnpm
 
 ---
@@ -39,49 +43,90 @@ A comprehensive full-stack application for tracking and analyzing trade performa
 
 ```text
 Trade-Performance-Tracker/
-├── backend/                  # Go API Server
-│   ├── cmd/                  # Entry point for the application (main.go)
-│   │   ├── api/              # Where main.go located
-│   ├── internal/             # Application code (Clean Architecture)
-│   │   ├── config/           # Configuration loaders
-│   │   ├── delivery/         # HTTP handlers and routing
-│   │   ├── domain/           # Core interfaces and entities
-│   │   ├── repository/       # Database interactions
-│   │   └── services/         # Business logic
-│   ├── pkg/                  # Shared utilities and helpers
-│   ├── .dockerignore         # Ignored files (Docker)
-│   ├── .env.example          # Example environment variables
-│   ├── .gitignore            # Ignored files (Git)
-│   ├── go.mod                # Go module dependencies
-│   ├── go.sum                # Another Go file
-│   └── README.md             # README
-└── frontend/                 # Next.js Application
-│   ├── app/                  # App Router pages and layouts
-│   │   ├── (account)/        # Auth pages (login, register)
-│   │   ├── admin/            # Dashboard, Profile, Stocks, Transactions, Assistant, Tracker, Calculator, Journals
-│   │   └── components/       # Shared & Local Page UI Components (for pages, etc.)
-│   ├── components/           # Reusable UI components (shadcn, charts, etc.)
-│   ├── hooks/                # Custom React hooks for API and state management
-│   ├── lib/                  # Utility functions
-│   ├── types/                # TypeScript interface definitions
-│   ├── .env.example          # Example environment variables for frontend
-│   ├── Dockerfile            # Docker instructions for frontend deployment
-│   ├── eslint.config.mjs     # Linting rules and code style configuration
-│   ├── next.env-d.ts         # TypeScript definitions for Next.js
-│   ├── next.config.ts        # Next.js specific configuration
-│   ├── package.json          # Node dependencies
-│   ├── pnpm-lock.yaml        # pnpm lockfile
-│   ├── pnpm-workspace.yaml   # Monorepo workspace configuration for pnpm
-│   ├── postcss.config.mjs    # Tailwind CSS and PostCSS configuration
-│   ├── proxy.ts              # Local development proxy settings
-│   ├── README.md             # README
-│   └── tsconfig.json         # TypeScript compiler configuration
-├── .gitignore                # Ignored files for the entire workspace (Git)
-├── backup-trade-tracker.sql  # Database snapshot or backup file
-├── CHANGELOG.md              # Record of all notable changes to the project
-├── docker-compose.yml        # Docker orchestration for local development
-├── README.md                 # Main project documentation
-└── vercel.json               # Vercel config file
+├── backend/                    # Go API Engine
+│   ├── cmd/                    # Application Entrypoints
+│   │   └── api/                # Fiber API runtime
+│   │       └── main.go         # Bootstraps configuration, DB, handlers, and routers
+│   ├── core/                   # Domain-Driven Design Core
+│   │   ├── config/             # DB connectivity, pooling & environment configs
+│   │   ├── delivery/           # Request controllers & endpoint routing
+│   │   │   ├── handlers/       # Endpoint handlers (user, positions, notes, assets, etc.)
+│   │   │   └── http/           # Fiber router configuration (routers.go)
+│   │   ├── domain/             # Core business models, GORM structures & contracts
+│   │   ├── integrations/       # Live market data scrapers & scanner feeds
+│   │   │   └── providers/      # TV Scanner (TradingView) & Yahoo Finance adapters
+│   │   ├── repositories/       # Database access layers & persistence queries
+│   │   ├── script/             # Executable utilities (auto-migrate.go script)
+│   │   ├── services/           # Enterprise logic, use cases & calculations
+│   │   └── worker/             # Background daemons (update_stock.go price synchronizer)
+│   ├── pkg/                    # Reusable framework utilities
+│   │   ├── middleware/         # Security & JWT router guards
+│   │   └── utils/              # Crypt encoders, number formatters, error wrappers
+│   ├── .dockerignore           # Excluded files for containerization
+│   ├── .env.example            # Backend environment blueprint
+│   ├── .gitignore              # Git patterns to ignore in backend
+│   ├── Dockerfile              # Go lightweight production container
+│   ├── go.mod                  # Go engine dependencies
+│   ├── go.sum                  # Dependecies checksum verification
+│   └── README.md               # Backend technical guide
+│
+├── frontend/                   # Next.js Application
+│   ├── app/                    # Next.js App Router (Pages, layouts & states)
+│   │   ├── (account)/          # Auth routes (login, register) with Server/Client splits
+│   │   │   ├── loading.tsx     # Animated auth page skeleton loader
+│   │   │   ├── login/          # LoginPage Server parent + LoginClient interactive form
+│   │   │   └── register/       # RegisterPage Server parent + RegisterClient interactive form
+│   │   ├── admin/              # Secured administrative dashboard views
+│   │   │   ├── assistant/      # AI Copilot layout and conversational workspace
+│   │   │   ├── calculator/     # Position sizing & risk-reward ratio calculator
+│   │   │   ├── composite/      # IDX Composite Terminal details & lightweight-charts UI
+│   │   │   ├── dashboard/      # Unified balance summaries & key statistics
+│   │   │   ├── journals/       # Notebook space & formatted journal cards
+│   │   │   ├── profile/        # Accounts management, asset splits & passwords
+│   │   │   ├── stocks/         # Holdings trackers with dynamic metadata routing
+│   │   │   └── transactions/   # Filterable logs, trade audits & fee records
+│   │   ├── components/         # Decomposition React UI components (scoped by domain)
+│   │   │   ├── calculator/     # Custom numeric pads and input screens
+│   │   │   ├── dashboard/      # Account balance widgets & charts cards
+│   │   │   ├── journal/        # Note editors & popup sheet displays
+│   │   │   ├── profile/        # Allocation charts & manage-balance side sheets
+│   │   │   ├── shared/         # Common Dialog wrappers, image boxes & modals
+│   │   │   ├── stock/          # Position selectors & custom charts
+│   │   │   ├── terminal/       # TradingView lightweight chart visualizers
+│   │   │   ├── tracker/        # Budgeting columns & mobile-friendly lists
+│   │   │   ├── trades/         # Performance modal wrappers & ROI sheets
+│   │   │   ├── transaction/    # Responsive table structures & data columns
+│   │   │   ├── user/           # Authentication controls & reusable input forms
+│   │   │   ├── AdminSidebar.tsx# Main navigation bar layout
+│   │   │   └── ThemeProvider.tsx# System theme contexts switcher
+│   │   ├── hooks/              # Domain-specific React hooks (user, notes, assets, etc.)
+│   │   ├── lib/                # Client config & formatters (axios.ts, formatter.ts)
+│   │   ├── schemas/            # Safe runtime validators enforced via Zod
+│   │   ├── stores/             # Global stores managed via Zustand (user, transactions)
+│   │   ├── layout.tsx          # Root HTML frame & fonts binding
+│   │   └── globals.css         # Typography, tailwind layers & scroll themes
+│   ├── components/             # Reusable UI primitives
+│   │   └── ui/                 # Shadcn/ui core primitive components
+│   ├── hooks/                  # Global sidebar & device viewport helpers (use-mobile.ts)
+│   ├── lib/                    # Standard utilities framework (utils.ts)
+│   ├── public/                 # Static graphical assets & icons
+│   ├── tsconfig.json           # Compiler rules for TypeScript
+│   ├── next.config.ts          # Core Next.js configuration rules
+│   ├── package.json            # Node modules dependencies and task runners
+│   ├── pnpm-lock.yaml          # Pnpm lockfile for deterministic installs
+│   ├── pnpm-workspace.yaml     # Monorepo workspaces definition
+│   ├── eslint.config.mjs       # Code style enforcement rules
+│   ├── postcss.config.mjs      # CSS compile specifications
+│   ├── proxy.ts                # Dev server connection proxies
+│   └── README.md               # Frontend user guide
+│
+├── .gitignore                  # Global project files to ignore
+├── backup-trade-tracker.sql    # Relational database seed snapshot
+├── CHANGELOG.md                # Historic record of releases & milestones
+├── DEPLOYMENT.md               # Production cloud deployment guide
+├── docker-compose.yml          # Container orchestration blueprints
+├── vercel.json                 # Monorepo vercel routing config
+└── README.md                   # Main workspace manual
 ```
 
 ---
@@ -97,79 +142,76 @@ Trade-Performance-Tracker/
 - [Vercel](https://vercel.com) (Managed PostgreSQL & Connection Pooling.)
 - [Supabase](https://supabase.com/) (Managed PostgreSQL & Connection Pooling, use this if you're going to online)
 
-### 1. Backend Setup
+### 1. Backend Engine Setup
 
 1. Navigate to the backend directory:
    ```bash
    cd backend
    ```
-2. Set up environment variables:
+2. Setup environment variables:
    ```bash
    cp .env.example .env
    ```
-   *Edit `.env` to match your PostgreSQL database credentials.*
-3. Install dependencies:
+   *Edit `.env` to configure your PostgreSQL credentials.*
+3. Download dependencies:
    ```bash
    go mod tidy
    ```
-4. Run migrations:
+4. Perform auto-migration:
    ```bash
    go run core/script/auto-migrate.go
    ```
-5. Run the Go server:
+5. Boot the server engine:
    ```bash
    go run cmd/api/main.go
    ```
-   *The API will start on the configured port (default is usually :3000 or :8080).*
+   *The server starts on the configured port (default `:8080`).*
 
-### 2. Frontend Setup
+### 2. Frontend Platform Setup
 
-1. Open a new terminal and navigate to the frontend directory:
+1. Open a new terminal session and navigate to the frontend directory:
    ```bash
    cd frontend
    ```
-2. Install dependencies via pnpm:
+2. Install clean dependencies:
    ```bash
    pnpm install
    ```
-3. Set up environment variables (if required for API endpoint URLs):
-   ```bash
-   # Create a .env.local if you need to override the default API URL (Schemas can be obtained from .env.example)
-   ```
-4. Start the Next.js development server:
+3. Boot the Next.js development server:
    ```bash
    pnpm run dev
    ```
-   *The frontend will be available at [http://localhost:3000](http://localhost:3000).*
+   *Access the client directly at [http://localhost:3000](http://localhost:3000).*
 
 ---
 
-## 🛠️ Environment Variables Setup
+## ⚙️ Environment Blueprint
 
 Copy the `.env.example` file to `.env` in both `/frontend` and `/backend` directories, then fill in the following variables:
 
 ### 🌐 Frontend (`/frontend`)
-| Variable | Description | How to Obtain |
+| Variable | Description | Source |
 | :--- | :--- | :--- |
-| `NEXT_PUBLIC_API_URL` | Your Go Backend URL | Usually `http://localhost:8080` for local or your Vercel deployment URL. Default: `{url}/api` |
-| `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` | Cloudinary Cloud Name | Get it from [Cloudinary Dashboard](https://console.cloudinary.com/console/) after sign up. |
+| `NEXT_PUBLIC_API_URL` | Go Backend Engine URL | Default: `http://localhost:8080/api` |
+| `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` | Cloudinary Account Name | Cloudinary Console Dashboard |
 
 ### ⚙️ Backend (`/backend`)
-| Variable | Description | How to Obtain |
+| Variable | Description | Source |
 | :--- | :--- | :--- |
 | `DB_CONNECTION` | PostgreSQL Connection String | See [Database Setup Guide](#🔧-database-setup-guide) |
 | `PORT` | Server Port | Default: `8080`. |
 | `JWT_SECRET` | Secret key for JWT signing | Create a random secure string (e.g., using `openssl rand -base64 32`). |
 | `PRODUCTION_MODE` | App environment state | Set to `false` for local dev, `true` for production/Vercel. |
+| `PRODUCTION_ENVIRONMENT` | App environment name | Example: Vercel, localhost, etc. |
 | `API_GROUP_NAME` | Fiber route prefix | Default: `/api`. |
+| `ALLOW_ORIGINS` | Allowed CORS Origins (splitted with comma) | Example: http://localhost:3000, https://tpt-v3.vercel.app. |
 
 ---
 
 ## 🔧 Database Setup Guide
 
-- Cloud: Go to Supabase > Connect > Transaction Pooler. Use Port 6543. For more information, see images below.
-
-- Local: Use your local PostgreSQL URI (e.g., postgres://user:pass@localhost:5432/db)
+- **Cloud (Recommended)**: Go to Supabase > Connect > Transaction Pooler. Use Port `6543`.
+- **Local Dev**: Use your local PostgreSQL connection string (e.g., `postgres://user:pass@localhost:5432/db`).
 
 <p align="center">
   <img src="./assets/image-1.png" alt="Image 1" width="800" />

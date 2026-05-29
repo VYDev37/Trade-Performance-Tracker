@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter } from "@/components/ui/sheet";
 
 import { useAddNote, useUpdateNote } from "@/app/hooks";
-import type { JournalInfo } from "@/app/types/user/JournalInfo";
+import type { JournalInfo } from "@/app/schemas/journal.schema";
 
 import { PenIcon } from "lucide-react";
 import NoteForm from "./NoteForm";

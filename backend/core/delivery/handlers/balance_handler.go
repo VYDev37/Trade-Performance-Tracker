@@ -46,3 +46,22 @@ func (h *BalanceHandler) HandleUpdateBalance(c fiber.Ctx) error {
 
 	return c.Status(200).JSON(fiber.Map{"message": "Balance updated."})
 }
+
+func (h *BalanceHandler) HandleGetAccountsByType(c fiber.Ctx) error {
+	uid, ok := c.Locals("user_id").(uint64)
+	if !ok {
+		return c.Status(401).JSON(fiber.Map{"message": "Unauthorized."})
+	}
+
+	assetType := c.Params("type")
+	if assetType != "stock_balance" && assetType != "cash_balance" {
+		return c.Status(400).JSON(fiber.Map{"message": "Invalid asset type."})
+	}
+
+	accounts, err := h.service.GetAccountsByType(uid, assetType)
+	if err != nil {
+		return format.ErrorResponse(c, err)
+	}
+
+	return c.Status(200).JSON(fiber.Map{"accounts": accounts})
+}

@@ -1,59 +1,11 @@
-"use client"
+import { Metadata } from "next";
+import LoginClient from "./LoginClient";
 
-import { useState } from "react";
-import { useLogin } from "@/app/hooks";
-import { useRouter } from "next/navigation";
+export const metadata: Metadata = {
+    title: "Sign In - Trade Performance Tracker",
+    description: "Access your personalized Trade Performance Tracker dashboard to monitor, audit, and analyze your past trades, transactions, and current portfolios in real time.",
+};
 
-import { AuthForm } from "@/app/components/user";
-
-export default function Login() {
-    const [identifier, setIdentifier] = useState<string>("");
-    const [password, setPassword] = useState<string>("");
-
-    const { login, loading, error } = useLogin();
-    const router = useRouter();
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        const success = await login({ identifier, password });
-        if (success)
-            router.push("/");
-
-        // console.log(`DEBUG NEXT_API_URL: ${process.env.NEXT_PUBLIC_API_URL}`)
-    };
-
-    return (
-        <AuthForm title="Welcome Back" subtitle="Sign in to your account"
-            fields={[
-                {
-                    id: "identifier",
-                    label: "Username or Email",
-                    type: "text",
-                    value: identifier,
-                    onChange: (e) => setIdentifier(e.target.value),
-                    autoComplete: "",
-                    placeholder: "user@example.com",
-                    required: true
-                },
-                {
-                    id: "password",
-                    label: "Password",
-                    type: "password",
-                    value: password,
-                    onChange: (e) => setPassword(e.target.value),
-                    autoComplete: "current-password",
-                    placeholder: "••••••••",
-                    required: true
-                }
-            ]}
-            onSubmit={handleSubmit}
-            submitLabel="Sign In"
-            loading={loading}
-            error={error}
-            footerLink={{
-                text: "Don't have an account?",
-                linkText: "Sign up",
-                href: "/register"
-            }} />
-    );
+export default function LoginPage() {
+    return <LoginClient />;
 }

@@ -1,18 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Wallet, ArrowUpCircle, ArrowDownCircle, RefreshCw } from "lucide-react";
+import { Wallet, ArrowUpCircle, ArrowDownCircle, RefreshCw, Plus } from "lucide-react";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-import { useUser } from "@/app/context/UserContext";
-import { useTransaction } from "@/app/context/TransactionContext";
+import { useUser } from "@/app/stores";
+import { useTransaction } from "@/app/stores";
 
 import { useUpdateBalance } from "@/app/hooks";
-import type { UserBalanceReq } from "@/app/types/http/UserRequest";
+import { AddAccountModal } from ".";
+import type { UserBalanceReq } from "@/app/schemas/balance.schema";
 import { Textarea } from "@/components/ui/textarea";
 
 interface ManageBalanceSheetProps {
@@ -20,32 +22,92 @@ interface ManageBalanceSheetProps {
     mode: 'stock' | 'cash';
 }
 
-export default function ManageBalanceSheet({ children, mode }: ManageBalanceSheetProps) {
-    const [open, setOpen] = useState(false);
-    const [formData, setFormData] = useState<UserBalanceReq>({
-        amount: "", mode: "add", title: "",
-        note: "", fee: "",
-        bank_src: "", asset_type: mode === 'stock' ? "stock_balance" : "cash_balance"
-    });
+interface AccountProp {
+    provider_name: string;
+    account_no: string;
+    is_new: boolean;
+}
 
-    const { refetch } = useTransaction();
-    const { refreshProfile } = useUser();
+export default function ManageBalanceSheet({ children, mode }: ManageBalanceSheetProps) {
+    const defaultData: UserBalanceReq = {
+        amount: 0, mode: "add", title: "",
+        note: "", fee: 0, date: new Date(),
+        bank_src: "", asset_type: mode === 'stock' ? "stock_balance" : "cash_balance",
+        provider: "", account_no: ""
+    };
+
+    const [open, setOpen] = useState(false);
+    const [formData, setFormData] = useState<UserBalanceReq>(defaultData);
+
+    const [showAddAccountModal, setShowAddAccountModal] = useState(false);
+
+    const refetch = useTransaction((state) => state.refetch);
+    const availableAccounts = useTransaction((state) => state.availableAccounts);
     const { updateBalance, loading, error } = useUpdateBalance();
+
+    const user = useUser((state) => state.user);
+    const refreshProfile = useUser((state) => state.refreshProfile);
+
+    const maxBalance = user?.balance[formData.asset_type] || 0;
+    const [localNewAccounts, setLocalNewAccounts] = useState<AccountProp[]>([]);
+
+    const accountsToDisplay = [
+        ...(availableAccounts || []).map(acc => ({
+            provider_name: acc.provider_name,
+            account_no: acc.account_no,
+            is_new: false
+        })),
+        ...localNewAccounts
+    ];
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        console.log(formData);
+        const totalOut = formData.amount + formData.fee;
+        console.log(formData, user, maxBalance, totalOut);
+        if (formData.mode === "rem" && totalOut > maxBalance) {
+            alert("Insufficient balance.");
+            return;
+        }
 
         const success = await updateBalance(formData);
         if (success) {
             setOpen(false);
 
-            await refreshProfile();
-            await refetch();
+            await refreshProfile(true);
+            await refetch(true);
+
+            setFormData(defaultData);
         }
     }
 
-    const handleFormChange = (field: keyof UserBalanceReq, value: string | number) => {
-        setFormData({ ...formData, [field]: value });
+    const handleFormChange = (field: keyof UserBalanceReq, value: string) => {
+        let val: string | number | Date = value;
+        if (["fee", "amount"].includes(field)) {
+            const numVal = Number(value.replace(/[^0-9]/g, ""))
+            val = numVal;
+
+            if (formData.mode === "rem" && field === "amount" && Number(numVal) > maxBalance)
+                val = maxBalance
+        }
+        else if (field === "date") {
+            val = new Date(value);
+        }
+
+        setFormData({ ...formData, [field]: val });
+    }
+
+    const onAddAccount = (selectedProvider: string, accountNo: string) => {
+        const newAccount: AccountProp = { provider_name: selectedProvider, account_no: accountNo, is_new: true };
+        setLocalNewAccounts(prev => [...prev, newAccount]);
+        setFormData(prev => ({
+            ...prev,
+            provider: selectedProvider,
+            bank_src: selectedProvider,
+            account_no: accountNo,
+            mode: prev.mode === "rem" ? "add" : prev.mode
+        }));
+        setShowAddAccountModal(false);
     }
 
     const renderForm = (modeLabel: string, colorClass: string) => (
@@ -65,23 +127,82 @@ export default function ManageBalanceSheet({ children, mode }: ManageBalanceShee
                 )}
 
                 <Label htmlFor="amount" className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                    {mode === "stock" ? `Amount to ${modeLabel.toLowerCase()}`
+                    {formData.asset_type === "stock_balance" ? `Amount to ${modeLabel.toLowerCase()}`
                         : "Amount"}
                 </Label>
                 <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 font-medium">Rp</span>
-                    <Input id="amount" type="text" placeholder="0.00" value={formData.amount} min={0} max={formData.mode === "rem" ? formData.amount : undefined}
+                    <Input id="amount" type="text" inputMode="numeric" placeholder="0.00" value={formData.amount}
                         onChange={(e) => handleFormChange("amount", e.target.value)} className="pl-10 bg-transparent border-none text-md h-14 focus-visible:ring-0 focus-visible:ring-offset-0 font-bold"
                         required />
                 </div>
-                <Label htmlFor="bank_src" className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                    Source (e.g. SeaBank)
-                </Label>
-                <div className="relative">
-                    <Input id="bank_src" type="text" placeholder="Bank / E-Wallet Name" value={formData.bank_src} onChange={(e) => handleFormChange("bank_src", e.target.value)}
-                        className="bg-transparent border-none text-xs h-14 focus-visible:ring-0 focus-visible:ring-offset-0 font-bold"
-                        required />
+                <div className="flex justify-between items-center mt-4">
+                    <Label className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                        Select Account
+                    </Label>
+                    <button
+                        type="button"
+                        onClick={() => setShowAddAccountModal(true)}
+                        className="text-[10px] text-blue-400 hover:text-blue-300 font-bold uppercase tracking-wider flex items-center gap-1 transition-colors"
+                    >
+                        <Plus className="w-3 h-3" /> Add New
+                    </button>
                 </div>
+                <div className="relative mt-1">
+                    <Select
+                        value={formData.provider && formData.account_no ? `${formData.provider}-${formData.account_no}` : ""}
+                        onValueChange={(val) => {
+                            const [provider, account_no] = val.split("-");
+                            setFormData({
+                                ...formData,
+                                provider,
+                                bank_src: provider,
+                                account_no
+                            });
+                        }}
+                    >
+                        <SelectTrigger className="w-full bg-slate-900 border-white/10 text-xs font-bold text-white h-14 rounded-md focus:ring-1 focus:ring-blue-500">
+                            <SelectValue placeholder="Select Bank / E-Wallet Account" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-zinc-950 text-white border-white/10">
+                            <SelectGroup>
+                                {accountsToDisplay.map((acc, index) => {
+                                    const val = `${acc.provider_name}-${acc.account_no}`;
+                                    return (
+                                        <SelectItem key={val + index} value={val} className="text-xs font-semibold">
+                                            {acc.provider_name} - {acc.account_no}
+                                        </SelectItem>
+                                    );
+                                })}
+                                {accountsToDisplay.length === 0 && (
+                                    <div className="p-4 text-xs text-slate-500 text-center font-bold">
+                                        No existing accounts. Please click 'Add New'.
+                                    </div>
+                                )}
+                            </SelectGroup>
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                {/* Inline Overlay Sub-Modal for adding new accounts */}
+                {showAddAccountModal && (
+                    <AddAccountModal
+                        onClose={() => setShowAddAccountModal(false)}
+                        onAdd={onAddAccount}
+                    />
+                )}
+                {formData.asset_type === "cash_balance" && (
+                    <>
+                        <Label htmlFor="date" className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                            Transaction Date
+                        </Label>
+                        <div className="relative">
+                            <Input id="date" type="date" value={formData.date instanceof Date ? formData.date.toISOString().split('T')[0] : ""} onChange={(e) => handleFormChange("date", e.target.value)}
+                                className="bg-transparent border-none text-xs h-14 focus-visible:ring-0 focus-visible:ring-offset-0 font-bold"
+                                required />
+                        </div>
+                    </>
+                )}
                 {modeLabel.toLowerCase() !== "adjust" && formData.asset_type !== "cash_balance" && (
                     <>
                         <Label htmlFor="fee" className="text-xs font-semibold uppercase tracking-wider text-slate-400">
@@ -89,7 +210,7 @@ export default function ManageBalanceSheet({ children, mode }: ManageBalanceShee
                         </Label>
                         <div className="relative">
                             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 font-medium">Rp</span>
-                            <Input id="fee" type="text" placeholder="0.00" value={formData.fee} min={0}
+                            <Input id="fee" type="text" inputMode="numeric" placeholder="0.00" value={formData.fee} min={0}
                                 onChange={(e) => handleFormChange("fee", e.target.value)} className="pl-10 bg-transparent border-none text-md h-14 focus-visible:ring-0 focus-visible:ring-offset-0 font-bold" />
                         </div>
                     </>
@@ -146,7 +267,11 @@ export default function ManageBalanceSheet({ children, mode }: ManageBalanceShee
                         <TabsTrigger value="add" className="rounded-lg data-[state=active]:bg-green-500/20 data-[state=active]:text-green-400">
                             <ArrowUpCircle className="w-4 h-4 mr-1" /> {mode !== "stock" ? "Income" : "Add"}
                         </TabsTrigger>
-                        <TabsTrigger value="rem" className="rounded-lg data-[state=active]:bg-red-500/20 data-[state=active]:text-red-400">
+                        <TabsTrigger value="rem" disabled={accountsToDisplay.some(acc =>
+                            acc.provider_name === formData.provider &&
+                            acc.account_no === formData.account_no &&
+                            acc.is_new
+                        )} className="rounded-lg data-[state=active]:bg-red-500/20 data-[state=active]:text-red-400">
                             <ArrowDownCircle className="w-4 h-4 mr-1" /> {mode !== "stock" ? "Expense" : "Remove"}
                         </TabsTrigger>
                         {mode === "stock" && (<TabsTrigger value="mod" className="rounded-lg data-[state=active]:bg-blue-500/20 data-[state=active]:text-blue-400">

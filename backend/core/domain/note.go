@@ -4,11 +4,10 @@ import (
 	"time"
 
 	"github.com/lib/pq"
-	"gorm.io/gorm"
 )
 
 type Note struct {
-	gorm.Model
+	BaseModel
 
 	Title       string         `gorm:"type:varchar(255);not null"`
 	Description string         `gorm:"type:text;not null"`

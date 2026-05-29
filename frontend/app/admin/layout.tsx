@@ -1,5 +1,7 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import AdminSidebar from "@/app/components/AdminSidebar";
+import InitStores from "@/app/admin/InitStores";
+import { MigrationModal } from "@/app/components/shared";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
     return (
@@ -9,7 +11,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 <div className="flex h-16 items-center px-4 border-b border-white/5">
                     <SidebarTrigger />
                 </div>
-                <div className="flex-1 mx-6 md:mx-10 w-full max-w-full">
+                <div className="flex-1 px-4 md:px-6 lg:px-10 w-full">
+                    <InitStores />
+                    <MigrationModal />
                     {children}
                 </div>
             </main>

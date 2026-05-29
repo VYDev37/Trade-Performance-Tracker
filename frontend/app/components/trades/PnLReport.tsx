@@ -1,8 +1,8 @@
 import { cn } from "@/lib/utils";
 import { Formatter } from "@/app/lib";
 
-import type { TransactionInfo } from "@/app/types/user/TransactionInfo";
-import type { PortfolioItem } from "@/app/types/user/PortfolioInfo";
+import type { TransactionInfo } from "@/app/schemas/transaction.schema";
+import type { PortfolioItem } from "@/app/schemas/balance.schema";
 
 interface PnLReportProps {
     transaction?: TransactionInfo;
@@ -58,14 +58,14 @@ export default function PnLReport({ transaction, stock, userNickname, mode, card
                     "text-6xl font-black tracking-tighter leading-none my-2",
                     isProfit ? "text-emerald-400" : "text-red-400"
                 )}>
-                    {isProfit ? "+" : ""}{mode !== "pnl" ? `${roiPercentage.toFixed(2)}%` : `${Formatter.toCurrency(pnl)}`}
+                    {isProfit ? "+" : ""}{mode !== "pnl" ? `${roiPercentage.toFixed(2)}%` : `${Formatter.formatCurrency(pnl)}`}
                 </div>
 
                 {(mode === "pnl_roi") && (<div className={cn(
                     "px-6 py-2 rounded-full font-black text-xl flex items-center gap-2",
                     isProfit ? "bg-emerald-500/10 text-emerald-500" : "bg-red-500/10 text-red-500"
                 )}>
-                    {Formatter.toCurrency(pnl)}
+                    {Formatter.formatCurrency(pnl)}
                 </div>)}
             </div>
 
@@ -76,7 +76,7 @@ export default function PnLReport({ transaction, stock, userNickname, mode, card
                         {isStock ? "Avg Price" : "Entry Avg Price"}
                     </p>
                     <p className="text-xl font-bold font-mono">
-                        {isStock ? Formatter.toLocale((stock.invested_total / (stock.total_qty || 1))) : Formatter.toLocale(transaction?.entry_price_unit || 0)}
+                        {isStock ? Formatter.formatNumber((stock.invested_total / (stock.total_qty || 1))) : Formatter.formatNumber(transaction?.entry_price_unit || 0)}
                     </p>
                 </div>
                 <div className="text-right">
@@ -84,7 +84,7 @@ export default function PnLReport({ transaction, stock, userNickname, mode, card
                         {isStock ? "Current Price" : "Sell Avg Price"}
                     </p>
                     <p className="text-xl font-bold font-mono">
-                        {isStock ? Formatter.toLocale((stock.current_price || 0) / stock.total_qty) : Formatter.toLocale(transaction?.sell_price_unit || 0)}
+                        {isStock ? Formatter.formatNumber((stock.current_price || 0) / stock.total_qty) : Formatter.formatNumber(transaction?.sell_price_unit || 0)}
                     </p>
                 </div>
                 <div>
@@ -94,7 +94,7 @@ export default function PnLReport({ transaction, stock, userNickname, mode, card
                                 Fee
                             </p>
                             <p className="text-sm font-bold text-zinc-400">
-                                Rp{Formatter.toLocale(transaction?.transaction_fee || 0)}
+                                Rp{Formatter.formatNumber(transaction?.transaction_fee || 0)}
                             </p>
                         </>
                     )}
@@ -104,7 +104,7 @@ export default function PnLReport({ transaction, stock, userNickname, mode, card
                         {isStock ? "Total Lot" : "Sell Lot"}
                     </p>
                     <p className="text-sm font-bold text-zinc-400">
-                        {isStock ? Formatter.toLocale((stock.total_qty || 0) / 100) : Formatter.toLocale((transaction?.quantity || 0) / 100)}
+                        {isStock ? Formatter.formatNumber((stock.total_qty || 0) / 100) : Formatter.formatNumber((transaction?.quantity || 0) / 100)}
                     </p>
                 </div>
             </div>

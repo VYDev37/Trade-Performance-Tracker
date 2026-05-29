@@ -2,12 +2,10 @@ package domain
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 type Position struct {
-	gorm.Model
+	BaseModel
 
 	OwnerID           uint64  `gorm:"not null;index;"`
 	Ticker            string  `gorm:"not null;index;" json:"ticker"`
@@ -17,6 +15,8 @@ type Position struct {
 	PositionDirection string  `gorm:"type:varchar(10);not null;default:'LONG'" json:"position_direction"` // LONG / SHORT
 	TakeProfit        float64 `json:"tp_position"`
 	StopLoss          float64 `json:"sl_position"`
+	Provider          string  `gorm:"type:varchar(20)" json:"provider"`
+	AccountNo         string  `gorm:"type:varchar(20)" json:"account_no"`
 }
 
 type PositionAddReq struct {
@@ -26,6 +26,8 @@ type PositionAddReq struct {
 	InvestedTotal float64 `json:"invested_total" validate:"required,gt=0"` // avg price to add (ex: buy 3 lot BBRI for 800k IDR, avg += 800k, qty += 3)
 	Fee           float64 `json:"fee" validate:"gte=0"`
 	Notes         string  `json:"notes" validate:"max=255"`
+	Provider      string  `json:"provider" validate:"required"`
+	AccountNo     string  `json:"account_no" validate:"required"`
 }
 
 type PortfolioItem struct {
@@ -36,6 +38,8 @@ type PortfolioItem struct {
 	UnrealizedPnL      float64   `json:"unrealized_pnl"`
 	PnLPercentage      float64   `json:"pnl_percentage"`
 	UpdatedAt          time.Time `json:"updated_at"`
+	Provider           string    `json:"provider"`
+	AccountNo          string    `json:"account_no"`
 }
 
 type PortfolioResponse struct {

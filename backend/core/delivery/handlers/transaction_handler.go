@@ -66,3 +66,31 @@ func (h *TransactionHandler) HandleUpdateTransaction(c fiber.Ctx) error {
 
 	return c.Status(200).JSON(fiber.Map{"message": "Transaction updated successfully."})
 }
+
+func (h *TransactionHandler) HandleMigrateTransactions(c fiber.Ctx) error {
+	uid, ok := c.Locals("user_id").(uint64)
+	if !ok {
+		return c.Status(401).JSON(fiber.Map{"message": "Unauthorized."})
+	}
+
+	var req struct {
+		Provider       string `json:"provider" validate:"required"`
+		AccountNo      string `json:"account_no" validate:"required"`
+		TransactionIDs []uint `json:"transaction_ids" validate:"required,gt=0"`
+	}
+
+	if err := c.Bind().Body(&req); err != nil {
+		return c.Status(400).JSON(fiber.Map{"message": "Failed to parse body."})
+	}
+
+	if req.Provider == "" || req.AccountNo == "" || len(req.TransactionIDs) == 0 {
+		return c.Status(400).JSON(fiber.Map{"message": "Provider, account_no, and transaction_ids are required."})
+	}
+
+	if err := h.service.MigrateTransactions(uid, req.Provider, req.AccountNo, req.TransactionIDs); err != nil {
+		return format.ErrorResponse(c, err)
+	}
+
+	return c.Status(200).JSON(fiber.Map{"message": "Transactions migrated successfully."})
+}
+

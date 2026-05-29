@@ -1,15 +1,13 @@
 package domain
 
-import (
-	"gorm.io/gorm"
-)
-
 type Balance struct {
-	gorm.Model
+	BaseModel
 
-	UserID    uint64  `gorm:"not null;index"`
-	Amount    float64 `gorm:"default:0;not null"`
-	AssetType string  `gorm:"type:varchar(20);not null;default:'stock_balance';index"`
+	UserID    uint64  `gorm:"not null;uniqueIndex:idx_balance_account" json:"user_id"`
+	Amount    float64 `gorm:"default:0;not null" json:"amount"`
+	AssetType string  `gorm:"type:varchar(20);not null;default:'stock_balance';uniqueIndex:idx_balance_account" json:"asset_type"`
+	Provider  string  `gorm:"type:varchar(50);uniqueIndex:idx_balance_account" json:"provider"`
+	AccountNo string  `gorm:"type:varchar(50);uniqueIndex:idx_balance_account" json:"account_no"`
 }
 
 type BalanceResponse struct {
@@ -23,12 +21,21 @@ type BalanceDetail struct {
 	TotalLiquid  float64 `json:"total_liquid"`
 }
 
+type AccountResponse struct {
+	ProviderName string  `json:"provider_name"`
+	AccountNo    string  `json:"account_no"`
+	Amount       float64 `json:"amount"`
+}
+
 type BalanceUpdateReq struct {
 	Amount     float64 `json:"amount" validate:"required,gt=0"`
 	Fee        float64 `json:"fee" validate:"gte=0"`
 	Mode       string  `json:"mode" validate:"required,oneof=add rem mod"`
 	AssetType  string  `json:"asset_type" validate:"required,oneof=stock_balance cash_balance"`
-	Note       string  `json:"note" validate:"lt=50"`
+	Note       string  `json:"note"`
 	BankSource string  `json:"bank_src" validate:"required,gt=0,lt=18"`
-	Title      string  `json:"title" validate:"lt=20"`
+	Title      string  `json:"title" validate:"lt=100"`
+	Date       string  `json:"date"`
+	Provider   string  `json:"provider" validate:"required"`
+	AccountNo  string  `json:"account_no" validate:"required"`
 }

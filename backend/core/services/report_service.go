@@ -29,7 +29,7 @@ func NewReportService(pService PositionService, uService UserService,
 	return &reportService{pService: pService, uService: uService, tService: tService, provider: provider}
 }
 
-func (s *reportService) exportFinancialLog(f *excelize.File, userID uint64) {
+func (s *reportService) exportFinancialLog(f *excelize.File, userID uint64) error {
 	sectionName := "Financial"
 	f.NewSheet(sectionName)
 
@@ -47,7 +47,7 @@ func (s *reportService) exportFinancialLog(f *excelize.File, userID uint64) {
 
 	txs, err := s.tService.GetLocalTransactions(userID)
 	if err != nil {
-		return
+		return err
 	}
 
 	for _, t := range txs {
@@ -66,9 +66,10 @@ func (s *reportService) exportFinancialLog(f *excelize.File, userID uint64) {
 	}
 
 	writer.BuildTable(sectionName, startRow, len(header))
+	return nil
 }
 
-func (s *reportService) exportTransactions(f *excelize.File, userID uint64) {
+func (s *reportService) exportTransactions(f *excelize.File, userID uint64) error {
 	sectionName := "Transactions"
 	f.NewSheet(sectionName)
 
@@ -82,7 +83,7 @@ func (s *reportService) exportTransactions(f *excelize.File, userID uint64) {
 
 	txs, err := s.tService.GetLocalTransactions(userID)
 	if err != nil {
-		return
+		return err
 	}
 	for _, t := range txs {
 		if t.TransactionType != "buy" && t.TransactionType != "sell" {
@@ -99,9 +100,10 @@ func (s *reportService) exportTransactions(f *excelize.File, userID uint64) {
 	}
 
 	writer.BuildTable(sectionName, startRow, len(header))
+	return nil
 }
 
-func (s *reportService) exportPositions(f *excelize.File, userID uint64) {
+func (s *reportService) exportPositions(f *excelize.File, userID uint64) error {
 	sectionName := "Portfolio"
 	f.NewSheet(sectionName)
 
@@ -116,7 +118,10 @@ func (s *reportService) exportPositions(f *excelize.File, userID uint64) {
 
 	writer.WriteHeader(header)
 
-	pos, _ := s.pService.GetPositions(userID)
+	pos, err := s.pService.GetPositions(userID)
+	if err != nil {
+		return err
+	}
 	tickers := []string{}
 
 	for _, p := range pos {
@@ -126,8 +131,11 @@ func (s *reportService) exportPositions(f *excelize.File, userID uint64) {
 	var currentValue float64
 
 	portfolio, err := s.pService.GetPortfolio(userID)
-	if portfolio == nil || err != nil {
-		return
+	if err != nil {
+		return err
+	}
+	if portfolio == nil {
+		return fmt.Errorf("portfolio is empty")
 	}
 
 	prices, _ := s.provider.GetBatchPrices(tickers)
@@ -169,14 +177,21 @@ func (s *reportService) exportPositions(f *excelize.File, userID uint64) {
 	writer.WriteRow([]interface{}{"Market value", format.FormatCurrency(currentValue)})
 
 	writer.BuildTable(sectionName+"_2", startRow2, len(header2))
+	return nil
 }
 
 func (s *reportService) ExportProfile(userID uint64) (*excelize.File, error) {
 	f := excelize.NewFile()
 
-	s.exportTransactions(f, userID)
-	s.exportPositions(f, userID)
-	s.exportFinancialLog(f, userID)
+	if err := s.exportTransactions(f, userID); err != nil {
+		return nil, err
+	}
+	if err := s.exportPositions(f, userID); err != nil {
+		return nil, err
+	}
+	if err := s.exportFinancialLog(f, userID); err != nil {
+		return nil, err
+	}
 
 	index, _ := f.GetSheetIndex("Transactions")
 

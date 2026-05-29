@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { AppConfig } from "./app.config";
 import { ThemeProvider } from "./components/ThemeProvider";
-import { UserProvider } from "./context/UserContext";
-import { TransactionProvider } from "./context/TransactionContext";
 
 import "./globals.css";
 
@@ -19,7 +17,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: AppConfig.appName,
-  description: "A simple shop platform.",
+  description: "A simple tracker platform.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -27,11 +25,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-          <UserProvider>
-            <TransactionProvider>
-              {children}
-            </TransactionProvider>
-          </UserProvider>
+          {children}
         </ThemeProvider>
       </body>
     </html>

@@ -9,8 +9,8 @@ import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 import { PnlReport } from "@/app/components/trades";
-import { TransactionInfo } from "@/app/types/user/TransactionInfo";
-import { PortfolioItem } from "@/app/types/user/PortfolioInfo";
+import { TransactionInfo } from "@/app/schemas/transaction.schema";
+import { PortfolioItem } from "@/app/schemas/balance.schema";
 import { Label } from "@/components/ui/label";
 
 interface PnLReportModalProps {

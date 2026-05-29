@@ -11,7 +11,7 @@ type NoteRepository interface {
 	RemoveNote(noteID uint, trx *gorm.DB) error
 	UpdateNote(note *domain.Note, trx *gorm.DB) error
 
-	GetNote(noteID uint) (*domain.Note, error)
+	GetNote(noteID uint, tx *gorm.DB) (*domain.Note, error)
 	GetNotes(userID uint64) ([]domain.Note, error)
 	GetDB() *gorm.DB
 }
@@ -68,9 +68,14 @@ func (r *noteRepo) GetNotes(userID uint64) ([]domain.Note, error) {
 	return notes, nil
 }
 
-func (r *noteRepo) GetNote(noteID uint) (*domain.Note, error) {
+func (r *noteRepo) GetNote(noteID uint, tx *gorm.DB) (*domain.Note, error) {
+	db := r.DB
+
+	if tx != nil {
+		db = tx
+	}
 	var notes domain.Note
-	if err := r.DB.Where("id = ?", noteID).Take(&notes).Error; err != nil {
+	if err := db.Where("id = ?", noteID).Take(&notes).Error; err != nil {
 		return nil, err
 	}
 

@@ -1,13 +1,13 @@
 import { FolderOpen } from "lucide-react";
 import { Formatter } from "@/app/lib";
-import { useUser } from "@/app/context/UserContext";
+import { useUser } from "@/app/stores";
 import { PnLReportModal } from "@/app/components/trades";
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 
-import type { PortfolioItem } from "@/app/types/user/PortfolioInfo";
+import type { PortfolioItem } from "@/app/schemas/balance.schema";
 
 interface StockMobileCardProps {
     stocks: PortfolioItem[];
@@ -18,7 +18,7 @@ interface StockMobileCardProps {
 }
 
 export default function StockDesktopTable({ stocks, loading, handleAddRedirect, handleTickerChange }: StockMobileCardProps) {
-    const { user } = useUser();
+    const user = useUser((state) => state.user);
     return (
         <div className="hidden md:block overflow-x-auto">
             <Table className="mt-5">
@@ -67,14 +67,16 @@ export default function StockDesktopTable({ stocks, loading, handleAddRedirect, 
                             return (
                                 <TableRow key={idx}>
                                     <TableCell className="font-medium cursor-pointer" role="button" tabIndex={0}
-                                        onKeyDown={(e) => e.key === 'Enter' && handleTickerChange(stock.ticker)} onClick={() => handleTickerChange(stock.ticker)}>{stock.ticker}</TableCell>
-                                    <TableCell>{Formatter.toLocale(stock.total_qty / 100)}</TableCell>
-                                    <TableCell>{Formatter.toCurrency(stock.invested_total)}</TableCell>
-                                    <TableCell>{Formatter.toCurrency(currentPrice)}</TableCell>
-                                    <TableCell className={isProfit ? "text-emerald-400" : "text-red-400"}>
-                                        {pnlSign}{Formatter.toLocale(stock.unrealized_pnl, true)} ({pnlSign}{Formatter.toLocale(stock.pnl_percentage)}%)
+                                        onKeyDown={(e) => e.key === 'Enter' && handleTickerChange(stock.ticker)} onClick={() => handleTickerChange(stock.ticker)}>
+                                        <div>{stock.ticker}</div>
                                     </TableCell>
-                                    <TableCell>{Formatter.toDate(stock.updated_at)}</TableCell>
+                                    <TableCell>{Formatter.formatNumber(stock.total_qty / 100)}</TableCell>
+                                    <TableCell>{Formatter.formatCurrency(stock.invested_total)}</TableCell>
+                                    <TableCell>{Formatter.formatCurrency(currentPrice)}</TableCell>
+                                    <TableCell className={isProfit ? "text-emerald-400" : "text-red-400"}>
+                                        {pnlSign}{Formatter.formatNumber(stock.unrealized_pnl, true)} ({pnlSign}{Formatter.formatNumber(stock.pnl_percentage)}%)
+                                    </TableCell>
+                                    <TableCell>{Formatter.formatDate(stock.updated_at)}</TableCell>
                                     <TableCell className="flex gap-2">
                                         <PnLReportModal stock={stock} username={user?.username || ""} />
                                         <Button className="bg-green-600 text-white" onClick={() => handleAddRedirect("add", stock.ticker)}>Buy</Button>

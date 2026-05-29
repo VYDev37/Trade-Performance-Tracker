@@ -3,8 +3,8 @@ import { ArrowUpRight, ArrowDownRight, Info, PenIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Formatter } from '@/app/lib';
 import { CustomDialog } from '@/app/components/shared';
-import type { TransactionInfo } from '@/app/types/user/TransactionInfo';
-import { useTransaction } from '@/app/context/TransactionContext';
+import type { TransactionInfo } from '@/app/schemas/transaction.schema';
+import { useTransaction } from '@/app/stores';
 import { TrackerEditSheet } from './index';
 
 interface TrackerCombinedColumnProps {
@@ -15,7 +15,7 @@ interface TrackerCombinedColumnProps {
 }
 
 export default function TrackerCombinedColumn({ title, items, totalCount, onViewAll }: TrackerCombinedColumnProps) {
-    const { refetch } = useTransaction();
+    const refetch = useTransaction((state) => state.refetch);
     const [editingItem, setEditingItem] = useState<TransactionInfo | null>(null);
 
     return (
@@ -65,9 +65,9 @@ export default function TrackerCombinedColumn({ title, items, totalCount, onView
                             </div>
                             <div className="text-right flex-shrink-0">
                                 <p className={`text-sm font-bold ${isIncome ? 'text-emerald-500' : 'text-red-400'}`}>
-                                    {sign}{Formatter.toLocale(item.price)}
+                                    {sign}{Formatter.formatNumber(item.price)}
                                 </p>
-                                <p className="text-[9px] text-slate-600 font-medium">{Formatter.toDate(item.created_at!)}</p>
+                                <p className="text-[9px] text-slate-600 font-medium">{Formatter.formatDate(item.created_at!)}</p>
                             </div>
                         </div>
                     );

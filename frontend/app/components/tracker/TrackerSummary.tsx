@@ -13,7 +13,7 @@ export default function TrackerSummary({ income, expense }: TrackerSummaryProps)
             <div className="bg-[#14181f] border border-slate-800 p-4 md:p-5 rounded-xl md:rounded-2xl flex items-center justify-between">
                 <div className="space-y-1">
                     <p className="text-[10px] text-emerald-500 font-bold uppercase tracking-wider">Total Inflow</p>
-                    <p className="text-lg md:text-xl font-bold text-white">{Formatter.toCurrency(income)}</p>
+                    <p className="text-lg md:text-xl font-bold text-white">{Formatter.formatCurrency(income)}</p>
                 </div>
                 <div className="w-10 h-10 bg-emerald-500/10 rounded-full flex items-center justify-center">
                     <TrendingUp className="w-5 h-5 text-emerald-500" />
@@ -24,7 +24,7 @@ export default function TrackerSummary({ income, expense }: TrackerSummaryProps)
             <div className="bg-[#14181f] border border-slate-800 p-4 md:p-5 rounded-xl md:rounded-2xl flex items-center justify-between">
                 <div className="space-y-1">
                     <p className="text-[10px] text-red-500 font-bold uppercase tracking-wider">Total Outflow</p>
-                    <p className="text-lg md:text-xl font-bold text-white">{Formatter.toCurrency(Math.abs(expense))}</p>
+                    <p className="text-lg md:text-xl font-bold text-white">{Formatter.formatCurrency(Math.abs(expense))}</p>
                 </div>
                 <div className="w-10 h-10 bg-red-500/10 rounded-full flex items-center justify-center rotate-90">
                     <TrendingUp className="w-5 h-5 text-red-500" />

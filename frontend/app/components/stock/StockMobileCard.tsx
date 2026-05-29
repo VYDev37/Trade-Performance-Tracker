@@ -1,5 +1,5 @@
 import { ChartLine } from "lucide-react";
-import { useUser } from "@/app/context/UserContext";
+import { useUser } from "@/app/stores";
 import { PnLReportModal } from "@/app/components/trades";
 
 import { cn } from "@/lib/utils";
@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
 import { Formatter } from "@/app/lib";
-import type { PortfolioItem } from "@/app/types/user/PortfolioInfo";
+import type { PortfolioItem } from "@/app/schemas/balance.schema";
 
 interface StockMobileCardProps {
     stocks: PortfolioItem[];
@@ -19,7 +19,7 @@ interface StockMobileCardProps {
 }
 
 export default function StockMobileCard({ stocks, loading, handleAddRedirect, handleTickerChange }: StockMobileCardProps) {
-    const { user } = useUser();
+    const user = useUser((state) => state.user);
     return (
         <div className="grid grid-cols-1 gap-4 md:hidden">
             {loading ? (
@@ -78,11 +78,12 @@ export default function StockMobileCard({ stocks, loading, handleAddRedirect, ha
                                 <div className="text-xs text-zinc-400 uppercase tracking-wider">Ticker</div>
                                 <div className="text-lg font-bold text-sky-400" role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && handleTickerChange(stock.ticker)}
                                     onClick={() => handleTickerChange(stock.ticker)}>{stock.ticker}</div>
+
                             </div>
                             <div className="text-right">
                                 <div className="text-xs text-zinc-400 uppercase tracking-wider">Market Value</div>
                                 <div className={cn("text-sm font-bold", isProfit ? "text-emerald-400" : "text-red-400")}>
-                                    {stock.pnl_percentage === 0 ? "" : isProfit ? "▲" : "▼"} {Formatter.toLocale(currentPrice / stock.total_qty)} ({pnlSign}{Formatter.toLocale(stock.pnl_percentage)}%)
+                                    {stock.pnl_percentage === 0 ? "" : isProfit ? "▲" : "▼"} {Formatter.formatNumber(currentPrice / stock.total_qty)} ({pnlSign}{Formatter.formatNumber(stock.pnl_percentage)}%)
                                 </div>
                             </div>
                         </div>
@@ -90,22 +91,22 @@ export default function StockMobileCard({ stocks, loading, handleAddRedirect, ha
                         <div className="grid grid-cols-2 gap-4 py-2 border-y border-white/5">
                             <div>
                                 <div className="text-[10px] text-zinc-500 uppercase">Invested Total</div>
-                                <div className="text-sm font-medium">{Formatter.toCurrency(stock.invested_total)}</div>
+                                <div className="text-sm font-medium">{Formatter.formatCurrency(stock.invested_total)}</div>
                             </div>
                             <div className="text-right">
                                 <div className="text-[10px] text-zinc-500 uppercase">Total Qty</div>
-                                <div className="text-sm font-medium">{Formatter.toLocale(stock.total_qty / 100)} Lot</div>
+                                <div className="text-sm font-medium">{Formatter.formatNumber(stock.total_qty / 100)} Lot</div>
                             </div>
                         </div>
                         <div className="grid grid-cols-2 gap-4 py-2 border-y border-white/5">
                             <div>
                                 <div className="text-[10px] text-zinc-500 uppercase">Current Price</div>
-                                <div className="text-sm font-medium">{Formatter.toCurrency(currentPrice)}</div>
+                                <div className="text-sm font-medium">{Formatter.formatCurrency(currentPrice)}</div>
                             </div>
                             <div className="text-right">
                                 <div className="text-[10px] text-zinc-400 uppercase tracking-wider">PnL Unrealized</div>
                                 <div className={cn("text-sm font-bold", isProfit ? "text-emerald-400" : "text-red-400")}>
-                                    {isProfit ? "▲" : "▼"} {Formatter.toLocale(stock.unrealized_pnl, true)} ({pnlSign}{Formatter.toLocale(stock.pnl_percentage, true)}%)
+                                    {isProfit ? "▲" : "▼"} {Formatter.formatNumber(stock.unrealized_pnl, true)} ({pnlSign}{Formatter.formatNumber(stock.pnl_percentage, true)}%)
                                 </div>
                             </div>
                         </div>

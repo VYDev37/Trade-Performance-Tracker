@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
-import type { JournalInfo } from "@/app/types/user/JournalInfo";
+import type { JournalInfo } from "@/app/schemas/journal.schema";
 
 interface NoteFormProps {
     existingData?: JournalInfo;
@@ -24,7 +24,7 @@ export default function NoteForm({ existingData, loading, onSubmit }: NoteFormPr
         title: "",
         description: "",
         category: "",
-        image_url: []
+        image_url: [],
     });
 
     const handleChangeData = (key: keyof JournalInfo, value: any) => {
@@ -105,7 +105,7 @@ export default function NoteForm({ existingData, loading, onSubmit }: NoteFormPr
                     )}
                 </CldUploadWidget>
                 {data.image_url && data.image_url.map((img, i) => (
-                    <div className="relative mt-4 rounded-md overflow-hidden border border-white/10 group">
+                    <div key={`cld-${i}`} className="relative mt-4 rounded-md overflow-hidden border border-white/10 group">
                         <Image key={i} src={img} alt="Preview" width={500} height={300} className="object-cover w-full h-auto" />
                         <button
                             type="button"

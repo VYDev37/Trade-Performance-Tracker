@@ -3,6 +3,8 @@ package services
 import (
 	"trade-tracker/core/domain"
 	repository "trade-tracker/core/repositories"
+
+	"gorm.io/gorm"
 )
 
 type NoteService interface {
@@ -22,22 +24,30 @@ func NewNoteService(repo repository.NoteRepository) NoteService {
 }
 
 func (s *noteService) AddNote(note *domain.Note) error {
-	return s.repo.AddNote(note, nil)
+	db := s.repo.GetDB()
+	return db.Transaction(func(tx *gorm.DB) error {
+		return s.repo.AddNote(note, tx)
+	})
 }
 
 func (s *noteService) RemoveNote(id uint, userID uint64) error {
-	if note, err := s.repo.GetNote(id); err != nil || note.UserID != userID {
-		return domain.ErrMismatchInfo
-	}
-
-	return s.repo.RemoveNote(id, nil)
+	db := s.repo.GetDB()
+	return db.Transaction(func(tx *gorm.DB) error {
+		if note, err := s.repo.GetNote(id, tx); err != nil || note.UserID != userID {
+			return domain.ErrMismatchInfo
+		}
+		return s.repo.RemoveNote(id, tx)
+	})
 }
 
 func (s *noteService) UpdateNote(note *domain.Note) error {
-	if note2, err := s.repo.GetNote(note.ID); err != nil || note2.UserID != note.UserID {
-		return domain.ErrMismatchInfo
-	}
-	return s.repo.UpdateNote(note, nil)
+	db := s.repo.GetDB()
+	return db.Transaction(func(tx *gorm.DB) error {
+		if note2, err := s.repo.GetNote(note.ID, tx); err != nil || note2.UserID != note.UserID {
+			return domain.ErrMismatchInfo
+		}
+		return s.repo.UpdateNote(note, tx)
+	})
 }
 
 func (s *noteService) GetNotes(userID uint64) ([]domain.NoteResponse, error) {
@@ -50,7 +60,7 @@ func (s *noteService) GetNotes(userID uint64) ([]domain.NoteResponse, error) {
 
 	for _, note := range notes {
 		myNotes = append(myNotes, domain.NoteResponse{
-			ID:          note.ID,
+			ID:          note.BaseModel.ID,
 			UpdatedAt:   note.UpdatedAt,
 			Title:       note.Title,
 			Description: note.Description,

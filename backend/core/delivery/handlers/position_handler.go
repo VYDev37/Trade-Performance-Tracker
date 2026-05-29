@@ -63,6 +63,8 @@ func (h *PositionHandler) HandleAddPosition(c fiber.Ctx) error {
 		Ticker:        req.Ticker,
 		InvestedTotal: req.InvestedTotal,
 		PositionType:  req.PositionType,
+		Provider:      req.Provider,
+		AccountNo:     req.AccountNo,
 	}, req.Fee); err != nil {
 		return format.ErrorResponse(c, err)
 	}
@@ -83,3 +85,30 @@ func (h *PositionHandler) HandleGetPortfolio(c fiber.Ctx) error {
 
 	return c.Status(200).JSON(fiber.Map{"portfolio": data})
 }
+
+func (h *PositionHandler) HandleMigratePositions(c fiber.Ctx) error {
+	uid, ok := c.Locals("user_id").(uint64)
+	if !ok {
+		return c.Status(401).JSON(fiber.Map{"message": "Unauthorized."})
+	}
+
+	var req struct {
+		Provider  string `json:"provider" validate:"required"`
+		AccountNo string `json:"account_no" validate:"required"`
+	}
+
+	if err := c.Bind().Body(&req); err != nil {
+		return c.Status(400).JSON(fiber.Map{"message": "Failed to parse body."})
+	}
+
+	if req.Provider == "" || req.AccountNo == "" {
+		return c.Status(400).JSON(fiber.Map{"message": "Provider and account_no are required."})
+	}
+
+	if err := h.service.MigratePositions(uid, req.Provider, req.AccountNo); err != nil {
+		return format.ErrorResponse(c, err)
+	}
+
+	return c.Status(200).JSON(fiber.Map{"message": "Positions migrated successfully."})
+}
+

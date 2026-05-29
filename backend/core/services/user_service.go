@@ -32,20 +32,22 @@ func (s *userService) CreateUser(user *domain.User) error {
 	user.Username = strings.ToLower(user.Username)
 	user.Email = strings.ToLower(user.Email)
 
-	if _, err := s.repo.GetUserByUsernameOrEmail(user.Username, user.Email); err == nil {
-		return domain.ErrAlreadyExist
-	}
-
 	hashed, err := hash.HashPassword(user.Password)
 	if err != nil {
 		return domain.ErrInvalidInput
 	}
-
 	user.Password = hashed
 
 	db := s.repo.GetDB()
 	return db.Transaction(func(tx *gorm.DB) error {
+		if _, err := s.repo.GetUserByUsernameOrEmail(user.Username, user.Email, tx); err == nil {
+			return domain.ErrAlreadyExist
+		}
+
 		if err := s.repo.CreateUser(user, tx); err != nil {
+			if err == gorm.ErrDuplicatedKey || strings.Contains(err.Error(), "duplicate key") || strings.Contains(err.Error(), "23505") {
+				return domain.ErrAlreadyExist
+			}
 			return err
 		}
 
@@ -67,7 +69,7 @@ func (s *userService) CreateUser(user *domain.User) error {
 func (s *userService) Login(identifier, password string) (*domain.User, error) {
 	identifier = strings.ToLower(identifier)
 
-	user, err := s.repo.GetUserByUsernameOrEmail(identifier, identifier)
+	user, err := s.repo.GetUserByUsernameOrEmail(identifier, identifier, nil)
 	if err != nil {
 		return nil, domain.ErrWrongCredential
 	}
@@ -83,7 +85,7 @@ func (s *userService) Login(identifier, password string) (*domain.User, error) {
 }
 
 func (s *userService) GetUserByUsernameOrEmail(username, email string) (*domain.User, error) {
-	return s.repo.GetUserByUsernameOrEmail(strings.ToLower(username), strings.ToLower(email))
+	return s.repo.GetUserByUsernameOrEmail(strings.ToLower(username), strings.ToLower(email), nil)
 }
 
 func (s *userService) GetProfile(userID uint64) (*domain.UserProfileResponse, error) {

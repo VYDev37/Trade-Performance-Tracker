@@ -1,11 +1,10 @@
-
 "use client";
 
 import { useMemo } from "react";
 
 import { Skeleton } from "@/components/ui/skeleton";
-import { useUser } from "@/app/context/UserContext";
-import { useTransaction } from "@/app/context/TransactionContext";
+import { useUser } from "@/app/stores";
+import { useTransaction } from "@/app/stores";
 
 import { Formatter } from "@/app/lib";
 
@@ -17,15 +16,27 @@ interface UserStatValueProps {
     subfield?: "stock_balance" | "cash_balance";
     isCurrency?: boolean;
     useDynamicColor?: boolean;
+    selectedBroker?: string;
 }
 
-// TODO: Change unrealized PNL with realized PNL (from transactions)
-export default function UserStatValue({ field, subfield, isCurrency, useDynamicColor }: UserStatValueProps) {
-    const { user, isLoading } = useUser();
-    const { transactions, loading } = useTransaction();
+export default function UserStatValue({ field, subfield, isCurrency, useDynamicColor, selectedBroker = "all" }: UserStatValueProps) {
+    const user = useUser((state) => state.user);
+    const isLoadingUser = useUser((state) => state.isLoading);
+    const transactions = useTransaction((state) => state.transactions);
+    const loading = useTransaction((state) => state.loading);
+    const availableAccounts = useTransaction((state) => state.availableAccounts);
+
+    const filteredTransactions = useMemo(() => {
+        let list = transactions;
+        if (selectedBroker && selectedBroker !== "all") {
+            const [prov, accNo] = selectedBroker.split("-");
+            list = transactions.filter(t => t.provider === prov && t.account_no === accNo);
+        }
+        return list;
+    }, [transactions, selectedBroker]);
 
     const stats = useMemo(() => {
-        const transaction = transactions.filter(pos => pos.transaction_type === "sell");
+        const transaction = filteredTransactions.filter(pos => pos.transaction_type === "sell");
 
         const gainPositions = transaction
             .filter(pos => pos.realized_pnl >= 0)
@@ -45,10 +56,10 @@ export default function UserStatValue({ field, subfield, isCurrency, useDynamicC
             totalLoss,
             totalCount: transaction.length
         };
-    }, [user?.positions.items]);
+    }, [filteredTransactions]);
 
     let value: number | string;
-    if (isLoading || loading)
+    if (isLoadingUser || loading)
         return <span className="animate-pulse bg-white/10 rounded w-16 h-4 inline-block" />;
 
     switch (field) {
@@ -80,11 +91,25 @@ export default function UserStatValue({ field, subfield, isCurrency, useDynamicC
             value = stats.totalCount;
             break;
         case "balance":
-            const balanceData = user?.balance;
-            value = subfield ? (balanceData?.[subfield] || 0) : (user?.balance.stock_balance || 0);
+            if (selectedBroker && selectedBroker !== "all") {
+                const target = availableAccounts?.find(
+                    acc => `${acc.provider_name}-${acc.account_no}` === selectedBroker
+                );
+                value = target ? (target.amount || 0) : 0;
+            } else {
+                const balanceData = user?.balance;
+                value = subfield ? (balanceData?.[subfield] || 0) : (user?.balance.stock_balance || 0);
+            }
             break;
         case "total_equity":
-            value = user?.positions.total_equity || 0;
+            if (selectedBroker && selectedBroker !== "all") {
+                const items = (user?.positions.items || []).filter(
+                    p => `${p.provider}-${p.account_no}` === selectedBroker
+                );
+                value = items.reduce((acc, curr) => acc + (curr.current_price || 0), 0);
+            } else {
+                value = user?.positions.total_equity || 0;
+            }
             break;
         default:
             value = (user as any)?.[field] || 0;
@@ -97,14 +122,14 @@ export default function UserStatValue({ field, subfield, isCurrency, useDynamicC
     const hasSign = typeof value === "number" && !["total_equity", "balance", "positions_count", "winning_positions", "losing_positions", "temp_win_rate"].includes(field);
     const sign = hasSign && (value as number) > 0 ? "+" : "";
 
-    return (isLoading || loading) ? (
+    return (isLoadingUser || loading) ? (
         <Skeleton className="h-8 w-1/3 bg-slate-800 mb-6" />
     ) : (
         <span className={`font-bold ${colorClass}`}>
             {sign}
             {typeof value === "string" ? value
-                : field === "temp_win_rate" ? `${Formatter.toLocale(value)}%`
-                    : isCurrency ? Formatter.toCurrency(value) : Formatter.toLocale(value)}
+                : field === "temp_win_rate" ? `${Formatter.formatNumber(value)}%`
+                    : isCurrency ? Formatter.formatCurrency(value) : Formatter.formatNumber(value)}
         </span>
     );
 }

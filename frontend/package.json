@@ -17,6 +17,7 @@
     "html-to-image": "^1.11.13",
     "js-cookie": "^3.0.5",
     "jwt-decode": "^4.0.0",
+    "lightweight-charts": "^5.2.0",
     "lucide-react": "^0.563.0",
     "next": "16.1.6",
     "next-cloudinary": "^6.17.5",
@@ -27,7 +28,9 @@
     "react-markdown": "^10.1.0",
     "recharts": "^3.7.0",
     "swr": "^2.4.1",
-    "tailwind-merge": "^3.4.0"
+    "tailwind-merge": "^3.4.0",
+    "zod": "^4.4.3",
+    "zustand": "^5.0.13"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

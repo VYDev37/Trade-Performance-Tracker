@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
-import type { PortfolioItem } from '@/app/types/user/PortfolioInfo';
+import type { PortfolioItem } from '@/app/schemas/balance.schema';
 import { Formatter } from '@/app/lib';
 
 export interface PortfolioPieChartProps {
@@ -33,7 +33,7 @@ const CustomTooltip = ({ active, payload }: any) => {
                 <p className="text-white font-medium mb-1">{data.ticker}</p>
                 <div className="flex flex-col gap-1">
                     <span className="text-xs text-slate-300">
-                        Value: <span className="text-white font-medium ml-1">{Formatter.toCurrency(data.value)}</span>
+                        Value: <span className="text-white font-medium ml-1">{Formatter.formatCurrency(data.value)}</span>
                     </span>
                     <span className="text-xs text-slate-300">
                         Allocation: <span className="text-white font-medium ml-1">{data.percentage.toFixed(2)}%</span>
@@ -81,7 +81,7 @@ export default function PortfolioPieChart({ positions, isCapital }: PortfolioPie
             })),
             sumValue: total
         };
-    }, [positions]);
+    }, [positions, isCapital]);
 
     if (!chartData || chartData.length === 0) {
         return (
@@ -103,7 +103,7 @@ export default function PortfolioPieChart({ positions, isCapital }: PortfolioPie
                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none animate-in fade-in zoom-in duration-700">
                     <span className="text-slate-400 text-xs font-medium uppercase tracking-widest">Total Value</span>
                     <span className="text-white text-xs font-bold mt-1">
-                        {Formatter.toCurrency(sumValue)}
+                        {Formatter.formatCurrency(sumValue)}
                     </span>
                 </div>
                 <ResponsiveContainer width="100%" height="100%">

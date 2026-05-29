@@ -7,14 +7,15 @@ import {
 import { Button } from "@/components/ui/button";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 import { AppConfig } from "@/app/app.config";
-import { useUser } from "@/app/context/UserContext";
+import { useUser } from "@/app/stores";
 
 import {
     LayoutDashboard, TrendingUp, MessageSquareText, ArrowLeftRight,
-    User, Code2, LogOut, NotebookPen, Wallet2, LucideIcon, Calculator
+    User, Code2, LogOut, NotebookPen, Wallet2, LucideIcon, Calculator,
+    ChartBarIcon
 } from "lucide-react";
 
 interface SidebarMenus {
@@ -25,11 +26,13 @@ interface SidebarMenus {
 
 export default function AdminSidebar() {
     const pathname = usePathname();
-    const { logout } = useUser();
+    const router = useRouter();
+    const logout = useUser((state) => state.logout);
 
     const menus: SidebarMenus[] = [
         { label: "Dashboard", link: "/admin/dashboard", icon: LayoutDashboard },
         { label: "Stocks", link: "/admin/stocks", icon: TrendingUp },
+        { label: "Indonesian Market", link: "/admin/composite", icon: ChartBarIcon },
         { label: "AI Assistant", link: "/admin/assistant", icon: MessageSquareText },
         { label: "Financial Tracker", link: "/admin/tracker", icon: Wallet2 },
         { label: "My Journals", link: "/admin/journals", icon: NotebookPen },
@@ -55,7 +58,7 @@ export default function AdminSidebar() {
                     </SidebarGroupLabel>
                     <SidebarMenu className="px-3 gap-1">
                         {menus.map((menu) => {
-                            const isActive = pathname === menu.link;
+                            const isActive = pathname === menu.link || pathname.startsWith(menu.link + "/");
                             const Icon = menu.icon;
 
                             return (
@@ -79,7 +82,10 @@ export default function AdminSidebar() {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton asChild tooltip="Sign Out" className="h-11 w-full justify-start gap-3 px-4 text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors">
-                            <Button className="bg-transparent" onClick={logout}>
+                            <Button className="bg-transparent" onClick={() => {
+                                logout();
+                                router.push("/login");
+                            }}>
                                 <LogOut className="w-4 h-4" />
                                 <span className="font-medium group-data-[collapsible=icon]:hidden">Sign Out</span>
                             </Button>

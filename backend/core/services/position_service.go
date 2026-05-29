@@ -19,6 +19,7 @@ type PositionService interface {
 	GetPositions(userID uint64) ([]domain.Position, error)
 	GetPortfolio(userID uint64) (*domain.PortfolioResponse, error)
 	GetTickerCurrentPrice(ticker string) (float64, error)
+	MigratePositions(userID uint64, provider string, accountNo string) error
 }
 
 type positionService struct {
@@ -30,8 +31,20 @@ type positionService struct {
 	transactionService TransactionService
 }
 
-func NewPositionService(repo repositories.PositionRepository, uRepo repositories.UserRepository, provider providers.PriceProvider, transactionService TransactionService, balService BalanceService) PositionService {
-	return &positionService{repo: repo, uRepo: uRepo, provider: provider, transactionService: transactionService, balService: balService}
+func NewPositionService(
+	repo repositories.PositionRepository,
+	uRepo repositories.UserRepository,
+	provider providers.PriceProvider,
+	transactionService TransactionService,
+	balService BalanceService,
+) PositionService {
+	return &positionService{
+		repo:               repo,
+		uRepo:              uRepo,
+		provider:           provider,
+		transactionService: transactionService,
+		balService:         balService,
+	}
 }
 
 func (s *positionService) handleSellMode(existing *domain.Position, sellData *domain.Position, fee float64, tx *gorm.DB) error {
@@ -48,7 +61,7 @@ func (s *positionService) handleSellMode(existing *domain.Position, sellData *do
 		basePrice = existing.InvestedTotal
 	}
 
-	if err := s.balService.UpdateBalance(existing.OwnerID, sellData.InvestedTotal-fee, "stock_balance", tx); err != nil {
+	if err := s.balService.UpdateBalance(existing.OwnerID, sellData.InvestedTotal-fee, "stock_balance", sellData.Provider, sellData.AccountNo, tx); err != nil {
 		return domain.ErrInternalServerError
 	}
 
@@ -74,20 +87,26 @@ func (s *positionService) handleSellMode(existing *domain.Position, sellData *do
 		Action:    "sell",
 		Notes:     fmt.Sprintf("Sold %.f lot of %s for %s.", sellData.TotalQty, sellData.Ticker, format.FormatNumber(sellData.InvestedTotal)),
 		Title:     "",
+		Provider:  sellData.Provider,
+		AccountNo: sellData.AccountNo,
 	}, tx)
 }
 
 func (s *positionService) handleBuyMode(existing *domain.Position, buyData *domain.Position, fee float64, tx *gorm.DB) error {
-	balance, err := s.balService.GetBalanceByType(buyData.OwnerID, "stock_balance", tx)
+	accBal, err := s.balService.GetProviderAccount(buyData.OwnerID, "stock_balance", buyData.Provider, buyData.AccountNo, tx)
 	if err != nil {
 		return err
+	}
+	var balance float64
+	if accBal != nil {
+		balance = accBal.Amount
 	}
 
 	if balance < (buyData.InvestedTotal + fee) {
 		return domain.ErrInsufficientBalance
 	}
 
-	if err := s.balService.UpdateBalance(buyData.OwnerID, -(buyData.InvestedTotal + fee), "stock_balance", tx); err != nil {
+	if err := s.balService.UpdateBalance(buyData.OwnerID, -(buyData.InvestedTotal + fee), "stock_balance", buyData.Provider, buyData.AccountNo, tx); err != nil {
 		return err
 	}
 
@@ -117,6 +136,8 @@ func (s *positionService) handleBuyMode(existing *domain.Position, buyData *doma
 		Action:    "buy",
 		Notes:     fmt.Sprintf("Bought %.f lot of %s for %s.", buyData.TotalQty, buyData.Ticker, format.FormatNumber(buyData.InvestedTotal)),
 		Title:     "",
+		Provider:  buyData.Provider,
+		AccountNo: buyData.AccountNo,
 	}, tx)
 }
 
@@ -140,7 +161,7 @@ func (s *positionService) AddPosition(directionType string, pos *domain.Position
 
 	db := s.repo.GetDB()
 	return db.Transaction(func(tx *gorm.DB) error {
-		existing, err := s.repo.GetPosByTicker(pos.OwnerID, pos.Ticker, tx)
+		existing, err := s.repo.GetPosByTicker(pos.OwnerID, pos.Ticker, pos.Provider, pos.AccountNo, tx)
 		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 			return err
 		}
@@ -194,6 +215,8 @@ func (s *positionService) GetPortfolio(userID uint64) (*domain.PortfolioResponse
 			UnrealizedPnL:      unrealizedPnL,
 			PnLPercentage:      pnlPercentage,
 			UpdatedAt:          p.UpdatedAt,
+			Provider:           p.Provider,
+			AccountNo:          p.AccountNo,
 		})
 	}
 
@@ -205,4 +228,51 @@ func (s *positionService) GetPortfolio(userID uint64) (*domain.PortfolioResponse
 
 func (s *positionService) GetTickerCurrentPrice(ticker string) (float64, error) {
 	return s.provider.GetCurrentPrice(ticker)
+}
+
+func (s *positionService) MigratePositions(userID uint64, provider string, accountNo string) error {
+	db := s.repo.GetDB()
+	return db.Transaction(func(tx *gorm.DB) error {
+		positions, err := s.repo.GetPositions(userID)
+		if err != nil {
+			return err
+		}
+
+		for _, legacy := range positions {
+			if legacy.Provider != "" {
+				continue
+			}
+			existing, err := s.repo.GetPosByTicker(userID, legacy.Ticker, provider, accountNo, tx)
+			if err == nil {
+				existing.TotalQty += legacy.TotalQty
+				existing.InvestedTotal += legacy.InvestedTotal
+				if err := s.repo.UpdatePosition(existing, tx); err != nil {
+					return err
+				}
+				if err := s.repo.RemovePosition(legacy.ID, tx); err != nil {
+					return err
+				}
+			} else if errors.Is(err, gorm.ErrRecordNotFound) {
+				legacy.Provider = provider
+				legacy.AccountNo = accountNo
+				if err := s.repo.UpdatePosition(&legacy, tx); err != nil {
+					return err
+				}
+			} else {
+				return err
+			}
+		}
+
+		// Migrate legacy transactions (no provider and account_no, not "income" or "expense") to the new provider + account_no
+		if err := s.transactionService.MigrateTradingTransactions(userID, provider, accountNo, tx); err != nil {
+			return err
+		}
+
+		// Migrate Balance Records
+		if err := s.balService.MigrateBalances(userID, provider, accountNo, tx); err != nil {
+			return err
+		}
+
+		return nil
+	})
 }

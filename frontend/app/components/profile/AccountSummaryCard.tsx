@@ -1,6 +1,6 @@
 "use client";
 
-import type { UserProfile } from "@/app/types/user/UserInfo";
+import type { UserProfile } from "@/app/schemas/auth.schema.ts";
 import { axios, Formatter } from "@/app/lib";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -38,7 +38,7 @@ export default function AccountSummaryCard({ user }: AccountSummaryCardProps) {
             <CardHeader className="pb-4 border-b border-slate-800/50">
                 <CardTitle className="text-xl flex flex-col sm:flex-row text-white justify-between gap-4 sm:items-center">
                     <div className="w-full flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-                        {/* Section Kiri: User Info */}
+                        {/* Left section: User Info */}
                         <div className="flex items-center gap-3 min-w-0">
                             <div className="relative">
                                 <UserCircle className="h-10 w-10 shrink-0 text-blue-500" />
@@ -54,7 +54,7 @@ export default function AccountSummaryCard({ user }: AccountSummaryCardProps) {
                             </div>
                         </div>
 
-                        {/* Section Kanan: Action Buttons */}
+                        {/* Right section: buttons */}
                         <div className="flex flex-col sm:flex-row items-center gap-2 w-full lg:w-auto">
                             {/* Add Cash - Secondary Style */}
                             <ManageBalanceSheet mode="stock">
@@ -96,7 +96,7 @@ export default function AccountSummaryCard({ user }: AccountSummaryCardProps) {
                         <div className="min-w-0">
                             <p className="text-sm font-medium text-slate-400 mb-1 truncate">Stock Liquid Balance</p>
                             <p className="text-xl md:text-2xl font-bold text-white tracking-tight truncate">
-                                {Formatter.toCurrency(user.balance.stock_balance)}
+                                {Formatter.formatCurrency(user.balance.stock_balance)}
                             </p>
                         </div>
                     </div>
@@ -109,7 +109,7 @@ export default function AccountSummaryCard({ user }: AccountSummaryCardProps) {
                         <div className="min-w-0">
                             <p className="text-sm font-medium text-slate-400 mb-1 truncate">Total Equity</p>
                             <p className="text-xl md:text-2xl font-bold text-white tracking-tight truncate">
-                                {Formatter.toCurrency(user.positions.total_equity)}
+                                {Formatter.formatCurrency(user.positions?.total_equity)}
                             </p>
                         </div>
                     </div>

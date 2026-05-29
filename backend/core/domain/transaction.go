@@ -1,15 +1,7 @@
 package domain
 
-import (
-	"time"
-
-	"gorm.io/gorm"
-)
-
 type Transaction struct {
-	gorm.Model
-
-	ID              uint    `json:"id"`
+	BaseModel
 	OwnerID         uint64  `gorm:"not null;index" json:"owner_id"`
 	TransactionType string  `gorm:"not null;default:'buy'" json:"transaction_type"`
 	TransactionFee  float64 `gorm:"not null" json:"transaction_fee"`
@@ -17,10 +9,10 @@ type Transaction struct {
 	BasePrice       float64 `gorm:"not null" json:"base_price"`
 	Price           float64 `gorm:"not null" json:"price"`
 	Ticker          string  `gorm:"not null" json:"ticker"`
-	Title           string  `gorm:"type:varchar(50)" json:"title"`
-	Notes           string  `gorm:"type:varchar(255)" json:"notes"`
-
-	CreatedAt time.Time `json:"created_at"`
+	Title           string  `gorm:"type:varchar(255)" json:"title"`
+	Notes           string  `gorm:"type:text" json:"notes"`
+	Provider        string  `gorm:"type:varchar(50);index:idx_provider_account" json:"provider"`
+	AccountNo       string  `gorm:"type:varchar(50);index:idx_provider_account" json:"account_no"`
 }
 
 type TransactionResponse struct {

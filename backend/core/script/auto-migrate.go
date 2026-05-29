@@ -27,6 +27,7 @@ func main() {
 		&domain.Transaction{},
 		&domain.Note{},
 		&domain.Balance{},
+		&domain.Asset{},
 	); err != nil {
 		log.Fatalf("Failed to migrate database: %v.\n", err)
 	}

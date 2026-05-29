@@ -9,7 +9,7 @@ import { Formatter } from "@/app/lib";
 import { useRemoveNote } from "@/app/hooks/note";
 import { ConfirmModal, ImageBox, CustomDialog } from "@/app/components/shared";
 import { NoteSheet } from "@/app/components/journal";
-import type { JournalInfo } from "@/app/types/user/JournalInfo";
+import type { JournalInfo } from "@/app/schemas/journal.schema";
 
 import { MoreVertical, PenIcon, ImageIcon } from "lucide-react";
 import { useState } from "react";
@@ -91,7 +91,7 @@ export default function NoteCard({ note, onRefresh }: NoteCardProps) {
                                 {note.title}
                             </CardTitle>
                             <CardDescription className="text-[10px] md:text-xs text-zinc-500 font-medium">
-                                {Formatter.toDate(note.updated_at!)}
+                                {Formatter.formatDate(note.updated_at!)}
                             </CardDescription>
                         </CardHeader>
 

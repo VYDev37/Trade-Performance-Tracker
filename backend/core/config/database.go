@@ -52,7 +52,7 @@ func InitDBConnection(dbConnection string) (*gorm.DB, error) {
 	}
 
 	// if err := db.AutoMigrate(&domain.User{}, &domain.Position{},
-	// 	&domain.Transaction{}, &domain.Note{}, &domain.Balance{}); err != nil {
+	// 	&domain.Transaction{}, &domain.Note{}, &domain.Balance{}, &domain.Asset{}); err != nil {
 	// 	return nil, err
 	// }
 

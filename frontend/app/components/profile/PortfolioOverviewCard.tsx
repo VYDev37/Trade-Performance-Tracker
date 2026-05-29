@@ -1,4 +1,4 @@
-import type { PortfolioItem } from "@/app/types/user/PortfolioInfo";
+import type { PortfolioItem } from "@/app/schemas/balance.schema";
 import { Formatter } from "@/app/lib";
 import { useMemo } from "react";
 
@@ -65,15 +65,15 @@ export default function PortfolioOverviewCard({ portfolio }: PortfolioOverviewCa
                                         </div>
                                         <div>
                                             <p className="font-bold text-white tracking-wide">{item.ticker}</p>
-                                            <p className="text-xs text-slate-400 mt-1">{Formatter.toLocale(item.total_qty / 100)} lot</p>
+                                            <p className="text-xs text-slate-400 mt-1">{Formatter.formatNumber(item.total_qty / 100)} lot</p>
                                         </div>
                                     </div>
                                     <div className="text-right">
                                         <p className={`font-medium ${colorClass}`}>
-                                            {sign}{Formatter.toCurrency(item.unrealized_pnl)}
+                                            {sign}{Formatter.formatCurrency(item.unrealized_pnl)}
                                         </p>
                                         <p className={`text-xs ${colorClass}`}>
-                                            {sign}{Formatter.toLocale(item.pnl_percentage)}%
+                                            {sign}{Formatter.formatNumber(item.pnl_percentage)}%
                                         </p>
                                     </div>
                                 </div>

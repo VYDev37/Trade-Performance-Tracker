@@ -30,7 +30,7 @@ func (h *UserHandler) HandleRegister(c fiber.Ctx) error {
 	var req domain.UserRegisterReq
 
 	if err := c.Bind().Body(&req); err != nil {
-		return c.Status(400).JSON(fiber.Map{"message": "Failed to parse body."})
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"code": fiber.StatusBadRequest, "message": "Failed to parse body."})
 	}
 
 	user := &domain.User{
@@ -43,30 +43,30 @@ func (h *UserHandler) HandleRegister(c fiber.Ctx) error {
 	if err := h.validate.Struct(req); err != nil {
 		if validationErrors, ok := err.(validator.ValidationErrors); ok {
 			errFirst := validationErrors[0]
-			return c.Status(400).JSON(fiber.Map{"message": format.FormatError(errFirst)})
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"code": fiber.StatusBadRequest, "message": format.FormatError(errFirst)})
 		}
-		return c.Status(400).JSON(fiber.Map{"message": "Invalid request."})
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"code": fiber.StatusBadRequest, "message": "Invalid request."})
 	}
 
 	if err := h.service.CreateUser(user); err != nil {
 		return format.ErrorResponse(c, err)
 	}
 
-	return c.Status(200).JSON(fiber.Map{"message": "Registration success."})
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"code": fiber.StatusOK, "message": "Registration success."})
 }
 
 func (h *UserHandler) HandleLogin(c fiber.Ctx) error {
 	var req domain.UserLoginReq
 	if err := c.Bind().Body(&req); err != nil {
-		return c.Status(400).JSON(fiber.Map{"message": "Failed to parse body."})
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"code": fiber.StatusBadRequest, "message": "Failed to parse body."})
 	}
 
 	if err := h.validate.Struct(req); err != nil {
 		if validationErrors, ok := err.(validator.ValidationErrors); ok {
 			errFirst := validationErrors[0]
-			return c.Status(400).JSON(fiber.Map{"message": format.FormatError(errFirst)})
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"code": fiber.StatusBadRequest, "message": format.FormatError(errFirst)})
 		}
-		return c.Status(400).JSON(fiber.Map{"message": "Invalid request."})
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"code": fiber.StatusBadRequest, "message": "Invalid request."})
 	}
 
 	user, err := h.service.Login(req.Identifier, req.Password)
@@ -77,7 +77,7 @@ func (h *UserHandler) HandleLogin(c fiber.Ctx) error {
 	token, err := auth.GenerateToken(user.ID)
 	if err != nil {
 		log.Printf("Error when trying to generate token: %v.\n", err.Error())
-		return c.Status(500).JSON(fiber.Map{"message": "Internal server error."})
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"code": fiber.StatusInternalServerError, "message": "Internal server error."})
 	}
 
 	c.Cookie(&fiber.Cookie{
@@ -90,7 +90,7 @@ func (h *UserHandler) HandleLogin(c fiber.Ctx) error {
 		Path:     "/",
 	})
 
-	return c.Status(200).JSON(fiber.Map{"message": "Login success.", "token": token})
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"code": fiber.StatusOK, "message": "Login success.", "token": token})
 }
 
 func (h *UserHandler) HandleGetMe(c fiber.Ctx) error {
@@ -103,7 +103,7 @@ func (h *UserHandler) HandleGetMe(c fiber.Ctx) error {
 		return format.ErrorResponse(c, err)
 	}
 
-	return c.Status(200).JSON(fiber.Map{"data": res})
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"data": res})
 }
 
 func (h *UserHandler) Logout(c fiber.Ctx) error {
@@ -117,6 +117,7 @@ func (h *UserHandler) Logout(c fiber.Ctx) error {
 		Path:     "/",
 	})
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"code":    fiber.StatusOK,
 		"message": "Logged out from server",
 	})
 }

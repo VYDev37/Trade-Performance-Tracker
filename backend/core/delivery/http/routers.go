@@ -3,6 +3,7 @@ package http
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"trade-tracker/core/delivery/handlers"
 	"trade-tracker/core/services"
@@ -14,10 +15,20 @@ import (
 
 func InitRoutes(uService services.UserService, pService services.PositionService,
 	tService services.TransactionService, nService services.NoteService,
-	bService services.BalanceService, rService services.ReportService) *fiber.App {
+	bService services.BalanceService, rService services.ReportService, aService services.AssetService) *fiber.App {
 	app := fiber.New()
+	originsEnv := os.Getenv("ALLOW_ORIGINS")
+	var origins []string
+	if originsEnv != "" {
+		for _, o := range strings.Split(originsEnv, ",") {
+			origins = append(origins, strings.TrimSpace(o))
+		}
+	} else {
+		origins = []string{"http://localhost:3000", "https://tpt-v3.vercel.app"}
+	}
+
 	app.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3000"},
+		AllowOrigins:     origins,
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization", "X-Requested-With"},
 		AllowCredentials: true,
@@ -65,12 +76,14 @@ func InitRoutes(uService services.UserService, pService services.PositionService
 	positionApi.Post("/add/:type", positionService.HandleAddPosition)
 	positionApi.Get("/get-price/:ticker", positionService.HandleGetTickerMarketPrice)
 	positionApi.Get("/portfolio", positionService.HandleGetPortfolio)
+	positionApi.Post("/migrate", positionService.HandleMigratePositions)
 
 	trxApi := api.Group("/transactions", middleware.AuthMiddleware())
 	trxService := handlers.NewTransactionHandler(tService)
 
 	trxApi.Get("/my-info", trxService.HandleGetLocalTransaction)
 	trxApi.Put("/update/:id", trxService.HandleUpdateTransaction)
+	trxApi.Post("/migrate", trxService.HandleMigrateTransactions)
 
 	noteApi := api.Group("/notes", middleware.AuthMiddleware())
 	noteService := handlers.NewNoteHandler(nService)
@@ -84,11 +97,22 @@ func InitRoutes(uService services.UserService, pService services.PositionService
 	balanceService := handlers.NewBalanceHandler(bService)
 
 	balanceApi.Post("/update-balance", balanceService.HandleUpdateBalance)
+	balanceApi.Get("/accounts/:type", balanceService.HandleGetAccountsByType)
 
 	reportApi := api.Group("/report", middleware.AuthMiddleware())
 	reportService := handlers.NewReportHandler(rService)
 
 	reportApi.Get("/get", reportService.ExportProfile)
+
+	assetApi := api.Group("/asset", middleware.AuthMiddleware())
+	assetService := handlers.NewAssetHandler(aService)
+
+	assetApi.Get("/get-items", assetService.HandleGetAssets)
+	assetApi.Get("/get-item/:ticker", assetService.HandleGetAsset)
+	assetApi.Get("/get-chart/:ticker", assetService.HandleGetAssetChart)
+
+	workerGroup := app.Group("/worker")
+	workerGroup.Get("/update-prices", assetService.HandleUpdateStock)
 
 	return app
 }
