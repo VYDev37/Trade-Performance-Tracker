@@ -13,6 +13,7 @@ import { PaginationControls } from "@/app/components/shared";
 import { useUser } from "@/app/stores";
 import { useTransaction } from "@/app/stores";
 import { useAdminTable } from "@/app/hooks/table";
+import type { AvailableAccount, TransactionInfo } from "@/app/schemas/transaction.schema";
 
 export default function TransactionClient() {
     const error = useTransaction((state) => state.error);
@@ -24,6 +25,23 @@ export default function TransactionClient() {
 
     const user = useUser((state) => state.user);
 
+    const uniqueAccounts = useMemo(() => {
+        const accs: AvailableAccount[] = [];
+        const seen = new Set<string>();
+
+        (transactions || []).forEach(item => {
+            if (item.provider && item.account_no) {
+                const key = `${item.provider}-${item.account_no}`;
+                if (!seen.has(key)) {
+                    seen.add(key);
+                    accs.push({ provider_name: item.provider, account_no: item.account_no });
+                }
+            }
+        });
+        return accs;
+    }, [user]);
+
+
     const tableConfig = useMemo(() => ({
         itemsPerPage: 15,
         searchField: (item: any, term: string) => item.ticker.toLowerCase().includes(term),
@@ -32,7 +50,7 @@ export default function TransactionClient() {
             const timeB = b.created_at.getTime();
             return dir === "asc" ? timeA - timeB : timeB - timeA;
         },
-        filterFn: (t: any) => {
+        filterFn: (t: TransactionInfo) => {
             if (t.transaction_type === "income" || t.transaction_type === "expense") {
                 return false;
             }
@@ -46,8 +64,9 @@ export default function TransactionClient() {
                 }
             }
             // Provider filter
-            if (filterProvider !== "all" && t.provider !== filterProvider) {
-                return false;
+            if (filterProvider !== "all") {
+                const [provider, account_no] = filterProvider.split("-");
+                return provider === t.provider && account_no === t.account_no;
             }
             return true;
         }
@@ -88,7 +107,6 @@ export default function TransactionClient() {
                             <SelectGroup>
                                 <SelectItem value="all">All Transactions</SelectItem>
                                 <SelectItem value="stocks">Stocks</SelectItem>
-                                <SelectItem value="crypto">Crypto</SelectItem>
                                 <SelectItem value="cashflow">Cash Flow</SelectItem>
                             </SelectGroup>
                         </SelectContent>
@@ -102,17 +120,9 @@ export default function TransactionClient() {
                         <SelectContent className="bg-zinc-950 text-white border-white/10">
                             <SelectGroup>
                                 <SelectItem value="all">All Providers</SelectItem>
-                                <SelectItem value="BCA">BCA</SelectItem>
-                                <SelectItem value="SeaBank">SeaBank</SelectItem>
-                                <SelectItem value="Bank Mandiri">Mandiri</SelectItem>
-                                <SelectItem value="BRI">BRI</SelectItem>
-                                <SelectItem value="BNI">BNI</SelectItem>
-                                <SelectItem value="BSI">BSI</SelectItem>
-                                <SelectItem value="Bank Jago">Bank Jago</SelectItem>
-                                <SelectItem value="GoPay">GoPay</SelectItem>
-                                <SelectItem value="OVO">OVO</SelectItem>
-                                <SelectItem value="ShopeePay">ShopeePay</SelectItem>
-                                <SelectItem value="Broker">Broker</SelectItem>
+                                {uniqueAccounts && uniqueAccounts.map((item, id) => (
+                                    <SelectItem key={id} value={`${item.provider_name}-${item.account_no}`}>{item.provider_name} - {item.account_no}</SelectItem>
+                                ))}
                             </SelectGroup>
                         </SelectContent>
                     </Select>

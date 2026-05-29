@@ -34,9 +34,6 @@ export default function StockList() {
                 }
             }
         });
-
-        console.log(accs)
-
         return accs;
     }, [user]);
 
