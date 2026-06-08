@@ -8,12 +8,12 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 
 import { Card, CardContent } from "@/components/ui/card";
 
-import { TransactionTable, TransactionCard } from "@/app/components/transaction";
-import { PaginationControls } from "@/app/components/shared";
-import { useUser } from "@/app/stores";
-import { useTransaction } from "@/app/stores";
-import { useAdminTable } from "@/app/hooks/table";
-import type { AvailableAccount, TransactionInfo } from "@/app/schemas/transaction.schema";
+import { TransactionTable, TransactionCard } from "@/components/transaction";
+import { PaginationControls } from "@/components/shared";
+import { useUser } from "@/stores";
+import { useTransaction } from "@/stores";
+import { useAdminTable } from "@/hooks/table";
+import type { AvailableAccount, TransactionInfo } from "@/schemas/transaction.schema";
 
 export default function TransactionClient() {
     const error = useTransaction((state) => state.error);

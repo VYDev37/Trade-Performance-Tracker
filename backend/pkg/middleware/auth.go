@@ -43,7 +43,7 @@ func AuthMiddleware() fiber.Handler {
 				Path:     "/",
 				HTTPOnly: true,
 				Secure:   (os.Getenv("PRODUCTION_MODE") == "true"),
-				SameSite: "None",
+				SameSite: "Lax",
 			})
 			return c.Status(401).JSON(fiber.Map{"message": "Invalid token."})
 		}

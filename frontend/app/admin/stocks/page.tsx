@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { MoreHorizontal } from "lucide-react";
 
-import { StockAddPosition, StockChart, StockList } from "@/app/components/stock";
+import { StockAddPosition, StockChart, StockList } from "@/components/stock";
 import { Card } from "@/components/ui/card";
 
 interface StockParams {

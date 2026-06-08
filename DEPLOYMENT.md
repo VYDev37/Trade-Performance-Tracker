@@ -44,5 +44,5 @@ For more information, refer to [🛠️Environment Variables Setup](README.md#�
 
 When operating in production under this unified Vercel domain architecture, be mindful of the following parameters:
 
-*   **Cookie Security**: Because authentication seamlessly relies on HTTP-only cookies, you must ensure your production cookie generation is strictly configured with `Secure: true` and `SameSite: None` to comply with transmission standards over HTTPS.
+*   **Cookie Security**: Because authentication seamlessly relies on HTTP-only cookies, you must ensure your production cookie generation is strictly configured with `Secure: true` and `SameSite: Lax` to prevent Cross-Site Request Forgery (CSRF) attacks under a unified domain.
 *   **Cold Starts**: If deployed to the Vercel Hobby Tier, the underlying Go serverless functions are configured to scale down to zero during periods of inactivity. You should anticipate a temporary "Cold Start" delay of approximately 2-3 seconds on the very first subsequent `/api` request.

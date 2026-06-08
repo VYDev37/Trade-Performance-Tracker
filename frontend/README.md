@@ -20,49 +20,43 @@ This directory contains the Next.js frontend platform for the Trade Performance 
 
 ## 🧩 Architectural Modularization & Folder Structure
 
-The frontend leverages Next.js App Router conventions and features modular, domain-driven directories located in `app/`:
+The frontend leverages Next.js App Router conventions combined with root-level modular folders for separation of concerns:
 
-### 📂 Folder Conventions in `app/`
-
+### 📂 Routing (`app/`)
+The `app/` folder is strictly reserved for route layout, pages, and entry points:
 - **`app/(account)/`**: Authentication routes group.
-  - `loading.tsx`: Elegant shared card skeleton loader that renders during state changes.
-  - `login/` & `register/`: Split into pure **Server Component entrypoints** (`page.tsx` rendering SEO-compliant static meta headers) and modular, interactive **Client child components** (`LoginClient.tsx` & `RegisterClient.tsx`).
+  - `loading.tsx`: Elegant shared card skeleton loader.
+  - `login/` & `register/`: Pure **Server Component entrypoints** (`page.tsx`) rendering interactive **Client child components** (`LoginClient.tsx` & `RegisterClient.tsx`).
 - **`app/admin/`**: Secured dashboards and features layouts.
-  - `dashboard/`: Displaying unified stats and portfolios metrics cards.
-  - `stocks/`: Positions, real-time tickers list, equipped with dynamic metadata headers.
-  - `transactions/`: Complete transaction lists, paginated order histories, and audit filters.
-  - `profile/`: Credentials forms, asset allocation diagrams, and capital sheets.
-  - `journals/`: Formatted diary cards, notebook notes, and media attachments.
-  - `composite/[[...id]]/`: Real-time stock details, interactive charts, and core fundamentals on the IDX Composite Terminal.
-  - `calculator/` & `assistant/`: Position size selectors and AI copilot workspaces.
-- **`app/components/`**: Decomposed application components (scoped by business domain):
-  - `calculator/`: Interactive keys and display fields.
-  - `dashboard/`: Overall balance displays and charts grids.
-  - `journal/`: Inline notes forms and modal dialog boxes.
-  - `profile/`: Glassmorphism donut charts, managing cash sheets, and details widgets.
-  - `stock/`: Buying sheets, position listings, and trends sparklines.
-  - `terminal/`: High-performance charts adapters (candle/line lightweight charts).
-  - `tracker/`: Budgets, mobile-friendly cashflow structures, and columns layout.
-  - `trades/`: Trade performance results, custom shareable cards, and PnL forms.
-  - `transaction/`: Responsive history tables, mobile records cards, and actions.
-  - `user/`: Login/register inputs and forms wrappers.
-  - *Direct elements*: `AdminSidebar.tsx` (primary navigation layout) & `ThemeProvider.tsx` (system theme modes selector).
-- **`app/hooks/`**: Specialized React hooks abstracting API actions, caches, and states:
-  - `asset/`: IDX composite details and candle chart queries.
-  - `calculator/`: Formulas and evaluations helpers.
-  - `note/`: Journal fetchers, adders, modifiers, and deleters.
-  - `position/`: Holdings mutations and live-prices socket listeners.
-  - `table/`: Sorting and paginating helpers.
-  - `transaction/`: Historical lists queries and migrations handlers.
-  - `user/`: Auth session actions, registration flows, and profiles.
-- **`app/lib/`**: Network configurations and text formatters:
-  - `axios.ts`: Preconfigured axios instance routing to backend endpoints.
-  - `formatter.ts`: Currency conversion, dates, and number formatters.
-- **`app/schemas/`**: Strict runtime schema validators using Zod:
+  - `dashboard/`: Unified stats and portfolio metrics.
+  - `stocks/`: Holdings tracker with dynamic metadata routing.
+  - `transactions/`: Complete transaction logs and audit filters.
+  - `profile/`: Account setups, asset allocations, and balance sheets.
+  - `journals/`: Formatted trading journals list.
+  - `composite/[[...id]]/`: IDX Composite Terminal workspace and interactive charts.
+  - `calculator/` & `assistant/`: Position size calculator and AI copilot workspace.
+- **`app/layout.tsx`**: Root HTML layout context.
+- **`app/globals.css`**: Global design system typography, scrollbar, and Tailwind configuration layers.
+
+### 📂 Codebase & Shared Modules
+Non-route shared folders are kept in the root folder to prevent route clutter and maintain clean imports:
+- **`components/`**: Decomposed application UI components (scoped by business domain):
+  - `calculator/`, `dashboard/`, `journal/`, `profile/`, `stock/`, `terminal/`, `tracker/`, `trades/`, `transaction/`, `user/`
+  - `ui/`: Radix-based UI primitive components (buttons, dialogs, inputs, sheets).
+  - *Direct elements*: `AdminSidebar.tsx` (primary sidebar shell) & `ThemeProvider.tsx` (theme switcher).
+- **`hooks/`**: Custom React hooks abstracting API queries, states, and client interactions:
+  - `asset/`, `calculator/`, `note/`, `position/`, `table/`, `transaction/`, `user/`
+  - `use-mobile.ts`: Viewport responsiveness listener.
+- **`lib/`**: Network client instances and standard utilities:
+  - `axios.ts`: Pre-configured Axios instance.
+  - `formatter.ts`: Currency conversion, percentage ratios, and date/time formatters.
+  - `utils.ts`: Standard class-merging helper (`cn`).
+- **`schemas/`**: Strict runtime schema validators using Zod:
   - `asset.schema.ts`, `auth.schema.ts`, `balance.schema.ts`, `journal.schema.ts`, `transaction.schema.ts`
-- **`app/stores/`**: High-performance Zustand store handlers:
-  - `useUserStore.ts`: Dynamic user profiles and active accounts state.
-  - `useTransactionStore.ts`: Real-time synced list of transaction logs.
+- **`stores/`**: High-performance Zustand store handlers:
+  - `useUserStore.ts`: User profile configuration and account state.
+  - `useTransactionStore.ts`: Synced log of user transactions.
+- **`app.config.ts`**: Global configuration namespace (`AppConfig`) holding site metadata constants.
 
 ### 📦 Root UI Helpers
 

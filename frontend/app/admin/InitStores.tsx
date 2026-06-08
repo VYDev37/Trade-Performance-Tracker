@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { useUser, useTransaction } from "@/app/stores";
+import { useUser, useTransaction } from "@/stores";
 
 export default function InitStores() {
     const initUser = useUser((state) => state.init);

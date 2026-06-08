@@ -1,7 +1,7 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import AdminSidebar from "@/app/components/AdminSidebar";
+import AdminSidebar from "@/components/AdminSidebar";
 import InitStores from "@/app/admin/InitStores";
-import { MigrationModal } from "@/app/components/shared";
+import { MigrationModal } from "@/components/shared";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
     return (

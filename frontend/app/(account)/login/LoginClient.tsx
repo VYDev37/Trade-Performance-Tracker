@@ -1,9 +1,9 @@
 "use client"
 
 import { useState } from "react";
-import { useLogin } from "@/app/hooks";
+import { useLogin } from "@/hooks";
 import { useRouter } from "next/navigation";
-import { AuthForm } from "@/app/components/user";
+import { AuthForm } from "@/components/user";
 
 export default function LoginClient() {
     const [identifier, setIdentifier] = useState<string>("");

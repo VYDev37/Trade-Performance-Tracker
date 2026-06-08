@@ -4,14 +4,14 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { useAssets } from "@/app/hooks/asset";
+import { useAssets } from "@/hooks/asset";
 import {
     LogEntry, OrderBook, TickerList, HeaderSummary,
     TechnicalChart, FundamentalsGrid, FinancialTables
-} from "@/app/components/terminal";
+} from "@/components/terminal";
 import { useParams, useRouter } from "next/navigation";
-import { Searchbar } from "@/app/components/shared";
-import { AssetOverview } from "@/app/schemas/asset.schema";
+import { Searchbar } from "@/components/shared";
+import { AssetOverview } from "@/schemas/asset.schema";
 
 export default function CompositeClient({ initialId }: { initialId?: string[] }) {
     const params = useParams();

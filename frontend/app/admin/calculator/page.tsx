@@ -1,4 +1,4 @@
-import Calculator from "@/app/components/calculator/Calculator";
+import Calculator from "@/components/calculator/Calculator";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {

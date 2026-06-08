@@ -8,6 +8,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v3"
+	"github.com/microcosm-cc/bluemonday"
 )
 
 type NoteHandler struct {
@@ -41,6 +42,11 @@ func (h *NoteHandler) HandleAddNote(c fiber.Ctx) error {
 		}
 		return c.Status(400).JSON(fiber.Map{"message": "Invalid request."})
 	}
+
+	p := bluemonday.StrictPolicy()
+	req.Description = p.Sanitize(req.Description)
+	req.Title = p.Sanitize(req.Title)
+	req.Category = p.Sanitize(req.Category)
 
 	if err := h.service.AddNote(&domain.Note{
 		UserID:      uid,
@@ -79,6 +85,11 @@ func (h *NoteHandler) HandleUpdateNote(c fiber.Ctx) error {
 		}
 		return c.Status(400).JSON(fiber.Map{"message": "Invalid request."})
 	}
+
+	p := bluemonday.StrictPolicy()
+	req.Description = p.Sanitize(req.Description)
+	req.Title = p.Sanitize(req.Title)
+	req.Category = p.Sanitize(req.Category)
 
 	note := &domain.Note{
 		UserID:      uid,

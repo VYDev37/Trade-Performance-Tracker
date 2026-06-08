@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { AuthForm } from "@/app/components/user";
-import { useRegister } from "@/app/hooks";
+import { AuthForm } from "@/components/user";
+import { useRegister } from "@/hooks";
 
 export default function RegisterClient() {
     const [name, setName] = useState<string>("");

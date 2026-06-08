@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useGetNotes } from "@/app/hooks";
-import { NoteCard, NoteEmpty, NoteSheet } from "@/app/components/journal";
+import { useGetNotes } from "@/hooks";
+import { NoteCard, NoteEmpty, NoteSheet } from "@/components/journal";
 
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";

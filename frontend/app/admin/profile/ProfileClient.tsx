@@ -1,7 +1,7 @@
 "use client";
 
-import { useUser } from "@/app/stores";
-import { AccountSummaryCard, PortfolioOverviewCard } from "@/app/components/profile";
+import { useUser } from "@/stores";
+import { AccountSummaryCard, PortfolioOverviewCard } from "@/components/profile";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,7 +11,7 @@ import { UserCircle, AlertCircle } from "lucide-react";
 import dynamic from "next/dynamic";
 
 // Bundle optimization via dynamic imports (Section 5 compliant)
-const PortfolioPieChart = dynamic(() => import('@/app/components/profile/PortfolioPieChart'), {
+const PortfolioPieChart = dynamic(() => import('@/components/profile/PortfolioPieChart'), {
     ssr: false,
     loading: () => <Skeleton className="w-full h-[350px] bg-slate-900/40 rounded-2xl border border-white/10" />
 });

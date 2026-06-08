@@ -86,7 +86,7 @@ func (h *UserHandler) HandleLogin(c fiber.Ctx) error {
 		Expires:  time.Now().Add(24 * time.Hour),
 		HTTPOnly: true,
 		Secure:   os.Getenv("PRODUCTION_MODE") == "true",
-		SameSite: "None",
+		SameSite: "Lax",
 		Path:     "/",
 	})
 
@@ -113,7 +113,7 @@ func (h *UserHandler) Logout(c fiber.Ctx) error {
 		Expires:  time.Unix(0, 0),
 		HTTPOnly: true,
 		Secure:   (os.Getenv("PRODUCTION_MODE") == "true"),
-		SameSite: "None",
+		SameSite: "Lax",
 		Path:     "/",
 	})
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{

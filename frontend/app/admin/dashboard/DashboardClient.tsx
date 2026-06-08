@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { UserStatValue } from "@/app/components/dashboard";
+import { UserStatValue } from "@/components/dashboard";
 import { Card, CardTitle, CardHeader, CardContent } from "@/components/ui/card";
 import { buttonVariants } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useTransaction } from "@/app/stores";
+import { useTransaction } from "@/stores";
 
 import Link from "next/link";
 import {
@@ -110,11 +110,11 @@ export default function DashboardClient() {
                                     <div className="flex flex-col ml-5">
                                         <div className="text-sm text-zinc-400">{info.title}</div>
                                         <div className={`text-lg ${info.textColor ? colors[info.textColor] : "text-white"}`}>
-                                            <UserStatValue 
-                                                field={info.field as any} 
-                                                subfield={info.subfield} 
-                                                isCurrency={info.isCurrency} 
-                                                useDynamicColor={info.useDynamicColor} 
+                                            <UserStatValue
+                                                field={info.field as any}
+                                                subfield={info.subfield}
+                                                isCurrency={info.isCurrency}
+                                                useDynamicColor={info.useDynamicColor}
                                                 selectedBroker={selectedBroker}
                                             />
                                         </div>

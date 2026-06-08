@@ -71,7 +71,7 @@ Trade-Performance-Tracker/
 │   └── README.md               # Backend technical guide
 │
 ├── frontend/                   # Next.js Application
-│   ├── app/                    # Next.js App Router (Pages, layouts & states)
+│   ├── app/                    # Next.js App Router (Strictly route pages and layouts)
 │   │   ├── (account)/          # Auth routes (login, register) with Server/Client splits
 │   │   │   ├── loading.tsx     # Animated auth page skeleton loader
 │   │   │   ├── login/          # LoginPage Server parent + LoginClient interactive form
@@ -85,30 +85,48 @@ Trade-Performance-Tracker/
 │   │   │   ├── profile/        # Accounts management, asset splits & passwords
 │   │   │   ├── stocks/         # Holdings trackers with dynamic metadata routing
 │   │   │   └── transactions/   # Filterable logs, trade audits & fee records
-│   │   ├── components/         # Decomposition React UI components (scoped by domain)
-│   │   │   ├── calculator/     # Custom numeric pads and input screens
-│   │   │   ├── dashboard/      # Account balance widgets & charts cards
-│   │   │   ├── journal/        # Note editors & popup sheet displays
-│   │   │   ├── profile/        # Allocation charts & manage-balance side sheets
-│   │   │   ├── shared/         # Common Dialog wrappers, image boxes & modals
-│   │   │   ├── stock/          # Position selectors & custom charts
-│   │   │   ├── terminal/       # TradingView lightweight chart visualizers
-│   │   │   ├── tracker/        # Budgeting columns & mobile-friendly lists
-│   │   │   ├── trades/         # Performance modal wrappers & ROI sheets
-│   │   │   ├── transaction/    # Responsive table structures & data columns
-│   │   │   ├── user/           # Authentication controls & reusable input forms
-│   │   │   ├── AdminSidebar.tsx# Main navigation bar layout
-│   │   │   └── ThemeProvider.tsx# System theme contexts switcher
-│   │   ├── hooks/              # Domain-specific React hooks (user, notes, assets, etc.)
-│   │   ├── lib/                # Client config & formatters (axios.ts, formatter.ts)
-│   │   ├── schemas/            # Safe runtime validators enforced via Zod
-│   │   ├── stores/             # Global stores managed via Zustand (user, transactions)
+│   │   ├── favicon.ico         # App Favicon
+│   │   ├── globals.css         # Typography, tailwind layers & scroll themes
 │   │   ├── layout.tsx          # Root HTML frame & fonts binding
-│   │   └── globals.css         # Typography, tailwind layers & scroll themes
-│   ├── components/             # Reusable UI primitives
-│   │   └── ui/                 # Shadcn/ui core primitive components
-│   ├── hooks/                  # Global sidebar & device viewport helpers (use-mobile.ts)
-│   ├── lib/                    # Standard utilities framework (utils.ts)
+│   │   └── page.tsx            # Main landing page route entrypoint
+│   ├── components/             # Reusable UI components
+│   │   ├── calculator/         # Custom numeric pads and input screens
+│   │   ├── dashboard/          # Account balance widgets & charts cards
+│   │   ├── journal/            # Note editors & popup sheet displays
+│   │   ├── profile/            # Allocation charts & manage-balance side sheets
+│   │   ├── shared/             # Common Dialog wrappers, image boxes & modals
+│   │   ├── stock/              # Position selectors & custom charts
+│   │   ├── terminal/           # TradingView lightweight chart visualizers
+│   │   ├── tracker/            # Budgeting columns & mobile-friendly lists
+│   │   ├── trades/             # Performance modal wrappers & ROI sheets
+│   │   ├── transaction/        # Responsive table structures & data columns
+│   │   ├── ui/                 # Shadcn/ui core primitive components
+│   │   ├── user/               # Authentication controls & reusable input forms
+│   │   ├── AdminSidebar.tsx    # Main navigation bar layout
+│   │   └── ThemeProvider.tsx   # System theme contexts switcher
+│   ├── hooks/                  # Custom React hooks (domain-specific & viewport helpers)
+│   │   ├── asset/              # IDX composite details and candle chart queries
+│   │   ├── calculator/         # Formulas and evaluations helpers
+│   │   ├── note/               # Journal fetchers, adders, modifiers, and deleters
+│   │   ├── position/           # Holdings mutations and live-prices socket listeners
+│   │   ├── table/              # Sorting and paginating helpers
+│   │   ├── transaction/        # Historical lists queries and migrations handlers
+│   │   ├── use-mobile.ts       # Global viewport width detector helper
+│   │   └── user/               # Auth session actions, registration flows, and profiles
+│   ├── lib/                    # Standard utilities, formatting, and axios configurations
+│   │   ├── axios.ts            # Preconfigured axios instance routing to backend endpoints
+│   │   ├── formatter.ts        # Currency conversion, dates, and number formatters
+│   │   └── utils.ts            # Class merging utility (cn) helper
+│   ├── schemas/                # Safe runtime validators enforced via Zod
+│   │   ├── asset.schema.ts     # IDX asset data formats validation
+│   │   ├── auth.schema.ts      # Authentication models validation
+│   │   ├── balance.schema.ts   # Capital and balance transaction data validator
+│   │   ├── journal.schema.ts   # Journal logs and attachments validator
+│   │   └── transaction.schema.ts # Orders and trade executions validator
+│   ├── stores/                 # Global stores managed via Zustand
+│   │   ├── useTransactionStore.ts # Synced cache for user order histories
+│   │   └── useUserStore.ts     # Active profile context and authentication session store
+│   ├── app.config.ts           # App constant configuration options
 │   ├── public/                 # Static graphical assets & icons
 │   ├── tsconfig.json           # Compiler rules for TypeScript
 │   ├── next.config.ts          # Core Next.js configuration rules

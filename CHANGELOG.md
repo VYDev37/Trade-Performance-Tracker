@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.2] - 2026-06-08
+### Added
+- Added limiter and helmet on backend.
+- Improved Frontend Security (Hooks fetching, etc.).
+- Improved UI on Financial Tracker Page.
+- Added cron job for stock data updater.
+
+### Changed
+- Merged `@/app/lib` to `@/lib`
+- Merged `@/app/components` to `@/components`
+- Merged `@/app/hooks` to `@/hooks`
+- Merged `@/app/stores` to `@/stores`
+- Merged `@/app/schemas` to `@/schemas`
+- Merged `@/app/app.config.ts` to `@/app.config.ts`
+
 ## [0.3.1] - 2026-05-29
 ### Added
 - Added functionality to filter transaction by provider.

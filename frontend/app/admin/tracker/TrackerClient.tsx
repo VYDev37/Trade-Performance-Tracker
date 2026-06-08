@@ -4,10 +4,10 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ArrowDown, ArrowRightLeft, Sparkles } from 'lucide-react';
 import { useEffect, useState, useMemo } from 'react';
 
-import { useTransaction } from '@/app/stores';
+import { useTransaction } from '@/stores';
 
-import { TrackerHeader, TrackerSummary, TrackerTransactionColumn, TrackerCombinedColumn } from '@/app/components/tracker';
-import { TrackerMigrationModal } from '@/app/components/shared';
+import { TrackerHeader, TrackerSummary, TrackerTransactionColumn, TrackerCombinedColumn } from '@/components/tracker';
+import { TrackerMigrationModal } from '@/components/shared';
 
 export default function TrackerClient() {
     const refetch = useTransaction((state) => state.refetch);
@@ -53,7 +53,7 @@ export default function TrackerClient() {
         );
     }, [transactions]);
 
-    console.log(legacyCashTransactions);
+    //console.log(legacyCashTransactions);
 
     useEffect(() => {
         if (legacyCashTransactions.length > 0 && !hasAutoOpened && !loading) {

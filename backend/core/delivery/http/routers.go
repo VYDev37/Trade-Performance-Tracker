@@ -9,8 +9,12 @@ import (
 	"trade-tracker/core/services"
 	"trade-tracker/pkg/middleware"
 
+	"time"
+
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/middleware/cors"
+	"github.com/gofiber/fiber/v3/middleware/helmet"
+	"github.com/gofiber/fiber/v3/middleware/limiter"
 )
 
 func InitRoutes(uService services.UserService, pService services.PositionService,
@@ -27,6 +31,7 @@ func InitRoutes(uService services.UserService, pService services.PositionService
 		origins = []string{"http://localhost:3000", "https://tpt-v3.vercel.app"}
 	}
 
+	app.Use(helmet.New())
 	app.Use(cors.New(cors.Config{
 		AllowOrigins:     origins,
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"},
@@ -55,15 +60,28 @@ func InitRoutes(uService services.UserService, pService services.PositionService
 	})
 
 	api := app.Group(os.Getenv("API_GROUP_NAME"))
+	
+	// General Rate Limiter (100 reqs / min)
+	api.Use(limiter.New(limiter.Config{
+		Max:        100,
+		Expiration: 1 * time.Minute,
+	}))
+	
 	api.Get("/", func(c fiber.Ctx) error {
 		return c.SendString("Hello World!")
+	})
+
+	// Strict Auth Rate Limiter (5 reqs / 15 min)
+	authLimiter := limiter.New(limiter.Config{
+		Max:        5,
+		Expiration: 15 * time.Minute,
 	})
 
 	accountApi := api.Group("/account")
 	userService := handlers.NewUserHandler(uService)
 
-	accountApi.Post("/register", userService.HandleRegister)
-	accountApi.Post("/login", userService.HandleLogin)
+	accountApi.Post("/register", authLimiter, userService.HandleRegister)
+	accountApi.Post("/login", authLimiter, userService.HandleLogin)
 	accountApi.Post("/logout", userService.Logout)
 
 	userApi := api.Group("/user", middleware.AuthMiddleware())
